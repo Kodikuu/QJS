@@ -10,22 +10,14 @@ LIBS = \
 	deps/libmatoya.a \
 	deps/libquickjs.a
 
-FXCFLAGS = \
-	/O3 \
-	/Ges \
-	/nologo
-
 FLAGS = \
-	-O2
-
-LIB_FLAGS = \
-	/nologo
+	-Os
 
 
 CFLAGS = $(INCLUDES) $(FLAGS)
 
 all: clean $(OBJS)
-	@gcc $(OBJS) $(LIBS) $(INCLUDES) -lpthread -lm -ldl -o main
+	@gcc $(OBJS) $(LIBS) $(INCLUDES) -lpthread -lm -ldl -o main -flto
 	@chmod +x main
 	@rm src/*.o
 	@echo running main
