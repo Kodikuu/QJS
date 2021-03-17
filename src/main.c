@@ -1,6 +1,8 @@
 #include "matoya.h"
 #include "quickjs.h"
+
 #include "lib.h"
+#include "quickjs-libc.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -9,6 +11,8 @@ int main(void) {
 	printf("Start main.\n");
 	JSRuntime* runtime = JS_NewRuntime();
 	JSContext* ctx = JS_NewContext(runtime);
+	JS_AddModuleExport(ctx, js_init_module_std(ctx, "std"), "std");
+
 	JS_AddModuleExport(ctx, JS_INIT_MODULE(ctx, "libc"), "libc");
 
 	printf("Read main.js\n");
