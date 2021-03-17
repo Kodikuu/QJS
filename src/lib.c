@@ -1,11 +1,13 @@
 #include <stdio.h>
-#include "lib.h"
-
 #include <string.h>
 
-#define LIBFUNCTIONS 1
+#include "matoya.h"
+#include "quickjs.h"
 
-// example function for tic80's print()
+#include "lib.h"
+
+#define LIBFUNCTIONS 3
+
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     
     // Check arg list length
@@ -18,9 +20,35 @@ static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValue
     return JS_NewInt32(ctx, strlen(string)); // length of string
 }
 
+static JSValue js_mty_hostname(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    
+    // Check arg list length
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    printf(JS_ToCString(ctx, this_val));
+    const char* hostname = MTY_Hostname();
+    return JS_NewString(ctx, hostname);
+}
+
+static JSValue js_callback(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    // Check arg list length
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    JS_Call(ctx, argv[0], JS_UNDEFINED, 0, NULL);
+
+    return JS_NewInt32(ctx, 0);
+}
+
 // list of exported functions, the string is how they'll appear in the module
 static const JSCFunctionListEntry js_tic_funcs[] = {
-    JS_CFUNC_DEF("print", 1, js_print ),
+    JS_CFUNC_DEF("print", 1, js_print),
+    JS_CFUNC_DEF("MTY_Hostname", 0, js_mty_hostname),
+    JS_CFUNC_DEF("callback", 1, js_callback),
 };
 
 // initializes the module with the export functions list and it's length
