@@ -27,4 +27,4 @@ all: clean $(OBJS)
 
 clean: 
 	@rm -f src/*.o
-	@rm main
+	@rm -f main
