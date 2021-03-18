@@ -16,6 +16,7 @@ struct mtymain {
 };
 
 // Callbacks
+
 static bool appFunc(void* opaque) {
 	struct mtymain* mtyctx = (struct mtymain*)opaque;
 
@@ -33,7 +34,6 @@ static void eventFunc(const MTY_Event *evt, void *opaque) {
 
 
 // Functions to expose to JS
-#define LIBFUNCTIONS 4
 
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     
@@ -103,10 +103,12 @@ static const JSCFunctionListEntry js_tic_funcs[] = {
     JS_CFUNC_DEF("MTY_AppCreate", 2, js_mty_app_create),
 };
 
+static const int func_count = (int)(sizeof(js_tic_funcs)/sizeof(js_tic_funcs[0]));
+
 // initializes the module with the export functions list and it's length
 static int js_tic_init(JSContext *ctx, JSModuleDef *m)
 {
-    return JS_SetModuleExportList(ctx, m, js_tic_funcs, LIBFUNCTIONS);
+    return JS_SetModuleExportList(ctx, m, js_tic_funcs, func_count);
 }
 
 
@@ -117,6 +119,6 @@ JSModuleDef *JS_INIT_MODULE(JSContext *ctx, const char *module_name)
     m = JS_NewCModule(ctx, module_name, js_tic_init);
     if (!m)
         return NULL;
-    JS_AddModuleExportList(ctx, m, js_tic_funcs, LIBFUNCTIONS);
+    JS_AddModuleExportList(ctx, m, js_tic_funcs, func_count);
     return m;
 }
