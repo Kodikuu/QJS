@@ -36,6 +36,10 @@ static void eventFunc(const MTY_Event *evt, void *opaque) {
 // Functions to expose to JS
 
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    /*
+    Args (1); String (C const char*)
+    Returns; Int32 (JS Int32)
+    */
     
     // Check arg list length
     if (argc >= 2 || argc <= 0) {
@@ -48,6 +52,10 @@ static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValue
 }
 
 static JSValue js_mty_hostname(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    /*
+    Args (0); void
+    Returns; const char* (JS String)
+    */
     
     // Check arg list length
     if (argc != 0) {
@@ -60,6 +68,10 @@ static JSValue js_mty_hostname(JSContext* ctx, JSValueConst this_val, int argc, 
 }
 
 static JSValue js_callback(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    /*
+    Args (1); Function (C string)
+    Returns; Int32 (JS Int32)
+    */
 
     // Check arg list length
     if (argc != 1) {
@@ -72,6 +84,10 @@ static JSValue js_callback(JSContext* ctx, JSValueConst this_val, int argc, JSVa
 }
 
 static JSValue js_mty_app_create(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    /*
+    Args (2); Function, Function (C strings)
+    Returns; Pointer (JS Int64)
+    */
     
     // Check arg list length
     if (argc != 2) {
