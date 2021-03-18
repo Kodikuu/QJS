@@ -4,6 +4,7 @@ import * as std from 'std';
 import * as libc from 'libc';
 
 let glbl = "test";
+let eventnum = 0;
 
 function test() {
     std.printf("- [lib] - Callback Success\n");
@@ -11,7 +12,8 @@ function test() {
 }
 
 function event() {
-    std.printf("Ooh, an event");
+    eventnum += 1;
+    std.printf(`Ooh, an event; ${eventnum}\n`);
 }
 
 function runloop() {
@@ -25,6 +27,7 @@ libc.print("Let's use Matoya to find out what PC we're on;");
 libc.print("Calling libc.MTY_Hostname...");
 let hostname = libc.MTY_Hostname();
 
-libc.print(`We are running on ${hostname}.`);
+libc.print(`We are running on ${hostname}.\n`);
 
+libc.print("Now lets make a window that has an event loop.\n")
 libc.MTY_AppCreate(runloop, event);

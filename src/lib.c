@@ -77,10 +77,7 @@ static JSValue js_mty_app_create(JSContext* ctx, JSValueConst this_val, int argc
     if (argc != 2) {
         return JS_EXCEPTION;
     }
-
-    printf("Alloccing");
     struct mtymain *mtyctx = MTY_Alloc(1, sizeof(struct mtymain));
-    printf("configuring");
     mtyctx->appFuncJS = argv[0];
     mtyctx->eventFuncJS = argv[1];
     mtyctx->ctx = ctx;
@@ -89,14 +86,12 @@ static JSValue js_mty_app_create(JSContext* ctx, JSValueConst this_val, int argc
 	winDesc.width = 360;
 	winDesc.height = 180;
 
-    printf("Making");
     mtyctx->app = MTY_AppCreate(appFunc, eventFunc, mtyctx);
     long app = 1;
     mtyctx->window = MTY_WindowCreate(mtyctx->app, "Window", &winDesc);
     MTY_WindowSetGFX(mtyctx->app, mtyctx->window, MTY_GFX_GL, 0);
     MTY_AppRun(mtyctx->app);
 
-    printf("Returning");
     return JS_NewInt64(ctx, (int64_t)app);
 }
 
