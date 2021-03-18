@@ -180,7 +180,9 @@ static JSValue js_mty_app_run(JSContext* ctx, JSValueConst this_val, int argc, J
 // list of exported functions, the string is how they'll appear in the module
 static const JSCFunctionListEntry js_tic_funcs[] = {
     JS_CFUNC_DEF("print", 1, js_print),
+
     JS_CFUNC_DEF("MTY_Hostname", 0, js_mty_hostname),
+
     JS_CFUNC_DEF("MTY_CTXCreate", 2, js_mty_ctx_create),
     JS_CFUNC_DEF("MTY_AppCreate", 2, js_mty_app_create),
     JS_CFUNC_DEF("MTY_WindowCreate", 2, js_mty_window_create),
