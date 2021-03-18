@@ -67,22 +67,6 @@ static JSValue js_mty_hostname(JSContext* ctx, JSValueConst this_val, int argc, 
     return JS_NewString(ctx, hostname);
 }
 
-static JSValue js_callback(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    /*
-    Args (1); Function (C string)
-    Returns; Int32 (JS Int32)
-    */
-
-    // Check arg list length
-    if (argc != 1) {
-        return JS_EXCEPTION;
-    }
-
-    JS_Call(ctx, argv[0], JS_UNDEFINED, 0, NULL);
-
-    return JS_NewInt32(ctx, 0);
-}
-
 static JSValue js_mty_app_create(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
     Args (2); Function, Function (C strings)
@@ -107,7 +91,6 @@ static JSValue js_mty_app_create(JSContext* ctx, JSValueConst this_val, int argc
 static const JSCFunctionListEntry js_tic_funcs[] = {
     JS_CFUNC_DEF("print", 1, js_print),
     JS_CFUNC_DEF("MTY_Hostname", 0, js_mty_hostname),
-    JS_CFUNC_DEF("callback", 1, js_callback),
     JS_CFUNC_DEF("MTY_AppCreate", 2, js_mty_app_create),
 };
 

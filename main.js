@@ -3,13 +3,7 @@
 import * as std from 'std';
 import * as libc from 'libc';
 
-let glbl = "test";
 let eventnum = 0;
-
-function test() {
-    std.printf("- [lib] - Callback Success\n");
-    std.printf(`Hell yeah ${glbl}\n\n`);
-}
 
 function event() {
     eventnum += 1;
@@ -19,9 +13,6 @@ function event() {
 function runloop() {
     std.printf("Ever heard of loop hero?");
 }
-
-libc.print("Try out a callback")
-libc.callback(test);
 
 libc.print("Let's use Matoya to find out what PC we're on;");
 libc.print("Calling libc.MTY_Hostname...");
