@@ -59,6 +59,7 @@ static bool appFunc(void* opaque) {
 
 	return true;
 }
+
 static void eventFunc(const MTY_Event *evt, void *opaque) {
 	struct mtymain* mtyctx = (struct mtymain*)opaque;
 
@@ -77,7 +78,7 @@ static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValue
     */
     
     // Check arg list length
-    if (argc >= 2 || argc <= 0) {
+    if (argc != 1) {
         return JS_EXCEPTION;
     }
 
