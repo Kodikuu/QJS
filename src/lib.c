@@ -15,6 +15,41 @@ struct mtymain {
     JSValueConst eventFuncJS;
 };
 
+// Converters
+
+MTY_WindowDesc convMTY_WindowDesc(JSContext *ctx, JSValue object) {
+    MTY_WindowDesc winDesc = { 0 };
+
+    uint32_t tmpint;
+
+    JS_ToUint32(ctx, &tmpint, JS_GetPropertyStr(ctx, object, "position"));
+    winDesc.position = tmpint;
+    JS_ToUint32(ctx, &tmpint, JS_GetPropertyStr(ctx, object, "api"));
+    winDesc.api = tmpint;
+    JS_ToUint32(ctx, &tmpint, JS_GetPropertyStr(ctx, object, "width"));
+    winDesc.width = tmpint;
+    JS_ToUint32(ctx, &tmpint, JS_GetPropertyStr(ctx, object, "height"));
+    winDesc.height = tmpint;
+    JS_ToUint32(ctx, &tmpint, JS_GetPropertyStr(ctx, object, "minWidth"));
+    winDesc.minWidth = tmpint;
+    JS_ToUint32(ctx, &tmpint, JS_GetPropertyStr(ctx, object, "minHeight"));
+    winDesc.minHeight = tmpint;
+    JS_ToUint32(ctx, &tmpint, JS_GetPropertyStr(ctx, object, "x"));
+    winDesc.x = tmpint;
+    JS_ToUint32(ctx, &tmpint, JS_GetPropertyStr(ctx, object, "y"));
+    winDesc.y = tmpint;
+
+    double tmpflt;
+    JS_ToFloat64(ctx, &tmpflt, JS_GetPropertyStr(ctx, object, "maxHeight"));
+    winDesc.maxHeight = tmpflt;
+
+    winDesc.fullscreen = JS_ToBool(ctx, JS_GetPropertyStr(ctx, object, "fullscreen"));
+    winDesc.hidden = JS_ToBool(ctx, JS_GetPropertyStr(ctx, object, "hidden"));
+    winDesc.vsync = JS_ToBool(ctx, JS_GetPropertyStr(ctx, object, "vsync"));
+
+    return winDesc;
+}
+
 // Callbacks
 
 static bool appFunc(void* opaque) {
@@ -107,12 +142,12 @@ static JSValue js_mty_app_create(JSContext* ctx, JSValueConst this_val, int argc
 
 static JSValue js_mty_window_create(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
-    Args (2); Pointer, String (C *MTY_App, const char*)
+    Args (3); Pointer, String, Obj (C *MTY_App, const char*, MTY_WindowDesc)
     Returns; Int32 (JS Int32)
     */
     
     // Check arg list length
-    if (argc != 2) {
+    if (argc != 3) {
         return JS_EXCEPTION;
     }
 
@@ -120,9 +155,7 @@ static JSValue js_mty_window_create(JSContext* ctx, JSValueConst this_val, int a
     JS_ToInt64(ctx, &ptr, argv[0]);
     struct MTY_App *app = (struct MTY_App*)ptr;
 
-    MTY_WindowDesc winDesc = { 0 };
-	winDesc.width = 360;
-	winDesc.height = 180;
+    MTY_WindowDesc winDesc = convMTY_WindowDesc(ctx, argv[2]);
 
     MTY_Window window = MTY_WindowCreate(app, JS_ToCString(ctx, argv[1]), &winDesc);
 
