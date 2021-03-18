@@ -21,4 +21,9 @@ let hostname = libc.MTY_Hostname();
 libc.print(`We are running on ${hostname}.\n`);
 
 libc.print("Now lets make a window that has an event loop.\n")
-libc.MTY_AppCreate(runloop, event);
+
+let mtyctx = libc.MTY_CTXCreate(runloop, event);
+let mtyapp = libc.MTY_AppCreate(mtyctx);
+let mtywindow = libc.MTY_WindowCreate(mtyapp, "QJS");
+libc.MTY_WindowSetGFX(mtyapp, mtywindow, 1, 0);
+libc.MTY_AppRun(mtyapp);
