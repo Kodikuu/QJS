@@ -14,12 +14,38 @@ class MTY_WindowDesc {
         this.minHeight = 0
         this.x = 0
         this.y = 0
-        this.maxHeight = 0.0
-        this.fullscreen = 0
-        this.hidden = 0
-        this.vsync = 0
+        this.maxHeight = 0
+        this.fullscreen = true
+        this.hidden = false
+        this.vsync = false
     }
 
+}
+
+function convMTY_WindowDesc(obj) {
+    let ret = Array(10)
+    let intview = new Uint32Array(ret)
+
+    let array = Object.values(mtywindesc)
+    var i;
+
+    let ints = new Uint32Array(array).slice(0, 8)
+    for (i = 0; i < ints.length; i++) {
+        intview[i] = ints[i]
+    }
+
+    let floats = new Float32Array(array).slice(8, 9)
+    for (i = 0; i < floats.length; i++) {
+        intview[i+8] = floats[i]
+    }
+
+    let bools = new Uint8Array(array).slice(9, 12)
+    let tmpval = 0;
+    for (i = 0; i < bools.length; i++) {
+        tmpval = (tmpval<<4) + bools[i]
+    }
+    intview[9] = tmpval
+    return intview
 }
 
 let eventnum = 0;
@@ -41,8 +67,9 @@ int32View[1] = -1500000;
 
 let array = libc.array(int32View);
 let strarray = new Uint8Array(array)
-libc.print(String.fromCharCode.apply(null, strarray))
-libc.print("Clear!\n")
+// libc.print(String.fromCharCode.apply(null, strarray))
+array = 0;
+strarray = 0;
 
 libc.print("Let's use Matoya to find out what PC we're on;");
 libc.print("Calling libc.MTY_Hostname...");
@@ -57,10 +84,12 @@ let mtyapp = libc.MTY_AppCreate(mtyctx);
 
 let mtywindesc = new MTY_WindowDesc()
 mtywindesc.width = 800;
-mtywindesc.height = 450;
+mtywindesc.height = 700;
 mtywindesc.minWidth = 400;
-mtywindesc.fullscreen = 0;
+mtywindesc.fullscreen = 1;
+let descarray = Object.values(mtywindesc)
+let desc = convMTY_WindowDesc(descarray);
 
-let mtywindow = libc.MTY_WindowCreate(mtyapp, "QJS", mtywindesc);
+let mtywindow = libc.MTY_WindowCreate(mtyapp, "QJS", desc);
 libc.MTY_WindowSetGFX(mtyapp, mtywindow, 1, 0);
 libc.MTY_AppRun(mtyapp);

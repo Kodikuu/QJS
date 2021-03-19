@@ -192,9 +192,12 @@ static JSValue js_mty_window_create(JSContext* ctx, JSValueConst this_val, int a
     JS_ToInt64(ctx, &ptr, argv[0]);
     struct MTY_App *app = (struct MTY_App*)ptr;
 
-    MTY_WindowDesc winDesc = convMTY_WindowDesc(ctx, argv[2]);
+    size_t psize;
+    size_t size;
+    JSValue jsArray = JS_GetTypedArrayBuffer(ctx, argv[2], NULL, &size, NULL);
+    MTY_WindowDesc *winDesc = (MTY_WindowDesc *)JS_GetArrayBuffer(ctx, &psize, jsArray);
 
-    MTY_Window window = MTY_WindowCreate(app, JS_ToCString(ctx, argv[1]), &winDesc);
+    MTY_Window window = MTY_WindowCreate(app, JS_ToCString(ctx, argv[1]), winDesc);
 
     return JS_NewInt32(ctx, (int32_t)window);
 }
