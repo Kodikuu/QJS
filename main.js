@@ -19,14 +19,13 @@ class MTY_WindowDesc {
         this.hidden = false
         this.vsync = false
     }
-
 }
 
 function convMTY_WindowDesc(obj) {
     let ret = Array(10)
     let intview = new Uint32Array(ret)
 
-    let array = Object.values(mtywindesc)
+    let array = Object.values(obj)
     var i;
 
     let ints = new Uint32Array(array).slice(0, 8)
