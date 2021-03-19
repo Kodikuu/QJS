@@ -28,20 +28,15 @@ function convMTY_WindowDesc(obj) {
     let array = Object.values(obj)
     var i;
 
-    let ints = new Uint32Array(array).slice(0, 8)
-    for (i = 0; i < ints.length; i++) {
-        intview[i] = ints[i]
+    let part1 = new Uint32Array(array).slice(0, 9)
+    for (i = 0; i < part1.length; i++) {
+        intview[i] = part1[i]
     }
 
-    let floats = new Float32Array(array).slice(8, 9)
-    for (i = 0; i < floats.length; i++) {
-        intview[i+8] = floats[i]
-    }
-
-    let bools = new Uint8Array(array).slice(9, 12)
+    let part2 = new Uint8Array(array).slice(9, 12)
     let tmpval = 0;
-    for (i = 0; i < bools.length; i++) {
-        tmpval = (tmpval<<4) + bools[i]
+    for (i = 0; i < part2.length; i++) {
+        tmpval = (tmpval<<4) + part2[i]
     }
     intview[9] = tmpval
     return intview
