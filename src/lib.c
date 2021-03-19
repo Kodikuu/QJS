@@ -67,9 +67,41 @@ static void eventFunc(const MTY_Event *evt, void *opaque) {
 
 }
 
+// Utilities
+
+static void  FreeArray(JSRuntime *rt, void *opaque, void *ptr) {
+    printf("FREE'D SOMETHING");
+    MTY_Free(ptr);
+}
 
 
 // Functions to expose to JS
+
+static JSValue js_array(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    /*
+    Args (1); String (C const char*)
+    Returns; Int32 (JS Int32)
+    */
+    
+    // Check arg list length
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    JSValue jsArray = JS_GetTypedArrayBuffer(ctx, argv[0], NULL, NULL, NULL);
+
+    size_t psize;
+    uint32_t *Array = (uint32_t *)JS_GetArrayBuffer(ctx, &psize, jsArray);
+
+    printf("JS TypedArray in C; %d, %d\n", Array[0], Array[1]);
+
+
+    uint8_t *arr = (uint8_t *)MTY_ReadFile("main.js", &psize);
+
+    JSValue jsArrRet = JS_NewArrayBuffer(ctx, arr, psize, FreeArray, NULL, 0);
+
+    return jsArrRet; // length of string
+}
 
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
@@ -81,6 +113,10 @@ static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValue
     if (argc != 1) {
         return JS_EXCEPTION;
     }
+
+    // Experimentation with GC to confirm FreeArray works... It does work
+    JSRuntime *rt = JS_GetRuntime(ctx);
+    JS_RunGC(rt);
 
     const char* string = JS_ToCString(ctx, argv[0]);
     printf("- [lib] \"%s\"\n", string);
@@ -213,6 +249,7 @@ static JSValue js_mty_app_run(JSContext* ctx, JSValueConst this_val, int argc, J
 
 // list of exported functions, the string is how they'll appear in the module
 static const JSCFunctionListEntry js_tic_funcs[] = {
+    JS_CFUNC_DEF("array", 1, js_array),
     JS_CFUNC_DEF("print", 1, js_print),
 
     JS_CFUNC_DEF("MTY_Hostname", 0, js_mty_hostname),
