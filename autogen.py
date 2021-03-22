@@ -7,19 +7,54 @@ def StartSection(handle, name, mbrief):
     handle.write(f"\n// {name}\n")
     handle.write(f"// {mbrief}\n\n")
 
+def FindReturns(args):
+    rets = []
+    for idx, arg in enumerate(args):
+        atype = arg["type"]
+        if (("*" in atype and "const" not in atype) or ("**" in atype)) and idx:
+            rets.append(arg["name"])
+    return rets
+
+
 def StartFunction(handle, name, length):
     handle.write(f"static JSValue js_{name}(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv)")
     handle.write(" {\n")
     handle.write(f"    if (jsargc != {length})")
-    handle.write(" {\n        return JS_EXCEPTION;\n    }\n\n")
+    handle.write(" {\n        return JS_EXCEPTION;\n    }\n")
+    handle.write("\n    int64_t *tmpint;\n")
+    handle.write("    double *tmpflt;\n\n")
 
-def Declare(handle, arg):
+def Declare(handle, arg, idx):
     if "..." in arg["name"] or "void" in arg["name"]:
-        pass
-    elif "*" in arg["type"]:
-        handle.write(f'    {arg["type"]}{arg["name"]};\n')
+        return False
     else:
-        handle.write(f'    {arg["type"]} {arg["name"]};\n')
+        atype = arg["type"]
+        if (("*" in atype and "const" not in atype) or ("**" in atype)) and idx:
+            handle.write(f'    {arg["type"]} {arg["name"]};\n\n')
+
+        elif "int" in atype or "size_t" in atype or "MTY" in atype or "wchar_t" in atype or atype in ("const void *", "void *", "bool", "void **", "bool *"):
+            handle.write(f"    JS_ToInt64(jsctx, tmpint, jsargv[{idx}]);\n")
+            if "*" in atype:
+                handle.write(f'    {arg["type"]} {arg["name"]} = ({atype})tmpint;\n\n')
+            elif "**" in atype:
+                handle.write(f'    {arg["type"]} {arg["name"]} = &({atype})tmpint;\n\n')
+            else:
+                handle.write(f'    {arg["type"]} {arg["name"]} = ({atype})*tmpint;\n\n')
+        elif "float" in atype:
+            handle.write(f"    JS_ToFloat64(jsctx, tmpflt, jsargv[{idx}]);\n")
+            if "*" in atype:
+                handle.write(f'    {arg["type"]} {arg["name"]} = ({atype})tmpflt;\n\n')
+            else:
+                handle.write(f'    {arg["type"]} {arg["name"]} = ({atype})*tmpflt;\n\n')
+        elif "char" in atype:
+            if atype.count("*") == 2:
+                handle.write(f'    char * tmpstr = JS_ToCString(jsctx, jsargv[{idx}]);\n')
+                handle.write(f'    {arg["type"]} {arg["name"]} = &tmpstr;\n')
+            else:
+                handle.write(f'    {arg["type"]} {arg["name"]} = JS_ToCString(jsctx, jsargv[{idx}]);\n')
+        else:
+            handle.write(f'    {arg["type"]} {arg["name"]} = jsargv[{idx}];\n')
+    return True
 
 # Process
 
@@ -38,7 +73,9 @@ def Call(handle, name, args, type):
             handle.write(arg['name'])
     handle.write(f");\n")
 
-def Return(handle, type):
+def Return(handle, type, rets):
+    if rets:
+        handle.write(f"    // Rets: {rets}\n")
     if not type == "void":
         handle.write("    return JS_NewInt64(jsctx, ret);\n}\n\n")
     else:
@@ -90,18 +127,21 @@ if __name__ == "__main__":
             StartSection(target, name, section["mbrief"])
 
             for function in section["functions"]:
-                if "JNIEnv" in function["name"]: # FIXME - JNIEnv stubs not defined
+                if "JNIEnv" in function["name"] or "MTY_VsprintfD" in function["name"]: # FIXME - JNIEnv stubs not defined
                     continue
                 functions.append([function["name"], len(function["args"]), f"js_{function['name']}"])
-                StartFunction(target, function["name"], len(function["args"]))
+                rets = FindReturns(function["args"])
+                StartFunction(target, function["name"], len(function["args"]) - len(rets))
 
+                idx = 0
                 for arg in function["args"]:
-                    Declare(target, arg)
+                    if Declare(target, arg, idx):
+                        idx += 1
 
                 newline(target)
                 Call(target, function["name"], function["args"], function["type"])
 
-                Return(target, function["type"])
+                Return(target, function["type"], rets)
         
         Boilerplate(target, functions)
 
