@@ -22,8 +22,8 @@ extern "C" {
 #endif
 
 
-//- module Version
-//- mdesc `libmatoya` version constants and helper functions.
+//- #module Version
+//- #mbrief `libmatoya` version information.
 
 #define MTY_VERSION         4
 #define MTY_VERSION_STRING  "v4"
@@ -33,8 +33,8 @@ MTY_EXPORT uint32_t
 MTY_Version(void);
 
 
-//- module Audio
-//- mdesc Simple audio playback.
+//- #module Audio
+//- #mbrief Simple audio playback.
 
 typedef struct MTY_Audio MTY_Audio;
 
@@ -54,8 +54,8 @@ MTY_EXPORT void
 MTY_AudioQueue(MTY_Audio *ctx, const int16_t *frames, uint32_t count);
 
 
-//- module Image
-//- mdesc Image compression and cropping. Program icons.
+//- #module Image
+//- #mbrief Image compression and cropping. Program icons.
 
 typedef enum {
 	MTY_IMAGE_PNG     = 1,
@@ -78,8 +78,8 @@ MTY_EXPORT void *
 MTY_GetProgramIcon(const char *path, uint32_t *width, uint32_t *height);
 
 
-//- module Crypto
-//- mdesc Common cryptography tasks.
+//- #module Crypto
+//- #mbrief Common cryptography tasks.
 
 #define MTY_SHA1_SIZE      20
 #define MTY_SHA1_HEX_MAX   48
@@ -97,7 +97,7 @@ typedef enum {
 } MTY_Algorithm;
 
 MTY_EXPORT uint32_t
-MTY_CRC32(const void *data, size_t size);
+MTY_CRC32(uint32_t crc, const void *data, size_t size);
 
 MTY_EXPORT uint32_t
 MTY_DJB2(const char *str);
@@ -140,8 +140,8 @@ MTY_AESGCMDecrypt(MTY_AESGCM *ctx, const void *nonce, const void *cipherText, si
 	const void *hash, void *plainText);
 
 
-//- module File
-//- mdesc Simple filesystem helpers.
+//- #module File
+//- #mbrief Simple filesystem helpers.
 
 #define MTY_URL_MAX  1024
 #define MTY_PATH_MAX 1280
@@ -223,8 +223,8 @@ MTY_EXPORT void
 MTY_LockFileDestroy(MTY_LockFile **lock);
 
 
-//- module JSON
-//- mdesc JSON parsing and construction.
+//- #module JSON
+//- #mbrief JSON parsing and construction.
 
 typedef struct MTY_JSON MTY_JSON;
 
@@ -370,8 +370,8 @@ MTY_EXPORT void
 MTY_JSONArraySetNull(MTY_JSON *json, uint32_t index);
 
 
-//- module Log
-//- mdesc Add logs, set logging callback, and log getters.
+//- #module Log
+//- #mbrief Add logs, set logging callback, and log getters.
 
 #define MTY_Log(msg, ...) \
 	MTY_LogParams(__FUNCTION__, msg, ##__VA_ARGS__)
@@ -397,8 +397,8 @@ MTY_EXPORT const char *
 MTY_GetLog(void);
 
 
-//- module Memory
-//- mdesc Memory allocation and manipulation.
+//- #module Memory
+//- #mbrief Memory allocation and manipulation.
 
 #define MTY_MIN(a, b) \
 	((a) > (b) ? (b) : (a))
@@ -493,8 +493,8 @@ MTY_EXPORT void
 MTY_Sort(void *base, size_t nElements, size_t size, MTY_CompareFunc func);
 
 
-//- module System
-//- mdesc Process and OS related functions.
+//- #module System
+//- #mbrief Process and OS related functions.
 
 typedef struct MTY_SO MTY_SO;
 
@@ -530,6 +530,9 @@ MTY_GetPlatform(void);
 MTY_EXPORT uint32_t
 MTY_GetPlatformNoWeb(void);
 
+MTY_EXPORT bool
+MTY_Supported(void);
+
 MTY_EXPORT const char *
 MTY_VersionString(uint32_t platform);
 
@@ -557,9 +560,12 @@ MTY_GetRunOnStartup(const char *name);
 MTY_EXPORT void
 MTY_SetRunOnStartup(const char *name, const char *path, const char *args);
 
+MTY_EXPORT void *
+MTY_JNIEnv(void);
 
-//- module Render
-//- mdesc Simple wrapped common rendering tasks.
+
+//- #module Render
+//- #mbrief Common rendering tasks.
 
 typedef struct MTY_Device MTY_Device;
 typedef struct MTY_Context MTY_Context;
@@ -629,23 +635,23 @@ typedef struct {
 typedef struct {
 	float x;
 	float y;
-} MTY_Vec2;
+} MTY_Point;
 
 typedef struct {
 	float x;
 	float y;
-	float z;
-	float w;
-} MTY_Vec4;
+	float r;
+	float b;
+} MTY_Rect;
 
 typedef struct {
-	MTY_Vec2 pos;
-	MTY_Vec2 uv;
+	MTY_Point pos;
+	MTY_Point uv;
 	uint32_t col;
 } MTY_Vtx;
 
 typedef struct {
-	MTY_Vec4 clip;
+	MTY_Rect clip;
 	uint32_t texture;
 	uint32_t elemCount;
 	uint32_t idxOffset;
@@ -665,7 +671,7 @@ typedef struct {
 } MTY_CmdList;
 
 typedef struct {
-	MTY_Vec2 displaySize;
+	MTY_Point displaySize;
 	MTY_CmdList *cmdList;
 	uint32_t cmdListLength;
 	uint32_t cmdListMax;
@@ -710,8 +716,8 @@ MTY_EXPORT void
 MTY_FreeRenderState(MTY_RenderState **state);
 
 
-//- module Struct
-//- mdesc Simple data structures.
+//- #module Struct
+//- #mbrief Simple data structures.
 
 typedef struct MTY_Hash MTY_Hash;
 typedef struct MTY_Queue MTY_Queue;
@@ -804,8 +810,8 @@ MTY_EXPORT void *
 MTY_ListRemove(MTY_List *ctx, MTY_ListNode *node);
 
 
-//- module Thread
-//- mdesc Thread creation and synchronization, atomics.
+//- #module Thread
+//- #mbrief Thread creation and synchronization, atomics.
 
 typedef struct MTY_Thread MTY_Thread;
 typedef struct MTY_Mutex MTY_Mutex;
@@ -951,8 +957,8 @@ MTY_EXPORT void
 MTY_GlobalUnlock(MTY_Atomic32 *lock);
 
 
-//- module Time
-//- mdesc High precision timestamp and sleep.
+//- #module Time
+//- #mbrief High precision timestamp and sleep.
 
 typedef int64_t MTY_Time;
 
@@ -972,8 +978,8 @@ MTY_EXPORT void
 MTY_RevertTimerResolution(uint32_t res);
 
 
-//- module App
-//- mdesc Application, window, and input management.
+//- #module App
+//- #mbrief Application, window, and input management.
 
 #define MTY_WINDOW_MAX 8
 
@@ -1018,7 +1024,7 @@ typedef enum {
 	MTY_EVENT_QUIT         = 2,
 	MTY_EVENT_SHUTDOWN     = 3,
 	MTY_EVENT_FOCUS        = 4,
-	MTY_EVENT_KEYBOARD     = 5,
+	MTY_EVENT_KEY          = 5,
 	MTY_EVENT_HOTKEY       = 6,
 	MTY_EVENT_TEXT         = 7,
 	MTY_EVENT_SCROLL       = 8,
@@ -1349,7 +1355,7 @@ typedef struct MTY_Event {
 		MTY_PenEvent pen;
 		MTY_KeyEvent key;
 
-		const char *arg;
+		const char *reopenArg;
 		uint32_t hotkey;
 		uint32_t trayID;
 		char text[8];
@@ -1364,6 +1370,7 @@ typedef struct {
 } MTY_MenuItem;
 
 typedef struct {
+	const char *title;
 	MTY_Position position;
 	MTY_GFX api;
 	uint32_t width;
@@ -1491,26 +1498,17 @@ MTY_AppGetInputMode(MTY_App *ctx);
 MTY_EXPORT void
 MTY_AppSetInputMode(MTY_App *ctx, MTY_Input mode);
 
-MTY_EXPORT void
-MTY_HotkeyToString(MTY_Mod mod, MTY_Key key, char *str, size_t len);
-
-MTY_EXPORT void
-MTY_SetAppID(const char *id);
-
-MTY_EXPORT void *
-MTY_GLGetProcAddress(const char *name);
-
-MTY_EXPORT void *
-MTY_JNIEnv(void);
-
 MTY_EXPORT MTY_Window
-MTY_WindowCreate(MTY_App *app, const char *title, const MTY_WindowDesc *desc);
+MTY_WindowCreate(MTY_App *app, const MTY_WindowDesc *desc);
 
 MTY_EXPORT void
 MTY_WindowDestroy(MTY_App *app, MTY_Window window);
 
 MTY_EXPORT bool
 MTY_WindowGetSize(MTY_App *app, MTY_Window window, uint32_t *width, uint32_t *height);
+
+MTY_EXPORT void
+MTY_WindowGetPosition(MTY_App *app, MTY_Window window, int32_t *x, int32_t *y);
 
 MTY_EXPORT bool
 MTY_WindowGetScreenSize(MTY_App *app, MTY_Window window, uint32_t *width, uint32_t *height);
@@ -1575,9 +1573,21 @@ MTY_WindowSetGFX(MTY_App *app, MTY_Window window, MTY_GFX api, bool vsync);
 MTY_EXPORT MTY_GFXState
 MTY_WindowGFXState(MTY_App *app, MTY_Window window);
 
+MTY_EXPORT void
+MTY_HotkeyToString(MTY_Mod mod, MTY_Key key, char *str, size_t len);
 
-//- module Dialog
-//- mdesc Stock dialog boxes provided by the OS.
+MTY_EXPORT void
+MTY_SetAppID(const char *id);
+
+MTY_EXPORT void
+MTY_PrintEvent(const MTY_Event *evt);
+
+MTY_EXPORT void *
+MTY_GLGetProcAddress(const char *name);
+
+
+//- #module Dialog
+//- #mbrief Stock dialog boxes provided by the OS.
 
 MTY_EXPORT bool
 MTY_HasDialogs(void);
@@ -1586,8 +1596,8 @@ MTY_EXPORT void
 MTY_MessageBox(const char *title, const char *fmt, ...);
 
 
-//- module Net
-//- mdesc HTTP/HTTPS, WebSocket support.
+//- #module Net
+//- #mbrief HTTP/HTTPS, WebSocket support.
 
 typedef struct MTY_WebSocket MTY_WebSocket;
 
@@ -1656,8 +1666,8 @@ MTY_EXPORT uint16_t
 MTY_WebSocketGetCloseCode(MTY_WebSocket *ctx);
 
 
-//- module TLS
-//- mdesc TLS/DTLS protocol wrapper.
+//- #module TLS
+//- #mbrief TLS/DTLS protocol wrapper.
 
 #define MTY_FINGERPRINT_MAX (MTY_SHA256_HEX_MAX + 40)
 
