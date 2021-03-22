@@ -72,9 +72,19 @@ let hostname = libc.MTY_Hostname();
 
 libc.print(`We are running on ${hostname}.\n`);
 
-libc.print("Print MTY_Version output from autobindings")
-let name = mty.MTY_Version();
-libc.print(name.ret)
+libc.print("Does main.js exist?")
+let name = mty.MTY_FileExists("main.js");
+libc.print(name.ret == 1)
+
+libc.print("")
+libc.print("Does main.go exist?")
+name = mty.MTY_FileExists("main.go");
+libc.print(name.ret == 1)
+
+libc.print("")
+libc.print("How big is main.js?")
+let size = mty.MTY_ReadFile("main.js")
+libc.print(size.size)
 
 libc.print("\nNow lets make a window that has an event loop.\n")
 
