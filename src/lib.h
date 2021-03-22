@@ -1,5 +1,7 @@
-#include "quickjs.h"
+#include <stdio.h>
+#include <string.h>
 
-#define JS_INIT_MODULE js_init_module
+#include "quickjs.h"
+#include "matoya.h"
 
 JSModuleDef *JS_INIT_MODULE(JSContext*, const char*);

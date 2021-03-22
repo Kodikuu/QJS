@@ -1,16 +1,10 @@
-#include <stdio.h>
-#include <string.h>
-
-#include "matoya.h"
-#include "quickjs.h"
-
 #include "lib.h"
 
 struct mtymain {
 	MTY_Window window;
 	MTY_App *app;
 
-    JSContext * ctx;
+    JSContext *ctx;
     JSValueConst appFuncJS;
     JSValueConst eventFuncJS;
 };
@@ -196,8 +190,9 @@ static JSValue js_mty_window_create(JSContext* ctx, JSValueConst this_val, int a
     size_t size;
     JSValue jsArray = JS_GetTypedArrayBuffer(ctx, argv[2], NULL, &size, NULL);
     MTY_WindowDesc *winDesc = (MTY_WindowDesc *)JS_GetArrayBuffer(ctx, &psize, jsArray);
-
-    MTY_Window window = MTY_WindowCreate(app, JS_ToCString(ctx, argv[1]), winDesc);
+    
+    // MTY_Window window = MTY_WindowCreate(app, JS_ToCString(ctx, argv[1]), winDesc);
+    MTY_Window window = MTY_WindowCreate(app, winDesc);
 
     return JS_NewInt32(ctx, (int32_t)window);
 }
