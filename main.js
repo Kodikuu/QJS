@@ -2,6 +2,7 @@
 // the module can later be imported like this by a .js file, but only if it's evaluated as a module!
 import * as std from 'std';
 import * as libc from 'libc';
+import * as mty from 'mty';
 
 //MTY_WindowDesc Class
 class MTY_WindowDesc {
@@ -71,7 +72,11 @@ let hostname = libc.MTY_Hostname();
 
 libc.print(`We are running on ${hostname}.\n`);
 
-libc.print("Now lets make a window that has an event loop.\n")
+libc.print("Print MTY_Version output from autobindings")
+let name = mty.MTY_Version();
+libc.print(name.ret)
+
+libc.print("\nNow lets make a window that has an event loop.\n")
 
 let mtyctx = libc.MTY_CTXCreate(runloop, event);
 let mtyapp = libc.MTY_AppCreate(mtyctx);

@@ -4,6 +4,8 @@
 #include "lib.h"
 #include "quickjs-libc.h"
 
+#include "libmatoya.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -15,6 +17,7 @@ int main(void) {
 	JS_AddModuleExport(ctx, js_init_module_std(ctx, "std"), "std");
 
 	JS_AddModuleExport(ctx, JS_INIT_MODULE(ctx, "libc"), "libc");
+	JS_AddModuleExport(ctx, JS_INIT_MODULE_MTY(ctx, "mty"), "mty");
 
 	printf("Read main.js\n");
 	size_t size;
