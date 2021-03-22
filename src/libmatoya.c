@@ -4,7 +4,7 @@
 // `libmatoya` version information.
 
 static JSValue js_MTY_Version(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -13,7 +13,9 @@ static JSValue js_MTY_Version(JSContext* jsctx, JSValueConst this_val, int jsarg
 
 
     int64_t ret = (int64_t)MTY_Version();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 
@@ -39,7 +41,9 @@ static JSValue js_MTY_AudioCreate(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_AudioCreate(sampleRate, minBuffer, maxBuffer);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AudioDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -55,7 +59,8 @@ static JSValue js_MTY_AudioDestroy(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_AudioDestroy(audio);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AudioGetQueued(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -71,7 +76,9 @@ static JSValue js_MTY_AudioGetQueued(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_AudioGetQueued(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AudioReset(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -87,7 +94,8 @@ static JSValue js_MTY_AudioReset(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_AudioReset(ctx);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AudioQueue(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -109,7 +117,8 @@ static JSValue js_MTY_AudioQueue(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_AudioQueue(ctx, frames, count);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 
@@ -140,8 +149,11 @@ static JSValue js_MTY_CompressImage(JSContext* jsctx, JSValueConst this_val, int
 
 
     int64_t ret = (int64_t)MTY_CompressImage(type, input, width, height, outputSize);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "outputSize", JS_NewInt64(jsctx, (int64_t)outputSize));
     // Rets: ['outputSize']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_DecompressImage(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -164,8 +176,12 @@ static JSValue js_MTY_DecompressImage(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_DecompressImage(input, size, width, height);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "width", JS_NewInt64(jsctx, (int64_t)width));
+    JS_SetPropertyStr(jsctx, retval, "height", JS_NewInt64(jsctx, (int64_t)height));
     // Rets: ['width', 'height']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_CropImage(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -191,8 +207,12 @@ static JSValue js_MTY_CropImage(JSContext* jsctx, JSValueConst this_val, int jsa
 
 
     int64_t ret = (int64_t)MTY_CropImage(image, cropWidth, cropHeight, width, height);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "width", JS_NewInt64(jsctx, (int64_t)width));
+    JS_SetPropertyStr(jsctx, retval, "height", JS_NewInt64(jsctx, (int64_t)height));
     // Rets: ['width', 'height']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_GetProgramIcon(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -210,8 +230,12 @@ static JSValue js_MTY_GetProgramIcon(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_GetProgramIcon(path, width, height);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "width", JS_NewInt64(jsctx, (int64_t)width));
+    JS_SetPropertyStr(jsctx, retval, "height", JS_NewInt64(jsctx, (int64_t)height));
     // Rets: ['width', 'height']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 
@@ -237,7 +261,9 @@ static JSValue js_MTY_CRC32(JSContext* jsctx, JSValueConst this_val, int jsargc,
 
 
     int64_t ret = (int64_t)MTY_CRC32(crc, data, size);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_DJB2(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -251,7 +277,9 @@ static JSValue js_MTY_DJB2(JSContext* jsctx, JSValueConst this_val, int jsargc, 
     const char * str = JS_ToCString(jsctx, jsargv[0]);
 
     int64_t ret = (int64_t)MTY_DJB2(str);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_BytesToHex(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -275,8 +303,10 @@ static JSValue js_MTY_BytesToHex(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_BytesToHex(bytes, size, hex, hexSize);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "hex", JS_NewInt64(jsctx, (int64_t)hex));
     // Rets: ['hex']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_HexToBytes(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -295,8 +325,10 @@ static JSValue js_MTY_HexToBytes(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_HexToBytes(hex, bytes, size);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "bytes", JS_NewInt64(jsctx, (int64_t)bytes));
     // Rets: ['bytes']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_BytesToBase64(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -320,8 +352,10 @@ static JSValue js_MTY_BytesToBase64(JSContext* jsctx, JSValueConst this_val, int
 
 
     MTY_BytesToBase64(bytes, size, b64, b64Size);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "b64", JS_NewInt64(jsctx, (int64_t)b64));
     // Rets: ['b64']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_CryptoHash(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -354,8 +388,10 @@ static JSValue js_MTY_CryptoHash(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_CryptoHash(algo, input, inputSize, key, keySize, output, outputSize);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "output", JS_NewInt64(jsctx, (int64_t)output));
     // Rets: ['output']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_CryptoHashFile(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -383,8 +419,11 @@ static JSValue js_MTY_CryptoHashFile(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_CryptoHashFile(algo, path, key, keySize, output, outputSize);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "output", JS_NewInt64(jsctx, (int64_t)output));
     // Rets: ['output']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_RandomBytes(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -403,7 +442,8 @@ static JSValue js_MTY_RandomBytes(JSContext* jsctx, JSValueConst this_val, int j
 
 
     MTY_RandomBytes(output, size);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_RandomUInt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -422,7 +462,9 @@ static JSValue js_MTY_RandomUInt(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_RandomUInt(minVal, maxVal);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AESGCMCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -438,7 +480,9 @@ static JSValue js_MTY_AESGCMCreate(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_AESGCMCreate(key);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AESGCMDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -454,7 +498,8 @@ static JSValue js_MTY_AESGCMDestroy(JSContext* jsctx, JSValueConst this_val, int
 
 
     MTY_AESGCMDestroy(aesgcm);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AESGCMEncrypt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -483,8 +528,12 @@ static JSValue js_MTY_AESGCMEncrypt(JSContext* jsctx, JSValueConst this_val, int
 
 
     int64_t ret = (int64_t)MTY_AESGCMEncrypt(ctx, nonce, plainText, size, hash, cipherText);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "hash", JS_NewInt64(jsctx, (int64_t)hash));
+    JS_SetPropertyStr(jsctx, retval, "cipherText", JS_NewInt64(jsctx, (int64_t)cipherText));
     // Rets: ['hash', 'cipherText']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AESGCMDecrypt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -514,8 +563,11 @@ static JSValue js_MTY_AESGCMDecrypt(JSContext* jsctx, JSValueConst this_val, int
 
 
     int64_t ret = (int64_t)MTY_AESGCMDecrypt(ctx, nonce, cipherText, size, hash, plainText);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "plainText", JS_NewInt64(jsctx, (int64_t)plainText));
     // Rets: ['plainText']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 
@@ -535,8 +587,11 @@ static JSValue js_MTY_ReadFile(JSContext* jsctx, JSValueConst this_val, int jsar
 
 
     int64_t ret = (int64_t)MTY_ReadFile(path, size);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "size", JS_NewInt64(jsctx, (int64_t)size));
     // Rets: ['size']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WriteFile(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -556,11 +611,13 @@ static JSValue js_MTY_WriteFile(JSContext* jsctx, JSValueConst this_val, int jsa
 
 
     int64_t ret = (int64_t)MTY_WriteFile(path, data, size);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WriteTextFile(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 3) {
+    if (jsargc != 2) {
         return JS_EXCEPTION;
     }
 
@@ -571,11 +628,13 @@ static JSValue js_MTY_WriteTextFile(JSContext* jsctx, JSValueConst this_val, int
     const char * fmt = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_WriteTextFile(path, fmt);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppendTextToFile(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 3) {
+    if (jsargc != 2) {
         return JS_EXCEPTION;
     }
 
@@ -586,7 +645,9 @@ static JSValue js_MTY_AppendTextToFile(JSContext* jsctx, JSValueConst this_val, 
     const char * fmt = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_AppendTextToFile(path, fmt);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_DeleteFile(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -600,7 +661,9 @@ static JSValue js_MTY_DeleteFile(JSContext* jsctx, JSValueConst this_val, int js
     const char * path = JS_ToCString(jsctx, jsargv[0]);
 
     int64_t ret = (int64_t)MTY_DeleteFile(path);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_FileExists(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -614,7 +677,9 @@ static JSValue js_MTY_FileExists(JSContext* jsctx, JSValueConst this_val, int js
     const char * path = JS_ToCString(jsctx, jsargv[0]);
 
     int64_t ret = (int64_t)MTY_FileExists(path);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Mkdir(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -628,7 +693,9 @@ static JSValue js_MTY_Mkdir(JSContext* jsctx, JSValueConst this_val, int jsargc,
     const char * path = JS_ToCString(jsctx, jsargv[0]);
 
     int64_t ret = (int64_t)MTY_Mkdir(path);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Path(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -643,7 +710,9 @@ static JSValue js_MTY_Path(JSContext* jsctx, JSValueConst this_val, int jsargc, 
     const char * file = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_Path(dir, file);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_CopyFile(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -658,7 +727,9 @@ static JSValue js_MTY_CopyFile(JSContext* jsctx, JSValueConst this_val, int jsar
     const char * dst = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_CopyFile(src, dst);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_MoveFile(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -673,7 +744,9 @@ static JSValue js_MTY_MoveFile(JSContext* jsctx, JSValueConst this_val, int jsar
     const char * dst = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_MoveFile(src, dst);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_GetDir(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -689,7 +762,9 @@ static JSValue js_MTY_GetDir(JSContext* jsctx, JSValueConst this_val, int jsargc
 
 
     int64_t ret = (int64_t)MTY_GetDir(dir);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_GetFileName(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -706,7 +781,9 @@ static JSValue js_MTY_GetFileName(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_GetFileName(path, extension);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_GetFileList(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -721,7 +798,9 @@ static JSValue js_MTY_GetFileList(JSContext* jsctx, JSValueConst this_val, int j
     const char * filter = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_GetFileList(path, filter);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_FreeFileList(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -737,7 +816,8 @@ static JSValue js_MTY_FreeFileList(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_FreeFileList(fileList);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_LockFileCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -754,7 +834,9 @@ static JSValue js_MTY_LockFileCreate(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_LockFileCreate(path, mode);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_LockFileDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -770,7 +852,8 @@ static JSValue js_MTY_LockFileDestroy(JSContext* jsctx, JSValueConst this_val, i
 
 
     MTY_LockFileDestroy(lock);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 
@@ -788,7 +871,9 @@ static JSValue js_MTY_JSONParse(JSContext* jsctx, JSValueConst this_val, int jsa
     const char * input = JS_ToCString(jsctx, jsargv[0]);
 
     int64_t ret = (int64_t)MTY_JSONParse(input);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONReadFile(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -802,7 +887,9 @@ static JSValue js_MTY_JSONReadFile(JSContext* jsctx, JSValueConst this_val, int 
     const char * path = JS_ToCString(jsctx, jsargv[0]);
 
     int64_t ret = (int64_t)MTY_JSONReadFile(path);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONDuplicate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -818,11 +905,13 @@ static JSValue js_MTY_JSONDuplicate(JSContext* jsctx, JSValueConst this_val, int
 
 
     int64_t ret = (int64_t)MTY_JSONDuplicate(json);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObj(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -831,11 +920,13 @@ static JSValue js_MTY_JSONObj(JSContext* jsctx, JSValueConst this_val, int jsarg
 
 
     int64_t ret = (int64_t)MTY_JSONObj();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONArray(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -844,7 +935,9 @@ static JSValue js_MTY_JSONArray(JSContext* jsctx, JSValueConst this_val, int jsa
 
 
     int64_t ret = (int64_t)MTY_JSONArray();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -860,7 +953,8 @@ static JSValue js_MTY_JSONDestroy(JSContext* jsctx, JSValueConst this_val, int j
 
 
     MTY_JSONDestroy(json);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONStringify(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -876,7 +970,9 @@ static JSValue js_MTY_JSONStringify(JSContext* jsctx, JSValueConst this_val, int
 
 
     int64_t ret = (int64_t)MTY_JSONStringify(json);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONWriteFile(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -893,7 +989,9 @@ static JSValue js_MTY_JSONWriteFile(JSContext* jsctx, JSValueConst this_val, int
 
 
     int64_t ret = (int64_t)MTY_JSONWriteFile(path, json);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONLength(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -909,7 +1007,9 @@ static JSValue js_MTY_JSONLength(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_JSONLength(json);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjKeyExists(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -926,7 +1026,9 @@ static JSValue js_MTY_JSONObjKeyExists(JSContext* jsctx, JSValueConst this_val, 
     const char * key = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_JSONObjKeyExists(json, key);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjGetKey(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -945,7 +1047,9 @@ static JSValue js_MTY_JSONObjGetKey(JSContext* jsctx, JSValueConst this_val, int
 
 
     int64_t ret = (int64_t)MTY_JSONObjGetKey(json, index);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjDeleteKey(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -962,7 +1066,8 @@ static JSValue js_MTY_JSONObjDeleteKey(JSContext* jsctx, JSValueConst this_val, 
     const char * key = JS_ToCString(jsctx, jsargv[1]);
 
     MTY_JSONObjDeleteKey(json, key);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONObjGet(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -979,7 +1084,9 @@ static JSValue js_MTY_JSONObjGet(JSContext* jsctx, JSValueConst this_val, int js
     const char * key = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_JSONObjGet(json, key);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjSet(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -999,7 +1106,8 @@ static JSValue js_MTY_JSONObjSet(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_JSONObjSet(json, key, value);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONArrayIndexExists(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1018,7 +1126,9 @@ static JSValue js_MTY_JSONArrayIndexExists(JSContext* jsctx, JSValueConst this_v
 
 
     int64_t ret = (int64_t)MTY_JSONArrayIndexExists(json, index);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONArrayDeleteIndex(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1037,7 +1147,8 @@ static JSValue js_MTY_JSONArrayDeleteIndex(JSContext* jsctx, JSValueConst this_v
 
 
     MTY_JSONArrayDeleteIndex(json, index);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONArrayGet(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1056,7 +1167,9 @@ static JSValue js_MTY_JSONArrayGet(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_JSONArrayGet(json, index);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONArraySet(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1078,7 +1191,8 @@ static JSValue js_MTY_JSONArraySet(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_JSONArraySet(json, index, value);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONArrayAppend(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1097,7 +1211,8 @@ static JSValue js_MTY_JSONArrayAppend(JSContext* jsctx, JSValueConst this_val, i
 
 
     MTY_JSONArrayAppend(json, value);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONObjGetString(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1119,8 +1234,11 @@ static JSValue js_MTY_JSONObjGetString(JSContext* jsctx, JSValueConst this_val, 
 
 
     int64_t ret = (int64_t)MTY_JSONObjGetString(json, key, val, size);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjGetInt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1139,8 +1257,11 @@ static JSValue js_MTY_JSONObjGetInt(JSContext* jsctx, JSValueConst this_val, int
 
 
     int64_t ret = (int64_t)MTY_JSONObjGetInt(json, key, val);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjGetUInt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1159,8 +1280,11 @@ static JSValue js_MTY_JSONObjGetUInt(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_JSONObjGetUInt(json, key, val);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjGetInt8(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1179,8 +1303,11 @@ static JSValue js_MTY_JSONObjGetInt8(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_JSONObjGetInt8(json, key, val);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjGetUInt8(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1199,8 +1326,11 @@ static JSValue js_MTY_JSONObjGetUInt8(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_JSONObjGetUInt8(json, key, val);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjGetInt16(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1219,8 +1349,11 @@ static JSValue js_MTY_JSONObjGetInt16(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_JSONObjGetInt16(json, key, val);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjGetUInt16(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1239,8 +1372,11 @@ static JSValue js_MTY_JSONObjGetUInt16(JSContext* jsctx, JSValueConst this_val, 
 
 
     int64_t ret = (int64_t)MTY_JSONObjGetUInt16(json, key, val);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjGetFloat(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1259,8 +1395,11 @@ static JSValue js_MTY_JSONObjGetFloat(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_JSONObjGetFloat(json, key, val);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjGetBool(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1279,8 +1418,11 @@ static JSValue js_MTY_JSONObjGetBool(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_JSONObjGetBool(json, key, val);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjValIsNull(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1297,7 +1439,9 @@ static JSValue js_MTY_JSONObjValIsNull(JSContext* jsctx, JSValueConst this_val, 
     const char * key = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_JSONObjValIsNull(json, key);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONObjSetString(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1315,7 +1459,8 @@ static JSValue js_MTY_JSONObjSetString(JSContext* jsctx, JSValueConst this_val, 
     const char * val = JS_ToCString(jsctx, jsargv[2]);
 
     MTY_JSONObjSetString(json, key, val);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONObjSetInt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1335,7 +1480,8 @@ static JSValue js_MTY_JSONObjSetInt(JSContext* jsctx, JSValueConst this_val, int
 
 
     MTY_JSONObjSetInt(json, key, val);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONObjSetUInt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1355,7 +1501,8 @@ static JSValue js_MTY_JSONObjSetUInt(JSContext* jsctx, JSValueConst this_val, in
 
 
     MTY_JSONObjSetUInt(json, key, val);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONObjSetFloat(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1375,7 +1522,8 @@ static JSValue js_MTY_JSONObjSetFloat(JSContext* jsctx, JSValueConst this_val, i
 
 
     MTY_JSONObjSetFloat(json, key, val);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONObjSetBool(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1395,7 +1543,8 @@ static JSValue js_MTY_JSONObjSetBool(JSContext* jsctx, JSValueConst this_val, in
 
 
     MTY_JSONObjSetBool(json, key, val);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONObjSetNull(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1412,7 +1561,8 @@ static JSValue js_MTY_JSONObjSetNull(JSContext* jsctx, JSValueConst this_val, in
     const char * key = JS_ToCString(jsctx, jsargv[1]);
 
     MTY_JSONObjSetNull(json, key);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONArrayGetString(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1436,8 +1586,11 @@ static JSValue js_MTY_JSONArrayGetString(JSContext* jsctx, JSValueConst this_val
 
 
     int64_t ret = (int64_t)MTY_JSONArrayGetString(json, index, val, size);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONArrayGetInt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1458,8 +1611,11 @@ static JSValue js_MTY_JSONArrayGetInt(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_JSONArrayGetInt(json, index, val);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONArrayGetUInt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1480,8 +1636,11 @@ static JSValue js_MTY_JSONArrayGetUInt(JSContext* jsctx, JSValueConst this_val, 
 
 
     int64_t ret = (int64_t)MTY_JSONArrayGetUInt(json, index, val);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONArrayGetFloat(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1502,8 +1661,11 @@ static JSValue js_MTY_JSONArrayGetFloat(JSContext* jsctx, JSValueConst this_val,
 
 
     int64_t ret = (int64_t)MTY_JSONArrayGetFloat(json, index, val);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONArrayGetBool(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1524,8 +1686,11 @@ static JSValue js_MTY_JSONArrayGetBool(JSContext* jsctx, JSValueConst this_val, 
 
 
     int64_t ret = (int64_t)MTY_JSONArrayGetBool(json, index, val);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "val", JS_NewInt64(jsctx, (int64_t)val));
     // Rets: ['val']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONArrayValIsNull(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1544,7 +1709,9 @@ static JSValue js_MTY_JSONArrayValIsNull(JSContext* jsctx, JSValueConst this_val
 
 
     int64_t ret = (int64_t)MTY_JSONArrayValIsNull(json, index);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_JSONArraySetString(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1564,7 +1731,8 @@ static JSValue js_MTY_JSONArraySetString(JSContext* jsctx, JSValueConst this_val
     const char * val = JS_ToCString(jsctx, jsargv[2]);
 
     MTY_JSONArraySetString(json, index, val);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONArraySetInt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1586,7 +1754,8 @@ static JSValue js_MTY_JSONArraySetInt(JSContext* jsctx, JSValueConst this_val, i
 
 
     MTY_JSONArraySetInt(json, index, val);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONArraySetUInt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1608,7 +1777,8 @@ static JSValue js_MTY_JSONArraySetUInt(JSContext* jsctx, JSValueConst this_val, 
 
 
     MTY_JSONArraySetUInt(json, index, val);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONArraySetFloat(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1630,7 +1800,8 @@ static JSValue js_MTY_JSONArraySetFloat(JSContext* jsctx, JSValueConst this_val,
 
 
     MTY_JSONArraySetFloat(json, index, val);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONArraySetBool(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1652,7 +1823,8 @@ static JSValue js_MTY_JSONArraySetBool(JSContext* jsctx, JSValueConst this_val, 
 
 
     MTY_JSONArraySetBool(json, index, val);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_JSONArraySetNull(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1671,7 +1843,8 @@ static JSValue js_MTY_JSONArraySetNull(JSContext* jsctx, JSValueConst this_val, 
 
 
     MTY_JSONArraySetNull(json, index);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 
@@ -1693,8 +1866,10 @@ static JSValue js_MTY_SetLogFunc(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_SetLogFunc(func, opaque);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "opaque", JS_NewInt64(jsctx, (int64_t)opaque));
     // Rets: ['opaque']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_DisableLog(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1710,11 +1885,12 @@ static JSValue js_MTY_DisableLog(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_DisableLog(disabled);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_LogParams(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 3) {
+    if (jsargc != 2) {
         return JS_EXCEPTION;
     }
 
@@ -1725,11 +1901,12 @@ static JSValue js_MTY_LogParams(JSContext* jsctx, JSValueConst this_val, int jsa
     const char * msg = JS_ToCString(jsctx, jsargv[1]);
 
     MTY_LogParams(func, msg);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_FatalParams(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 3) {
+    if (jsargc != 2) {
         return JS_EXCEPTION;
     }
 
@@ -1740,11 +1917,12 @@ static JSValue js_MTY_FatalParams(JSContext* jsctx, JSValueConst this_val, int j
     const char * msg = JS_ToCString(jsctx, jsargv[1]);
 
     MTY_FatalParams(func, msg);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_GetLog(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -1753,7 +1931,9 @@ static JSValue js_MTY_GetLog(JSContext* jsctx, JSValueConst this_val, int jsargc
 
 
     int64_t ret = (int64_t)MTY_GetLog();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 
@@ -1776,7 +1956,9 @@ static JSValue js_MTY_Alloc(JSContext* jsctx, JSValueConst this_val, int jsargc,
 
 
     int64_t ret = (int64_t)MTY_Alloc(nelem, elsize);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AllocAligned(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1795,7 +1977,9 @@ static JSValue js_MTY_AllocAligned(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_AllocAligned(size, align);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Realloc(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1817,7 +2001,9 @@ static JSValue js_MTY_Realloc(JSContext* jsctx, JSValueConst this_val, int jsarg
 
 
     int64_t ret = (int64_t)MTY_Realloc(mem, nelem, elsize);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Dup(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1836,7 +2022,9 @@ static JSValue js_MTY_Dup(JSContext* jsctx, JSValueConst this_val, int jsargc, J
 
 
     int64_t ret = (int64_t)MTY_Dup(mem, size);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Strdup(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1850,7 +2038,9 @@ static JSValue js_MTY_Strdup(JSContext* jsctx, JSValueConst this_val, int jsargc
     const char * str = JS_ToCString(jsctx, jsargv[0]);
 
     int64_t ret = (int64_t)MTY_Strdup(str);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Strcat(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1868,11 +2058,12 @@ static JSValue js_MTY_Strcat(JSContext* jsctx, JSValueConst this_val, int jsargc
     const char * src = JS_ToCString(jsctx, jsargv[2]);
 
     MTY_Strcat(dst, size, src);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_SprintfD(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 2) {
+    if (jsargc != 1) {
         return JS_EXCEPTION;
     }
 
@@ -1882,7 +2073,9 @@ static JSValue js_MTY_SprintfD(JSContext* jsctx, JSValueConst this_val, int jsar
     const char * fmt = JS_ToCString(jsctx, jsargv[0]);
 
     int64_t ret = (int64_t)MTY_SprintfD(fmt);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Strcasecmp(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1897,7 +2090,9 @@ static JSValue js_MTY_Strcasecmp(JSContext* jsctx, JSValueConst this_val, int js
     const char * s2 = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_Strcasecmp(s1, s2);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Free(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1913,7 +2108,8 @@ static JSValue js_MTY_Free(JSContext* jsctx, JSValueConst this_val, int jsargc, 
 
 
     MTY_Free(mem);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_FreeAligned(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1929,7 +2125,8 @@ static JSValue js_MTY_FreeAligned(JSContext* jsctx, JSValueConst this_val, int j
 
 
     MTY_FreeAligned(mem);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_Swap16(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1945,7 +2142,9 @@ static JSValue js_MTY_Swap16(JSContext* jsctx, JSValueConst this_val, int jsargc
 
 
     int64_t ret = (int64_t)MTY_Swap16(value);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Swap32(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1961,7 +2160,9 @@ static JSValue js_MTY_Swap32(JSContext* jsctx, JSValueConst this_val, int jsargc
 
 
     int64_t ret = (int64_t)MTY_Swap32(value);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Swap64(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1977,7 +2178,9 @@ static JSValue js_MTY_Swap64(JSContext* jsctx, JSValueConst this_val, int jsargc
 
 
     int64_t ret = (int64_t)MTY_Swap64(value);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_SwapToBE16(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -1993,7 +2196,9 @@ static JSValue js_MTY_SwapToBE16(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_SwapToBE16(value);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_SwapToBE32(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2009,7 +2214,9 @@ static JSValue js_MTY_SwapToBE32(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_SwapToBE32(value);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_SwapToBE64(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2025,7 +2232,9 @@ static JSValue js_MTY_SwapToBE64(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_SwapToBE64(value);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_SwapFromBE16(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2041,7 +2250,9 @@ static JSValue js_MTY_SwapFromBE16(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_SwapFromBE16(value);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_SwapFromBE32(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2057,7 +2268,9 @@ static JSValue js_MTY_SwapFromBE32(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_SwapFromBE32(value);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_SwapFromBE64(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2073,7 +2286,9 @@ static JSValue js_MTY_SwapFromBE64(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_SwapFromBE64(value);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WideToMulti(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2094,8 +2309,11 @@ static JSValue js_MTY_WideToMulti(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_WideToMulti(src, dst, len);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "dst", JS_NewInt64(jsctx, (int64_t)dst));
     // Rets: ['dst']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WideToMultiD(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2111,7 +2329,9 @@ static JSValue js_MTY_WideToMultiD(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_WideToMultiD(src);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_MultiToWide(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2130,8 +2350,11 @@ static JSValue js_MTY_MultiToWide(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_MultiToWide(src, dst, len);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "dst", JS_NewInt64(jsctx, (int64_t)dst));
     // Rets: ['dst']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_MultiToWideD(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2145,7 +2368,9 @@ static JSValue js_MTY_MultiToWideD(JSContext* jsctx, JSValueConst this_val, int 
     const char * src = JS_ToCString(jsctx, jsargv[0]);
 
     int64_t ret = (int64_t)MTY_MultiToWideD(src);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Strtok(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2162,8 +2387,11 @@ static JSValue js_MTY_Strtok(JSContext* jsctx, JSValueConst this_val, int jsargc
 
 
     int64_t ret = (int64_t)MTY_Strtok(str, delim, saveptr);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "saveptr", JS_NewInt64(jsctx, (int64_t)saveptr));
     // Rets: ['saveptr']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Sort(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2188,7 +2416,8 @@ static JSValue js_MTY_Sort(JSContext* jsctx, JSValueConst this_val, int jsargc, 
 
 
     MTY_Sort(base, nElements, size, func);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 
@@ -2206,7 +2435,9 @@ static JSValue js_MTY_SOLoad(JSContext* jsctx, JSValueConst this_val, int jsargc
     const char * name = JS_ToCString(jsctx, jsargv[0]);
 
     int64_t ret = (int64_t)MTY_SOLoad(name);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_SOGetSymbol(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2223,7 +2454,9 @@ static JSValue js_MTY_SOGetSymbol(JSContext* jsctx, JSValueConst this_val, int j
     const char * name = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_SOGetSymbol(so, name);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_SOUnload(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2239,11 +2472,12 @@ static JSValue js_MTY_SOUnload(JSContext* jsctx, JSValueConst this_val, int jsar
 
 
     MTY_SOUnload(so);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_Hostname(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -2252,11 +2486,13 @@ static JSValue js_MTY_Hostname(JSContext* jsctx, JSValueConst this_val, int jsar
 
 
     int64_t ret = (int64_t)MTY_Hostname();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_GetPlatform(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -2265,11 +2501,13 @@ static JSValue js_MTY_GetPlatform(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_GetPlatform();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_GetPlatformNoWeb(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -2278,11 +2516,13 @@ static JSValue js_MTY_GetPlatformNoWeb(JSContext* jsctx, JSValueConst this_val, 
 
 
     int64_t ret = (int64_t)MTY_GetPlatformNoWeb();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Supported(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -2291,7 +2531,9 @@ static JSValue js_MTY_Supported(JSContext* jsctx, JSValueConst this_val, int jsa
 
 
     int64_t ret = (int64_t)MTY_Supported();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_VersionString(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2307,7 +2549,9 @@ static JSValue js_MTY_VersionString(JSContext* jsctx, JSValueConst this_val, int
 
 
     int64_t ret = (int64_t)MTY_VersionString(platform);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_ProtocolHandler(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2323,12 +2567,14 @@ static JSValue js_MTY_ProtocolHandler(JSContext* jsctx, JSValueConst this_val, i
 
 
     MTY_ProtocolHandler(uri, token);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "token", JS_NewInt64(jsctx, (int64_t)token));
     // Rets: ['token']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_ProcessPath(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -2337,7 +2583,9 @@ static JSValue js_MTY_ProcessPath(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_ProcessPath();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_RestartProcess(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2352,7 +2600,9 @@ static JSValue js_MTY_RestartProcess(JSContext* jsctx, JSValueConst this_val, in
     char * const * argv = &tmpstr;
 
     int64_t ret = (int64_t)MTY_RestartProcess(argv);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_SetCrashFunc(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2370,8 +2620,10 @@ static JSValue js_MTY_SetCrashFunc(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_SetCrashFunc(func, opaque);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "opaque", JS_NewInt64(jsctx, (int64_t)opaque));
     // Rets: ['opaque']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_OpenConsole(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2385,11 +2637,12 @@ static JSValue js_MTY_OpenConsole(JSContext* jsctx, JSValueConst this_val, int j
     const char * title = JS_ToCString(jsctx, jsargv[0]);
 
     MTY_OpenConsole(title);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_CloseConsole(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -2398,7 +2651,8 @@ static JSValue js_MTY_CloseConsole(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_CloseConsole();
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_GetRunOnStartup(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2412,7 +2666,9 @@ static JSValue js_MTY_GetRunOnStartup(JSContext* jsctx, JSValueConst this_val, i
     const char * name = JS_ToCString(jsctx, jsargv[0]);
 
     int64_t ret = (int64_t)MTY_GetRunOnStartup(name);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_SetRunOnStartup(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2428,7 +2684,8 @@ static JSValue js_MTY_SetRunOnStartup(JSContext* jsctx, JSValueConst this_val, i
     const char * args = JS_ToCString(jsctx, jsargv[2]);
 
     MTY_SetRunOnStartup(name, path, args);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 
@@ -2436,7 +2693,7 @@ static JSValue js_MTY_SetRunOnStartup(JSContext* jsctx, JSValueConst this_val, i
 // Common rendering tasks.
 
 static JSValue js_MTY_RendererCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -2445,7 +2702,9 @@ static JSValue js_MTY_RendererCreate(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_RendererCreate();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_RendererDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2461,7 +2720,8 @@ static JSValue js_MTY_RendererDestroy(JSContext* jsctx, JSValueConst this_val, i
 
 
     MTY_RendererDestroy(renderer);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_RendererDrawQuad(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2492,8 +2752,13 @@ static JSValue js_MTY_RendererDrawQuad(JSContext* jsctx, JSValueConst this_val, 
 
 
     int64_t ret = (int64_t)MTY_RendererDrawQuad(ctx, api, device, context, image, desc, dest);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "device", JS_NewInt64(jsctx, (int64_t)device));
+    JS_SetPropertyStr(jsctx, retval, "context", JS_NewInt64(jsctx, (int64_t)context));
+    JS_SetPropertyStr(jsctx, retval, "dest", JS_NewInt64(jsctx, (int64_t)dest));
     // Rets: ['device', 'context', 'dest']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_RendererDrawUI(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2521,8 +2786,13 @@ static JSValue js_MTY_RendererDrawUI(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_RendererDrawUI(ctx, api, device, context, dd, dest);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "device", JS_NewInt64(jsctx, (int64_t)device));
+    JS_SetPropertyStr(jsctx, retval, "context", JS_NewInt64(jsctx, (int64_t)context));
+    JS_SetPropertyStr(jsctx, retval, "dest", JS_NewInt64(jsctx, (int64_t)dest));
     // Rets: ['device', 'context', 'dest']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_RendererSetUITexture(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2557,8 +2827,12 @@ static JSValue js_MTY_RendererSetUITexture(JSContext* jsctx, JSValueConst this_v
 
 
     int64_t ret = (int64_t)MTY_RendererSetUITexture(ctx, api, device, context, id, rgba, width, height);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "device", JS_NewInt64(jsctx, (int64_t)device));
+    JS_SetPropertyStr(jsctx, retval, "context", JS_NewInt64(jsctx, (int64_t)context));
     // Rets: ['device', 'context']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_RendererGetUITexture(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2577,7 +2851,9 @@ static JSValue js_MTY_RendererGetUITexture(JSContext* jsctx, JSValueConst this_v
 
 
     int64_t ret = (int64_t)MTY_RendererGetUITexture(ctx, id);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_GetAvailableGFX(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2593,7 +2869,9 @@ static JSValue js_MTY_GetAvailableGFX(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_GetAvailableGFX(apis);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_GetRenderState(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2613,8 +2891,12 @@ static JSValue js_MTY_GetRenderState(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_GetRenderState(api, device, context);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "device", JS_NewInt64(jsctx, (int64_t)device));
+    JS_SetPropertyStr(jsctx, retval, "context", JS_NewInt64(jsctx, (int64_t)context));
     // Rets: ['device', 'context']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_SetRenderState(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2636,8 +2918,12 @@ static JSValue js_MTY_SetRenderState(JSContext* jsctx, JSValueConst this_val, in
 
 
     MTY_SetRenderState(api, device, context, state);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "device", JS_NewInt64(jsctx, (int64_t)device));
+    JS_SetPropertyStr(jsctx, retval, "context", JS_NewInt64(jsctx, (int64_t)context));
+    JS_SetPropertyStr(jsctx, retval, "state", JS_NewInt64(jsctx, (int64_t)state));
     // Rets: ['device', 'context', 'state']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_FreeRenderState(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2653,7 +2939,8 @@ static JSValue js_MTY_FreeRenderState(JSContext* jsctx, JSValueConst this_val, i
 
 
     MTY_FreeRenderState(state);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 
@@ -2673,7 +2960,9 @@ static JSValue js_MTY_HashCreate(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_HashCreate(numBuckets);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_HashDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2692,7 +2981,8 @@ static JSValue js_MTY_HashDestroy(JSContext* jsctx, JSValueConst this_val, int j
 
 
     MTY_HashDestroy(hash, freeFunc);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_HashGet(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2709,7 +2999,9 @@ static JSValue js_MTY_HashGet(JSContext* jsctx, JSValueConst this_val, int jsarg
     const char * key = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_HashGet(ctx, key);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_HashGetInt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2728,7 +3020,9 @@ static JSValue js_MTY_HashGetInt(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_HashGetInt(ctx, key);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_HashSet(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2747,8 +3041,11 @@ static JSValue js_MTY_HashSet(JSContext* jsctx, JSValueConst this_val, int jsarg
 
 
     int64_t ret = (int64_t)MTY_HashSet(ctx, key, value);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "value", JS_NewInt64(jsctx, (int64_t)value));
     // Rets: ['value']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_HashSetInt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2769,8 +3066,11 @@ static JSValue js_MTY_HashSetInt(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_HashSetInt(ctx, key, value);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "value", JS_NewInt64(jsctx, (int64_t)value));
     // Rets: ['value']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_HashPop(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2787,7 +3087,9 @@ static JSValue js_MTY_HashPop(JSContext* jsctx, JSValueConst this_val, int jsarg
     const char * key = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_HashPop(ctx, key);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_HashPopInt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2806,7 +3108,9 @@ static JSValue js_MTY_HashPopInt(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_HashPopInt(ctx, key);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_HashNextKey(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2826,8 +3130,12 @@ static JSValue js_MTY_HashNextKey(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_HashNextKey(ctx, iter, key);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "iter", JS_NewInt64(jsctx, (int64_t)iter));
+    JS_SetPropertyStr(jsctx, retval, "key", JS_NewInt64(jsctx, (int64_t)key));
     // Rets: ['iter', 'key']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_HashNextKeyInt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2847,8 +3155,12 @@ static JSValue js_MTY_HashNextKeyInt(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_HashNextKeyInt(ctx, iter, key);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "iter", JS_NewInt64(jsctx, (int64_t)iter));
+    JS_SetPropertyStr(jsctx, retval, "key", JS_NewInt64(jsctx, (int64_t)key));
     // Rets: ['iter', 'key']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_QueueCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2867,7 +3179,9 @@ static JSValue js_MTY_QueueCreate(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_QueueCreate(len, bufSize);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_QueueDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2883,7 +3197,8 @@ static JSValue js_MTY_QueueDestroy(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_QueueDestroy(queue);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_QueueLength(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2899,7 +3214,9 @@ static JSValue js_MTY_QueueLength(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_QueueLength(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_QueueAcquireBuffer(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2915,7 +3232,9 @@ static JSValue js_MTY_QueueAcquireBuffer(JSContext* jsctx, JSValueConst this_val
 
 
     int64_t ret = (int64_t)MTY_QueueAcquireBuffer(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_QueuePush(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2934,7 +3253,8 @@ static JSValue js_MTY_QueuePush(JSContext* jsctx, JSValueConst this_val, int jsa
 
 
     MTY_QueuePush(ctx, size);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_QueuePop(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2957,8 +3277,12 @@ static JSValue js_MTY_QueuePop(JSContext* jsctx, JSValueConst this_val, int jsar
 
 
     int64_t ret = (int64_t)MTY_QueuePop(ctx, timeout, buffer, size);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "buffer", JS_NewInt64(jsctx, (int64_t)buffer));
+    JS_SetPropertyStr(jsctx, retval, "size", JS_NewInt64(jsctx, (int64_t)size));
     // Rets: ['buffer', 'size']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_QueuePopLast(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2981,8 +3305,12 @@ static JSValue js_MTY_QueuePopLast(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_QueuePopLast(ctx, timeout, buffer, size);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "buffer", JS_NewInt64(jsctx, (int64_t)buffer));
+    JS_SetPropertyStr(jsctx, retval, "size", JS_NewInt64(jsctx, (int64_t)size));
     // Rets: ['buffer', 'size']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_QueueReleaseBuffer(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -2998,7 +3326,8 @@ static JSValue js_MTY_QueueReleaseBuffer(JSContext* jsctx, JSValueConst this_val
 
 
     MTY_QueueReleaseBuffer(ctx);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_QueuePushPtr(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3019,8 +3348,11 @@ static JSValue js_MTY_QueuePushPtr(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_QueuePushPtr(ctx, opaque, size);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "opaque", JS_NewInt64(jsctx, (int64_t)opaque));
     // Rets: ['opaque']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_QueuePopPtr(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3043,8 +3375,12 @@ static JSValue js_MTY_QueuePopPtr(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_QueuePopPtr(ctx, timeout, opaque, size);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "opaque", JS_NewInt64(jsctx, (int64_t)opaque));
+    JS_SetPropertyStr(jsctx, retval, "size", JS_NewInt64(jsctx, (int64_t)size));
     // Rets: ['opaque', 'size']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_QueueFlush(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3063,11 +3399,12 @@ static JSValue js_MTY_QueueFlush(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_QueueFlush(ctx, freeFunc);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_ListCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -3076,7 +3413,9 @@ static JSValue js_MTY_ListCreate(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_ListCreate();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_ListDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3095,7 +3434,8 @@ static JSValue js_MTY_ListDestroy(JSContext* jsctx, JSValueConst this_val, int j
 
 
     MTY_ListDestroy(list, freeFunc);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_ListFirst(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3111,7 +3451,9 @@ static JSValue js_MTY_ListFirst(JSContext* jsctx, JSValueConst this_val, int jsa
 
 
     int64_t ret = (int64_t)MTY_ListFirst(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_ListAppend(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3129,8 +3471,10 @@ static JSValue js_MTY_ListAppend(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_ListAppend(ctx, value);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "value", JS_NewInt64(jsctx, (int64_t)value));
     // Rets: ['value']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_ListRemove(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3148,8 +3492,11 @@ static JSValue js_MTY_ListRemove(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_ListRemove(ctx, node);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "node", JS_NewInt64(jsctx, (int64_t)node));
     // Rets: ['node']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 
@@ -3171,8 +3518,11 @@ static JSValue js_MTY_ThreadCreate(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_ThreadCreate(func, opaque);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "opaque", JS_NewInt64(jsctx, (int64_t)opaque));
     // Rets: ['opaque']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_ThreadDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3188,7 +3538,9 @@ static JSValue js_MTY_ThreadDestroy(JSContext* jsctx, JSValueConst this_val, int
 
 
     int64_t ret = (int64_t)MTY_ThreadDestroy(thread);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_ThreadDetach(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3206,8 +3558,10 @@ static JSValue js_MTY_ThreadDetach(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_ThreadDetach(func, opaque);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "opaque", JS_NewInt64(jsctx, (int64_t)opaque));
     // Rets: ['opaque']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_ThreadGetID(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3223,11 +3577,13 @@ static JSValue js_MTY_ThreadGetID(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_ThreadGetID(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_MutexCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -3236,7 +3592,9 @@ static JSValue js_MTY_MutexCreate(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_MutexCreate();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_MutexDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3252,7 +3610,8 @@ static JSValue js_MTY_MutexDestroy(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_MutexDestroy(mutex);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_MutexLock(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3268,7 +3627,8 @@ static JSValue js_MTY_MutexLock(JSContext* jsctx, JSValueConst this_val, int jsa
 
 
     MTY_MutexLock(ctx);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_MutexTryLock(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3284,7 +3644,9 @@ static JSValue js_MTY_MutexTryLock(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_MutexTryLock(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_MutexUnlock(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3300,11 +3662,12 @@ static JSValue js_MTY_MutexUnlock(JSContext* jsctx, JSValueConst this_val, int j
 
 
     MTY_MutexUnlock(ctx);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_CondCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -3313,7 +3676,9 @@ static JSValue js_MTY_CondCreate(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_CondCreate();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_CondDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3329,7 +3694,8 @@ static JSValue js_MTY_CondDestroy(JSContext* jsctx, JSValueConst this_val, int j
 
 
     MTY_CondDestroy(cond);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_CondWait(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3350,8 +3716,11 @@ static JSValue js_MTY_CondWait(JSContext* jsctx, JSValueConst this_val, int jsar
 
 
     int64_t ret = (int64_t)MTY_CondWait(ctx, mutex, timeout);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "mutex", JS_NewInt64(jsctx, (int64_t)mutex));
     // Rets: ['mutex']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_CondWake(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3367,7 +3736,8 @@ static JSValue js_MTY_CondWake(JSContext* jsctx, JSValueConst this_val, int jsar
 
 
     MTY_CondWake(ctx);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_CondWakeAll(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3383,11 +3753,12 @@ static JSValue js_MTY_CondWakeAll(JSContext* jsctx, JSValueConst this_val, int j
 
 
     MTY_CondWakeAll(ctx);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_RWLockCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -3396,7 +3767,9 @@ static JSValue js_MTY_RWLockCreate(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_RWLockCreate();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_RWLockDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3412,7 +3785,8 @@ static JSValue js_MTY_RWLockDestroy(JSContext* jsctx, JSValueConst this_val, int
 
 
     MTY_RWLockDestroy(rwlock);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_RWTryLockReader(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3428,7 +3802,9 @@ static JSValue js_MTY_RWTryLockReader(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_RWTryLockReader(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_RWLockReader(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3444,7 +3820,8 @@ static JSValue js_MTY_RWLockReader(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_RWLockReader(ctx);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_RWLockWriter(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3460,7 +3837,8 @@ static JSValue js_MTY_RWLockWriter(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_RWLockWriter(ctx);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_RWLockUnlock(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3476,11 +3854,12 @@ static JSValue js_MTY_RWLockUnlock(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_RWLockUnlock(ctx);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_SyncCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -3489,7 +3868,9 @@ static JSValue js_MTY_SyncCreate(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_SyncCreate();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_SyncDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3505,7 +3886,8 @@ static JSValue js_MTY_SyncDestroy(JSContext* jsctx, JSValueConst this_val, int j
 
 
     MTY_SyncDestroy(sync);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_SyncWait(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3524,7 +3906,9 @@ static JSValue js_MTY_SyncWait(JSContext* jsctx, JSValueConst this_val, int jsar
 
 
     int64_t ret = (int64_t)MTY_SyncWait(ctx, timeout);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_SyncWake(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3540,7 +3924,8 @@ static JSValue js_MTY_SyncWake(JSContext* jsctx, JSValueConst this_val, int jsar
 
 
     MTY_SyncWake(ctx);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_ThreadPoolCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3556,7 +3941,9 @@ static JSValue js_MTY_ThreadPoolCreate(JSContext* jsctx, JSValueConst this_val, 
 
 
     int64_t ret = (int64_t)MTY_ThreadPoolCreate(maxThreads);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_ThreadPoolDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3575,7 +3962,8 @@ static JSValue js_MTY_ThreadPoolDestroy(JSContext* jsctx, JSValueConst this_val,
 
 
     MTY_ThreadPoolDestroy(pool, detach);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_ThreadPoolStart(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3596,8 +3984,11 @@ static JSValue js_MTY_ThreadPoolStart(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_ThreadPoolStart(ctx, func, opaque);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "opaque", JS_NewInt64(jsctx, (int64_t)opaque));
     // Rets: ['opaque']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_ThreadPoolDetach(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3619,7 +4010,8 @@ static JSValue js_MTY_ThreadPoolDetach(JSContext* jsctx, JSValueConst this_val, 
 
 
     MTY_ThreadPoolDetach(ctx, index, detach);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_ThreadPoolState(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3640,8 +4032,11 @@ static JSValue js_MTY_ThreadPoolState(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_ThreadPoolState(ctx, index, opaque);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "opaque", JS_NewInt64(jsctx, (int64_t)opaque));
     // Rets: ['opaque']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Atomic32Set(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3660,7 +4055,8 @@ static JSValue js_MTY_Atomic32Set(JSContext* jsctx, JSValueConst this_val, int j
 
 
     MTY_Atomic32Set(atomic, value);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_Atomic64Set(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3679,7 +4075,8 @@ static JSValue js_MTY_Atomic64Set(JSContext* jsctx, JSValueConst this_val, int j
 
 
     MTY_Atomic64Set(atomic, value);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_Atomic32Get(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3695,7 +4092,9 @@ static JSValue js_MTY_Atomic32Get(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_Atomic32Get(atomic);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Atomic64Get(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3711,7 +4110,9 @@ static JSValue js_MTY_Atomic64Get(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_Atomic64Get(atomic);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Atomic32Add(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3730,7 +4131,9 @@ static JSValue js_MTY_Atomic32Add(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_Atomic32Add(atomic, value);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Atomic64Add(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3749,7 +4152,9 @@ static JSValue js_MTY_Atomic64Add(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_Atomic64Add(atomic, value);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Atomic32CAS(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3771,7 +4176,9 @@ static JSValue js_MTY_Atomic32CAS(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_Atomic32CAS(atomic, oldValue, newValue);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Atomic64CAS(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3793,7 +4200,9 @@ static JSValue js_MTY_Atomic64CAS(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_Atomic64CAS(atomic, oldValue, newValue);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_GlobalLock(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3809,7 +4218,8 @@ static JSValue js_MTY_GlobalLock(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_GlobalLock(lock);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_GlobalUnlock(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3825,7 +4235,8 @@ static JSValue js_MTY_GlobalUnlock(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_GlobalUnlock(lock);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 
@@ -3833,7 +4244,7 @@ static JSValue js_MTY_GlobalUnlock(JSContext* jsctx, JSValueConst this_val, int 
 // High precision timestamp and sleep.
 
 static JSValue js_MTY_GetTime(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -3842,7 +4253,9 @@ static JSValue js_MTY_GetTime(JSContext* jsctx, JSValueConst this_val, int jsarg
 
 
     int64_t ret = (int64_t)MTY_GetTime();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_TimeDiff(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3861,7 +4274,9 @@ static JSValue js_MTY_TimeDiff(JSContext* jsctx, JSValueConst this_val, int jsar
 
 
     int64_t ret = (int64_t)MTY_TimeDiff(begin, end);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_Sleep(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3877,7 +4292,8 @@ static JSValue js_MTY_Sleep(JSContext* jsctx, JSValueConst this_val, int jsargc,
 
 
     MTY_Sleep(timeout);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_SetTimerResolution(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3893,7 +4309,8 @@ static JSValue js_MTY_SetTimerResolution(JSContext* jsctx, JSValueConst this_val
 
 
     MTY_SetTimerResolution(res);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_RevertTimerResolution(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3909,7 +4326,8 @@ static JSValue js_MTY_RevertTimerResolution(JSContext* jsctx, JSValueConst this_
 
 
     MTY_RevertTimerResolution(res);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 
@@ -3934,8 +4352,11 @@ static JSValue js_MTY_AppCreate(JSContext* jsctx, JSValueConst this_val, int jsa
 
 
     int64_t ret = (int64_t)MTY_AppCreate(appFunc, eventFunc, opaque);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "opaque", JS_NewInt64(jsctx, (int64_t)opaque));
     // Rets: ['opaque']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3951,7 +4372,8 @@ static JSValue js_MTY_AppDestroy(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_AppDestroy(app);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppRun(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3967,7 +4389,8 @@ static JSValue js_MTY_AppRun(JSContext* jsctx, JSValueConst this_val, int jsargc
 
 
     MTY_AppRun(ctx);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppSetTimeout(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -3986,7 +4409,8 @@ static JSValue js_MTY_AppSetTimeout(JSContext* jsctx, JSValueConst this_val, int
 
 
     MTY_AppSetTimeout(ctx, timeout);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppIsActive(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4002,7 +4426,9 @@ static JSValue js_MTY_AppIsActive(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_AppIsActive(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppActivate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4021,7 +4447,8 @@ static JSValue js_MTY_AppActivate(JSContext* jsctx, JSValueConst this_val, int j
 
 
     MTY_AppActivate(ctx, active);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppGetDetached(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4037,7 +4464,9 @@ static JSValue js_MTY_AppGetDetached(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_AppGetDetached(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppDetach(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4056,7 +4485,8 @@ static JSValue js_MTY_AppDetach(JSContext* jsctx, JSValueConst this_val, int jsa
 
 
     MTY_AppDetach(ctx, type);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppEnableScreenSaver(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4075,7 +4505,8 @@ static JSValue js_MTY_AppEnableScreenSaver(JSContext* jsctx, JSValueConst this_v
 
 
     MTY_AppEnableScreenSaver(ctx, enable);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppGetClipboard(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4091,7 +4522,9 @@ static JSValue js_MTY_AppGetClipboard(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_AppGetClipboard(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppSetClipboard(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4108,7 +4541,8 @@ static JSValue js_MTY_AppSetClipboard(JSContext* jsctx, JSValueConst this_val, i
     const char * text = JS_ToCString(jsctx, jsargv[1]);
 
     MTY_AppSetClipboard(ctx, text);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppKeyboardIsGrabbed(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4124,7 +4558,9 @@ static JSValue js_MTY_AppKeyboardIsGrabbed(JSContext* jsctx, JSValueConst this_v
 
 
     int64_t ret = (int64_t)MTY_AppKeyboardIsGrabbed(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppGrabKeyboard(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4143,7 +4579,8 @@ static JSValue js_MTY_AppGrabKeyboard(JSContext* jsctx, JSValueConst this_val, i
 
 
     MTY_AppGrabKeyboard(ctx, grab);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppMouseIsGrabbed(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4159,7 +4596,9 @@ static JSValue js_MTY_AppMouseIsGrabbed(JSContext* jsctx, JSValueConst this_val,
 
 
     int64_t ret = (int64_t)MTY_AppMouseIsGrabbed(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppGrabMouse(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4178,7 +4617,8 @@ static JSValue js_MTY_AppGrabMouse(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_AppGrabMouse(ctx, grab);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppSetTray(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4201,7 +4641,8 @@ static JSValue js_MTY_AppSetTray(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_AppSetTray(ctx, tooltip, items, len);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppRemoveTray(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4217,7 +4658,8 @@ static JSValue js_MTY_AppRemoveTray(JSContext* jsctx, JSValueConst this_val, int
 
 
     MTY_AppRemoveTray(ctx);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppNotification(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4235,7 +4677,8 @@ static JSValue js_MTY_AppNotification(JSContext* jsctx, JSValueConst this_val, i
     const char * msg = JS_ToCString(jsctx, jsargv[2]);
 
     MTY_AppNotification(ctx, title, msg);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppGetHotkey(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4260,7 +4703,9 @@ static JSValue js_MTY_AppGetHotkey(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_AppGetHotkey(ctx, scope, mod, key);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppSetHotkey(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4288,7 +4733,8 @@ static JSValue js_MTY_AppSetHotkey(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_AppSetHotkey(ctx, scope, mod, key, id);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppRemoveHotkeys(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4307,7 +4753,8 @@ static JSValue js_MTY_AppRemoveHotkeys(JSContext* jsctx, JSValueConst this_val, 
 
 
     MTY_AppRemoveHotkeys(ctx, scope);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppGetRelativeMouse(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4323,7 +4770,9 @@ static JSValue js_MTY_AppGetRelativeMouse(JSContext* jsctx, JSValueConst this_va
 
 
     int64_t ret = (int64_t)MTY_AppGetRelativeMouse(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppSetRelativeMouse(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4342,7 +4791,8 @@ static JSValue js_MTY_AppSetRelativeMouse(JSContext* jsctx, JSValueConst this_va
 
 
     MTY_AppSetRelativeMouse(ctx, relative);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppSetPNGCursor(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4370,7 +4820,8 @@ static JSValue js_MTY_AppSetPNGCursor(JSContext* jsctx, JSValueConst this_val, i
 
 
     MTY_AppSetPNGCursor(ctx, image, size, hotX, hotY);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppUseDefaultCursor(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4389,7 +4840,8 @@ static JSValue js_MTY_AppUseDefaultCursor(JSContext* jsctx, JSValueConst this_va
 
 
     MTY_AppUseDefaultCursor(ctx, useDefault);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppShowCursor(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4408,7 +4860,8 @@ static JSValue js_MTY_AppShowCursor(JSContext* jsctx, JSValueConst this_val, int
 
 
     MTY_AppShowCursor(ctx, show);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppCanWarpCursor(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4424,7 +4877,9 @@ static JSValue js_MTY_AppCanWarpCursor(JSContext* jsctx, JSValueConst this_val, 
 
 
     int64_t ret = (int64_t)MTY_AppCanWarpCursor(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppEnableGlobalHotkeys(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4443,7 +4898,8 @@ static JSValue js_MTY_AppEnableGlobalHotkeys(JSContext* jsctx, JSValueConst this
 
 
     MTY_AppEnableGlobalHotkeys(ctx, enable);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppSoftKeyboardIsShowing(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4459,7 +4915,9 @@ static JSValue js_MTY_AppSoftKeyboardIsShowing(JSContext* jsctx, JSValueConst th
 
 
     int64_t ret = (int64_t)MTY_AppSoftKeyboardIsShowing(app);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppShowSoftKeyboard(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4478,7 +4936,8 @@ static JSValue js_MTY_AppShowSoftKeyboard(JSContext* jsctx, JSValueConst this_va
 
 
     MTY_AppShowSoftKeyboard(ctx, show);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppGetOrientation(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4494,7 +4953,9 @@ static JSValue js_MTY_AppGetOrientation(JSContext* jsctx, JSValueConst this_val,
 
 
     int64_t ret = (int64_t)MTY_AppGetOrientation(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppSetOrientation(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4513,7 +4974,8 @@ static JSValue js_MTY_AppSetOrientation(JSContext* jsctx, JSValueConst this_val,
 
 
     MTY_AppSetOrientation(ctx, orientation);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppControllerRumble(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4538,7 +5000,8 @@ static JSValue js_MTY_AppControllerRumble(JSContext* jsctx, JSValueConst this_va
 
 
     MTY_AppControllerRumble(ctx, id, low, high);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppPenIsEnabled(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4554,7 +5017,9 @@ static JSValue js_MTY_AppPenIsEnabled(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_AppPenIsEnabled(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppEnablePen(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4573,7 +5038,8 @@ static JSValue js_MTY_AppEnablePen(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_AppEnablePen(ctx, enable);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_AppGetInputMode(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4589,7 +5055,9 @@ static JSValue js_MTY_AppGetInputMode(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_AppGetInputMode(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_AppSetInputMode(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4608,7 +5076,8 @@ static JSValue js_MTY_AppSetInputMode(JSContext* jsctx, JSValueConst this_val, i
 
 
     MTY_AppSetInputMode(ctx, mode);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_WindowCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4627,7 +5096,9 @@ static JSValue js_MTY_WindowCreate(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_WindowCreate(app, desc);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4646,7 +5117,8 @@ static JSValue js_MTY_WindowDestroy(JSContext* jsctx, JSValueConst this_val, int
 
 
     MTY_WindowDestroy(app, window);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_WindowGetSize(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4669,8 +5141,12 @@ static JSValue js_MTY_WindowGetSize(JSContext* jsctx, JSValueConst this_val, int
 
 
     int64_t ret = (int64_t)MTY_WindowGetSize(app, window, width, height);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "width", JS_NewInt64(jsctx, (int64_t)width));
+    JS_SetPropertyStr(jsctx, retval, "height", JS_NewInt64(jsctx, (int64_t)height));
     // Rets: ['width', 'height']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowGetPosition(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4693,8 +5169,11 @@ static JSValue js_MTY_WindowGetPosition(JSContext* jsctx, JSValueConst this_val,
 
 
     MTY_WindowGetPosition(app, window, x, y);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "x", JS_NewInt64(jsctx, (int64_t)x));
+    JS_SetPropertyStr(jsctx, retval, "y", JS_NewInt64(jsctx, (int64_t)y));
     // Rets: ['x', 'y']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_WindowGetScreenSize(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4717,8 +5196,12 @@ static JSValue js_MTY_WindowGetScreenSize(JSContext* jsctx, JSValueConst this_va
 
 
     int64_t ret = (int64_t)MTY_WindowGetScreenSize(app, window, width, height);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "width", JS_NewInt64(jsctx, (int64_t)width));
+    JS_SetPropertyStr(jsctx, retval, "height", JS_NewInt64(jsctx, (int64_t)height));
     // Rets: ['width', 'height']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowGetScale(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4737,7 +5220,9 @@ static JSValue js_MTY_WindowGetScale(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_WindowGetScale(app, window);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowSetTitle(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4757,7 +5242,8 @@ static JSValue js_MTY_WindowSetTitle(JSContext* jsctx, JSValueConst this_val, in
     const char * title = JS_ToCString(jsctx, jsargv[2]);
 
     MTY_WindowSetTitle(app, window, title);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_WindowIsVisible(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4776,7 +5262,9 @@ static JSValue js_MTY_WindowIsVisible(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_WindowIsVisible(app, window);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowIsActive(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4795,7 +5283,9 @@ static JSValue js_MTY_WindowIsActive(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_WindowIsActive(app, window);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowActivate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4817,7 +5307,8 @@ static JSValue js_MTY_WindowActivate(JSContext* jsctx, JSValueConst this_val, in
 
 
     MTY_WindowActivate(app, window, active);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_WindowExists(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4836,7 +5327,9 @@ static JSValue js_MTY_WindowExists(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_WindowExists(app, window);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowIsFullscreen(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4855,7 +5348,9 @@ static JSValue js_MTY_WindowIsFullscreen(JSContext* jsctx, JSValueConst this_val
 
 
     int64_t ret = (int64_t)MTY_WindowIsFullscreen(app, window);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowSetFullscreen(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4877,7 +5372,8 @@ static JSValue js_MTY_WindowSetFullscreen(JSContext* jsctx, JSValueConst this_va
 
 
     MTY_WindowSetFullscreen(app, window, fullscreen);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_WindowWarpCursor(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4902,7 +5398,8 @@ static JSValue js_MTY_WindowWarpCursor(JSContext* jsctx, JSValueConst this_val, 
 
 
     MTY_WindowWarpCursor(app, window, x, y);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_WindowGetDevice(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4921,7 +5418,9 @@ static JSValue js_MTY_WindowGetDevice(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_WindowGetDevice(app, window);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowGetContext(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4940,7 +5439,9 @@ static JSValue js_MTY_WindowGetContext(JSContext* jsctx, JSValueConst this_val, 
 
 
     int64_t ret = (int64_t)MTY_WindowGetContext(app, window);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowGetBackBuffer(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4959,7 +5460,9 @@ static JSValue js_MTY_WindowGetBackBuffer(JSContext* jsctx, JSValueConst this_va
 
 
     int64_t ret = (int64_t)MTY_WindowGetBackBuffer(app, window);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowDrawQuad(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -4984,7 +5487,8 @@ static JSValue js_MTY_WindowDrawQuad(JSContext* jsctx, JSValueConst this_val, in
 
 
     MTY_WindowDrawQuad(app, window, image, desc);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_WindowDrawUI(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5006,7 +5510,8 @@ static JSValue js_MTY_WindowDrawUI(JSContext* jsctx, JSValueConst this_val, int 
 
 
     MTY_WindowDrawUI(app, window, dd);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_WindowPresent(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5028,7 +5533,8 @@ static JSValue js_MTY_WindowPresent(JSContext* jsctx, JSValueConst this_val, int
 
 
     MTY_WindowPresent(app, window, numFrames);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_WindowGetUITexture(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5050,7 +5556,9 @@ static JSValue js_MTY_WindowGetUITexture(JSContext* jsctx, JSValueConst this_val
 
 
     int64_t ret = (int64_t)MTY_WindowGetUITexture(app, window, id);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowSetUITexture(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5081,7 +5589,8 @@ static JSValue js_MTY_WindowSetUITexture(JSContext* jsctx, JSValueConst this_val
 
 
     MTY_WindowSetUITexture(app, window, id, rgba, width, height);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_WindowGetGFX(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5100,7 +5609,9 @@ static JSValue js_MTY_WindowGetGFX(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_WindowGetGFX(app, window);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowSetGFX(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5125,7 +5636,9 @@ static JSValue js_MTY_WindowSetGFX(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_WindowSetGFX(app, window, api, vsync);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WindowGFXState(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5144,7 +5657,9 @@ static JSValue js_MTY_WindowGFXState(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_WindowGFXState(app, window);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_HotkeyToString(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5168,8 +5683,10 @@ static JSValue js_MTY_HotkeyToString(JSContext* jsctx, JSValueConst this_val, in
 
 
     MTY_HotkeyToString(mod, key, str, len);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "str", JS_NewInt64(jsctx, (int64_t)str));
     // Rets: ['str']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_SetAppID(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5183,7 +5700,8 @@ static JSValue js_MTY_SetAppID(JSContext* jsctx, JSValueConst this_val, int jsar
     const char * id = JS_ToCString(jsctx, jsargv[0]);
 
     MTY_SetAppID(id);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_PrintEvent(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5199,7 +5717,8 @@ static JSValue js_MTY_PrintEvent(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_PrintEvent(evt);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_GLGetProcAddress(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5213,7 +5732,9 @@ static JSValue js_MTY_GLGetProcAddress(JSContext* jsctx, JSValueConst this_val, 
     const char * name = JS_ToCString(jsctx, jsargv[0]);
 
     int64_t ret = (int64_t)MTY_GLGetProcAddress(name);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 
@@ -5221,7 +5742,7 @@ static JSValue js_MTY_GLGetProcAddress(JSContext* jsctx, JSValueConst this_val, 
 // Stock dialog boxes provided by the OS.
 
 static JSValue js_MTY_HasDialogs(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -5230,11 +5751,13 @@ static JSValue js_MTY_HasDialogs(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_HasDialogs();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_MessageBox(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 3) {
+    if (jsargc != 2) {
         return JS_EXCEPTION;
     }
 
@@ -5245,7 +5768,8 @@ static JSValue js_MTY_MessageBox(JSContext* jsctx, JSValueConst this_val, int js
     const char * fmt = JS_ToCString(jsctx, jsargv[1]);
 
     MTY_MessageBox(title, fmt);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 
@@ -5263,7 +5787,8 @@ static JSValue js_MTY_HttpSetProxy(JSContext* jsctx, JSValueConst this_val, int 
     const char * proxy = JS_ToCString(jsctx, jsargv[0]);
 
     MTY_HttpSetProxy(proxy);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_HttpParseUrl(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5287,8 +5812,12 @@ static JSValue js_MTY_HttpParseUrl(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_HttpParseUrl(url, host, hostSize, path, pathSize);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "host", JS_NewInt64(jsctx, (int64_t)host));
+    JS_SetPropertyStr(jsctx, retval, "path", JS_NewInt64(jsctx, (int64_t)path));
     // Rets: ['host', 'path']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_HttpEncodeUrl(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5307,8 +5836,10 @@ static JSValue js_MTY_HttpEncodeUrl(JSContext* jsctx, JSValueConst this_val, int
 
 
     MTY_HttpEncodeUrl(src, dst, size);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "dst", JS_NewInt64(jsctx, (int64_t)dst));
     // Rets: ['dst']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_HttpRequest(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5343,8 +5874,13 @@ static JSValue js_MTY_HttpRequest(JSContext* jsctx, JSValueConst this_val, int j
 
 
     int64_t ret = (int64_t)MTY_HttpRequest(host, secure, method, path, headers, body, bodySize, timeout, response, responseSize, status);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "response", JS_NewInt64(jsctx, (int64_t)response));
+    JS_SetPropertyStr(jsctx, retval, "responseSize", JS_NewInt64(jsctx, (int64_t)responseSize));
+    JS_SetPropertyStr(jsctx, retval, "status", JS_NewInt64(jsctx, (int64_t)status));
     // Rets: ['response', 'responseSize', 'status']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_HttpAsyncCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5360,11 +5896,12 @@ static JSValue js_MTY_HttpAsyncCreate(JSContext* jsctx, JSValueConst this_val, i
 
 
     MTY_HttpAsyncCreate(maxThreads);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_HttpAsyncDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -5373,7 +5910,8 @@ static JSValue js_MTY_HttpAsyncDestroy(JSContext* jsctx, JSValueConst this_val, 
 
 
     MTY_HttpAsyncDestroy();
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_HttpAsyncRequest(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5408,7 +5946,8 @@ static JSValue js_MTY_HttpAsyncRequest(JSContext* jsctx, JSValueConst this_val, 
 
 
     MTY_HttpAsyncRequest(index, host, secure, method, path, headers, body, size, timeout, func);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_HttpAsyncPoll(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5430,8 +5969,13 @@ static JSValue js_MTY_HttpAsyncPoll(JSContext* jsctx, JSValueConst this_val, int
 
 
     int64_t ret = (int64_t)MTY_HttpAsyncPoll(index, response, size, status);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "response", JS_NewInt64(jsctx, (int64_t)response));
+    JS_SetPropertyStr(jsctx, retval, "size", JS_NewInt64(jsctx, (int64_t)size));
+    JS_SetPropertyStr(jsctx, retval, "status", JS_NewInt64(jsctx, (int64_t)status));
     // Rets: ['response', 'size', 'status']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_HttpAsyncClear(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5447,7 +5991,8 @@ static JSValue js_MTY_HttpAsyncClear(JSContext* jsctx, JSValueConst this_val, in
 
 
     MTY_HttpAsyncClear(index);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_WebSocketListen(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5464,7 +6009,9 @@ static JSValue js_MTY_WebSocketListen(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_WebSocketListen(host, port);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WebSocketAccept(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5491,7 +6038,9 @@ static JSValue js_MTY_WebSocketAccept(JSContext* jsctx, JSValueConst this_val, i
 
 
     int64_t ret = (int64_t)MTY_WebSocketAccept(ws, origins, numOrigins, secureOrigin, timeout);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WebSocketConnect(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5518,8 +6067,11 @@ static JSValue js_MTY_WebSocketConnect(JSContext* jsctx, JSValueConst this_val, 
 
 
     int64_t ret = (int64_t)MTY_WebSocketConnect(host, port, secure, path, headers, timeout, upgradeStatus);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "upgradeStatus", JS_NewInt64(jsctx, (int64_t)upgradeStatus));
     // Rets: ['upgradeStatus']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WebSocketDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5535,7 +6087,8 @@ static JSValue js_MTY_WebSocketDestroy(JSContext* jsctx, JSValueConst this_val, 
 
 
     MTY_WebSocketDestroy(ws);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_WebSocketRead(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5559,8 +6112,11 @@ static JSValue js_MTY_WebSocketRead(JSContext* jsctx, JSValueConst this_val, int
 
 
     int64_t ret = (int64_t)MTY_WebSocketRead(ws, msg, size, timeout);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "msg", JS_NewInt64(jsctx, (int64_t)msg));
     // Rets: ['msg']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WebSocketWrite(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5577,7 +6133,9 @@ static JSValue js_MTY_WebSocketWrite(JSContext* jsctx, JSValueConst this_val, in
     const char * msg = JS_ToCString(jsctx, jsargv[1]);
 
     int64_t ret = (int64_t)MTY_WebSocketWrite(ws, msg);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_WebSocketGetCloseCode(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5593,7 +6151,9 @@ static JSValue js_MTY_WebSocketGetCloseCode(JSContext* jsctx, JSValueConst this_
 
 
     int64_t ret = (int64_t)MTY_WebSocketGetCloseCode(ctx);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 
@@ -5601,7 +6161,7 @@ static JSValue js_MTY_WebSocketGetCloseCode(JSContext* jsctx, JSValueConst this_
 // TLS/DTLS protocol wrapper.
 
 static JSValue js_MTY_CertCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
-    if (jsargc != 1) {
+    if (jsargc != 0) {
         return JS_EXCEPTION;
     }
 
@@ -5610,7 +6170,9 @@ static JSValue js_MTY_CertCreate(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_CertCreate();
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_CertDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5626,7 +6188,8 @@ static JSValue js_MTY_CertDestroy(JSContext* jsctx, JSValueConst this_val, int j
 
 
     MTY_CertDestroy(cert);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_CertGetFingerprint(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5647,8 +6210,10 @@ static JSValue js_MTY_CertGetFingerprint(JSContext* jsctx, JSValueConst this_val
 
 
     MTY_CertGetFingerprint(ctx, fingerprint, size);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "fingerprint", JS_NewInt64(jsctx, (int64_t)fingerprint));
     // Rets: ['fingerprint']
-    return JS_NewInt64(jsctx, 1);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_TLSCreate(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5671,8 +6236,11 @@ static JSValue js_MTY_TLSCreate(JSContext* jsctx, JSValueConst this_val, int jsa
 
 
     int64_t ret = (int64_t)MTY_TLSCreate(type, cert, host, peerFingerprint, mtu);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "cert", JS_NewInt64(jsctx, (int64_t)cert));
     // Rets: ['cert']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_TLSDestroy(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5688,7 +6256,8 @@ static JSValue js_MTY_TLSDestroy(JSContext* jsctx, JSValueConst this_val, int js
 
 
     MTY_TLSDestroy(dtls);
-    return JS_NewInt64(jsctx, 1);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));    return retval;
 }
 
 static JSValue js_MTY_TLSHandshake(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5715,8 +6284,11 @@ static JSValue js_MTY_TLSHandshake(JSContext* jsctx, JSValueConst this_val, int 
 
 
     int64_t ret = (int64_t)MTY_TLSHandshake(ctx, buf, size, writeFunc, opaque);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "opaque", JS_NewInt64(jsctx, (int64_t)opaque));
     // Rets: ['opaque']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_TLSEncrypt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5745,8 +6317,12 @@ static JSValue js_MTY_TLSEncrypt(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_TLSEncrypt(ctx, in, inSize, out, outSize, written);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "out", JS_NewInt64(jsctx, (int64_t)out));
+    JS_SetPropertyStr(jsctx, retval, "written", JS_NewInt64(jsctx, (int64_t)written));
     // Rets: ['out', 'written']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_TLSDecrypt(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5775,8 +6351,12 @@ static JSValue js_MTY_TLSDecrypt(JSContext* jsctx, JSValueConst this_val, int js
 
 
     int64_t ret = (int64_t)MTY_TLSDecrypt(ctx, in, inSize, out, outSize, read);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "out", JS_NewInt64(jsctx, (int64_t)out));
+    JS_SetPropertyStr(jsctx, retval, "read", JS_NewInt64(jsctx, (int64_t)read));
     // Rets: ['out', 'read']
-    return JS_NewInt64(jsctx, ret);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_IsTLSHandshake(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5795,7 +6375,9 @@ static JSValue js_MTY_IsTLSHandshake(JSContext* jsctx, JSValueConst this_val, in
 
 
     int64_t ret = (int64_t)MTY_IsTLSHandshake(buf, size);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static JSValue js_MTY_IsTLSApplicationData(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv) {
@@ -5814,7 +6396,9 @@ static JSValue js_MTY_IsTLSApplicationData(JSContext* jsctx, JSValueConst this_v
 
 
     int64_t ret = (int64_t)MTY_IsTLSApplicationData(buf, size);
-    return JS_NewInt64(jsctx, ret);
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));
+    return retval;
 }
 
 static const JSCFunctionListEntry js_tic_funcs[] = {

@@ -77,12 +77,16 @@ def Call(handle, name, args, type):
     handle.write(f");\n")
 
 def Return(handle, type, rets):
+    handle.write(f'    JSValue retval = JS_NewObject(jsctx);\n')
     if rets:
+        for ret in rets:
+            handle.write(f'    JS_SetPropertyStr(jsctx, retval, "{ret}", JS_NewInt64(jsctx, (int64_t){ret}));\n')
         handle.write(f"    // Rets: {rets}\n")
     if not type == "void":
-        handle.write("    return JS_NewInt64(jsctx, ret);\n}\n\n")
+            handle.write(f'    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt64(jsctx, ret));\n')
     else:
-        handle.write("    return JS_NewInt64(jsctx, 1);\n}\n\n")
+        handle.write('    JS_SetPropertyStr(jsctx, retval, "ret", JS_NewInt32(jsctx, 1));')
+    handle.write("    return retval;\n}\n\n")
 
 def Boilerplate(handle, functions):
     handle.write("static const JSCFunctionListEntry js_tic_funcs[] = {\n")
