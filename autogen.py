@@ -15,6 +15,9 @@ def FindReturns(args):
             rets.append(arg["name"])
     return rets
 
+def CountInputs(args, rets):
+    return len([i["type"] for i in args if i["type"]]) - len(rets)
+
 
 def StartFunction(handle, name, length):
     handle.write(f"static JSValue js_{name}(JSContext* jsctx, JSValueConst this_val, int jsargc, JSValueConst *jsargv)")
@@ -131,7 +134,7 @@ if __name__ == "__main__":
                     continue
                 functions.append([function["name"], len(function["args"]), f"js_{function['name']}"])
                 rets = FindReturns(function["args"])
-                StartFunction(target, function["name"], len(function["args"]) - len(rets))
+                StartFunction(target, function["name"], CountInputs(function["args"], rets))
 
                 idx = 0
                 for arg in function["args"]:
