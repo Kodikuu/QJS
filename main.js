@@ -7,6 +7,7 @@ import * as mty from 'mty';
 //MTY_WindowDesc Class
 class MTY_WindowDesc {
     constructor() {
+        this.title = "qjs"
         this.position = 0
         this.api = 0
         this.width = 0
@@ -23,23 +24,27 @@ class MTY_WindowDesc {
 }
 
 function convMTY_WindowDesc(obj) {
-    let ret = Array(10)
+    let ret = Array(12)
     let intview = new Uint32Array(ret)
 
     let array = Object.values(obj)
     var i;
 
-    let part1 = new Uint32Array(array).slice(0, 9)
-    for (i = 0; i < part1.length; i++) {
-        intview[i] = part1[i]
+    let strptr = libc.string(array[0])
+    intview[1] = strptr.high
+    intview[0] = strptr.low
+
+    let part1 = new Uint32Array(array).slice(1, 10)
+    for (i = 0; i < part1.length+1; i++) {
+        intview[i+2] = part1[i]
     }
 
-    let part2 = new Uint8Array(array).slice(9, 12)
+    let part2 = new Uint8Array(array).slice(10, 13)
     let tmpval = 0;
     for (i = 0; i < part2.length; i++) {
         tmpval = (tmpval<<4) + part2[i]
     }
-    intview[9] = tmpval
+    intview[11] = tmpval
     return intview
 }
 
@@ -99,6 +104,6 @@ mtywindesc.fullscreen = 1;
 let descarray = Object.values(mtywindesc)
 let desc = convMTY_WindowDesc(descarray);
 
-let mtywindow = libc.MTY_WindowCreate(mtyapp, "QJS", desc);
+let mtywindow = libc.MTY_WindowCreate(mtyapp, desc);
 libc.MTY_WindowSetGFX(mtyapp, mtywindow, 1, 0);
 libc.MTY_AppRun(mtyapp);

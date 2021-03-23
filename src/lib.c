@@ -97,6 +97,25 @@ static JSValue js_array(JSContext* ctx, JSValueConst this_val, int argc, JSValue
     return jsArrRet; // length of string
 }
 
+static JSValue js_string(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    /*
+    Args (1); String (C const char*)
+    Returns; Int32 (JS Int32)
+    */
+    
+    // Check arg list length
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    char *str = JS_ToCString(ctx, argv[0]);
+
+    JSValue retval = JS_NewObject(ctx);
+    JS_SetPropertyStr(ctx, retval, "high", JS_NewInt32(ctx, ((uint64_t)str)>>32));
+    JS_SetPropertyStr(ctx, retval, "low", JS_NewInt32(ctx, str));
+    return retval;
+}
+
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
     Args (1); String (C const char*)
@@ -178,7 +197,7 @@ static JSValue js_mty_window_create(JSContext* ctx, JSValueConst this_val, int a
     */
     
     // Check arg list length
-    if (argc != 3) {
+    if (argc != 2) {
         return JS_EXCEPTION;
     }
 
@@ -188,7 +207,7 @@ static JSValue js_mty_window_create(JSContext* ctx, JSValueConst this_val, int a
 
     size_t psize;
     size_t size;
-    JSValue jsArray = JS_GetTypedArrayBuffer(ctx, argv[2], NULL, &size, NULL);
+    JSValue jsArray = JS_GetTypedArrayBuffer(ctx, argv[1], NULL, &size, NULL);
     MTY_WindowDesc *winDesc = (MTY_WindowDesc *)JS_GetArrayBuffer(ctx, &psize, jsArray);
     
     // MTY_Window window = MTY_WindowCreate(app, JS_ToCString(ctx, argv[1]), winDesc);
@@ -248,6 +267,7 @@ static JSValue js_mty_app_run(JSContext* ctx, JSValueConst this_val, int argc, J
 // list of exported functions, the string is how they'll appear in the module
 static const JSCFunctionListEntry js_tic_funcs[] = {
     JS_CFUNC_DEF("array", 1, js_array),
+    JS_CFUNC_DEF("string", 1, js_string),
     JS_CFUNC_DEF("print", 1, js_print),
 
     JS_CFUNC_DEF("MTY_Hostname", 0, js_mty_hostname),
