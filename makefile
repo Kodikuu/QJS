@@ -24,7 +24,6 @@ all: clean $(OBJS)
 	@rm src/*.o
 	@echo running main
 	@echo
-	@./main
 
 clean: 
 	@rm -f src/*.o
