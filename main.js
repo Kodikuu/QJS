@@ -17,7 +17,7 @@ class MTY_WindowDesc {
         this.x = 0
         this.y = 0
         this.maxHeight = 0
-        this.fullscreen = true
+        this.fullscreen = false
         this.hidden = false
         this.vsync = false
     }
@@ -99,7 +99,6 @@ let mtyapp = libc.MTY_AppCreate(mtyctx);
 let mtywindesc = new MTY_WindowDesc()
 mtywindesc.width = 800;
 mtywindesc.height = 700;
-mtywindesc.minWidth = 400;
 mtywindesc.fullscreen = 1;
 let descarray = Object.values(mtywindesc)
 let desc = convMTY_WindowDesc(descarray);
