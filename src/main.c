@@ -9,11 +9,30 @@
 #include <stdio.h>
 #include <string.h>
 
+JSModuleDef *loadmodule(JSContext *ctx, const char *module_name, void *opaque) {
+	size_t size;
+	char *file = MTY_ReadFile(module_name, &size);
+	if (!file) {
+        JS_ThrowReferenceError(ctx, "could not load module filename '%s'", module_name);
+        return NULL;
+    }
+
+	JSValue m = JS_Eval(ctx, file, size, module_name, JS_EVAL_TYPE_MODULE  | JS_EVAL_FLAG_COMPILE_ONLY);
+    if (JS_IsException(m)) {
+        return NULL;
+	}
+
+	return JS_VALUE_GET_PTR(m);
+}
+
 
 int main(void) {
 	printf("Start main.\n");
 	JSRuntime* runtime = JS_NewRuntime();
 	JSContext* ctx = JS_NewContext(runtime);
+	JS_SetModuleLoaderFunc(runtime, NULL, loadmodule, NULL);
+
+
 	JS_AddModuleExport(ctx, js_init_module_std(ctx, "std"), "std");
 
 	JS_AddModuleExport(ctx, JS_INIT_MODULE(ctx, "libc"), "libc");

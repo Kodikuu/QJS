@@ -4,6 +4,8 @@ import * as std from 'std';
 import * as libc from 'libc';
 import * as mty from 'mty';
 
+import * as main2 from "main2.js"
+
 //MTY_WindowDesc Class
 class MTY_WindowDesc {
     constructor() {
