@@ -16,8 +16,8 @@ MTY_WindowDesc convMTY_WindowDesc(JSContext *ctx, JSValue object) {
 
     uint32_t tmpint;
 
-    JS_ToUint32(ctx, &tmpint, JS_GetPropertyStr(ctx, object, "position"));
-    winDesc.position = tmpint;
+    JS_ToUint32(ctx, &tmpint, JS_GetPropertyStr(ctx, object, "origin"));
+    winDesc.origin = tmpint;
     JS_ToUint32(ctx, &tmpint, JS_GetPropertyStr(ctx, object, "api"));
     winDesc.api = tmpint;
     JS_ToUint32(ctx, &tmpint, JS_GetPropertyStr(ctx, object, "width"));
@@ -136,7 +136,7 @@ static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValue
     return JS_NewInt32(ctx, strlen(string)); // length of string
 }
 
-static JSValue js_mty_hostname(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+static JSValue js_mty_gethostname(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
     Args (0); void
     Returns; const char* (JS String)
@@ -147,7 +147,7 @@ static JSValue js_mty_hostname(JSContext* ctx, JSValueConst this_val, int argc, 
         return JS_EXCEPTION;
     }
 
-    const char* hostname = MTY_Hostname();
+    const char* hostname = MTY_GetHostname();
     return JS_NewString(ctx, hostname);
 }
 
@@ -270,7 +270,7 @@ static const JSCFunctionListEntry js_tic_funcs[] = {
     JS_CFUNC_DEF("string", 1, js_string),
     JS_CFUNC_DEF("print", 1, js_print),
 
-    JS_CFUNC_DEF("MTY_Hostname", 0, js_mty_hostname),
+    JS_CFUNC_DEF("MTY_GetHostname", 0, js_mty_gethostname),
 
     JS_CFUNC_DEF("MTY_CTXCreate", 2, js_mty_ctx_create),
     JS_CFUNC_DEF("MTY_AppCreate", 2, js_mty_app_create),

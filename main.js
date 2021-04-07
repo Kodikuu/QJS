@@ -10,7 +10,7 @@ import * as main2 from "main2.js"
 class MTY_WindowDesc {
     constructor() {
         this.title = "qjs"
-        this.position = 0
+        this.origin = 0
         this.api = 0
         this.width = 0
         this.height = 0
@@ -75,7 +75,7 @@ strarray = 0;
 
 libc.print("Let's use Matoya to find out what PC we're on;");
 libc.print("Calling libc.MTY_Hostname...");
-let hostname = libc.MTY_Hostname();
+let hostname = libc.MTY_GetHostname();
 
 libc.print(`We are running on ${hostname}.\n`);
 
