@@ -28,10 +28,12 @@ JSModuleDef *loadmodule(JSContext *ctx, const char *module_name, void *opaque) {
 
 int main(void) {
 	printf("Start main.\n");
+
 	JSRuntime* runtime = JS_NewRuntime();
-	JSContext* ctx = JS_NewContext(runtime);
 	JS_SetModuleLoaderFunc(runtime, NULL, loadmodule, NULL);
 
+	JSContext* ctx = JS_NewContext(runtime);
+	JS_EnableBignumExt(ctx, true);
 
 	JS_AddModuleExport(ctx, js_init_module_std(ctx, "std"), "std");
 
