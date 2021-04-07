@@ -79,21 +79,17 @@ def DeclareFunction(handle, name, type, args):
     return True, arglen, f"js_{name}"
 
 
-def DeclareEnums(handle, enums):
-    handle.write('static int declareEnums(JSContext *jsctx) {\n    const char *string = "\\n')
-    for enum in enums:
-        handle.write(f'//{enum["name"]}\\n')
-        for value in enum["values"]:
-            handle.write(f'let {value["name"]} = {value["value"]}\\n')
-        handle.write("\\n")
-    handle.write('";\n')
-    handle.write('    JS_Eval(jsctx, string, sizeof(string), "main.js", JS_EVAL_TYPE_GLOBAL);\n}\n\n')
-
-
-def Boilerplate(handle, functions):
+def Boilerplate(handle, functions, enums):
     handle.write("static const JSCFunctionListEntry js_tic_funcs[] = {\n")
+
+    for enum in enums:
+        handle.write(f'    //{enum["name"]}\\n')
+        for value in enum["values"]:
+            handle.write(f'    JS_PROP_INT64_DEF("{value["name"]}", {value["value"]}, 0),\n')
+
     for func in functions:
         handle.write(f'    JS_CFUNC_DEF("{func[0]}", {func[1]}, {func[2]}),\n')
+
     handle.write("};\n")
     handle.write("""
 static const int func_count = (int)(sizeof(js_tic_funcs)/sizeof(js_tic_funcs[0]));
@@ -107,7 +103,6 @@ static int js_tic_init(JSContext *ctx, JSModuleDef *m)
 // this is what we use later as the module itself.
 JSModuleDef *JS_INIT_MODULE_MTY(JSContext *ctx, const char *module_name)
 {
-    declareEnums(ctx);
     JSModuleDef *m;
     m = JS_NewCModule(ctx, module_name, js_tic_init);
     if (!m)\n        return NULL;
@@ -138,5 +133,5 @@ if __name__ == "__main__":
             if "enums" in section:
                 [enums.append(enum) for enum in section["enums"]]
         
-        DeclareEnums(target, enums)
-        Boilerplate(target, functions)
+        # DeclareEnums(target, enums)
+        Boilerplate(target, functions, enums)
