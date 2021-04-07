@@ -79,6 +79,17 @@ def DeclareFunction(handle, name, type, args):
     return True, arglen, f"js_{name}"
 
 
+def DeclareEnums(handle, enums):
+    handle.write('static int declareEnums(JSContext *jsctx) {\n    const char *string = "\\n')
+    for enum in enums:
+        handle.write(f'//{enum["name"]}\\n')
+        for value in enum["values"]:
+            handle.write(f'let {value["name"]} = {value["value"]}\\n')
+        handle.write("\\n")
+    handle.write('";\n')
+    handle.write('    JS_Eval(jsctx, string, sizeof(string), "main.js", JS_EVAL_TYPE_GLOBAL);\n}\n\n')
+
+
 def Boilerplate(handle, functions):
     handle.write("static const JSCFunctionListEntry js_tic_funcs[] = {\n")
     for func in functions:
@@ -86,12 +97,18 @@ def Boilerplate(handle, functions):
     handle.write("};\n")
     handle.write("""
 static const int func_count = (int)(sizeof(js_tic_funcs)/sizeof(js_tic_funcs[0]));
-\n// initializes the module with the export functions list and it's length
+
+// initializes the module with the export functions list and it's length
 static int js_tic_init(JSContext *ctx, JSModuleDef *m)
-{\n    return JS_SetModuleExportList(ctx, m, js_tic_funcs, func_count);
-}\n\n\n// this is what we use later as the module itself.
+{
+        return JS_SetModuleExportList(ctx, m, js_tic_funcs, func_count);
+}
+
+// this is what we use later as the module itself.
 JSModuleDef *JS_INIT_MODULE_MTY(JSContext *ctx, const char *module_name)
-{\n    JSModuleDef *m;
+{
+    declareEnums(ctx);
+    JSModuleDef *m;
     m = JS_NewCModule(ctx, module_name, js_tic_init);
     if (!m)\n        return NULL;
     JS_AddModuleExportList(ctx, m, js_tic_funcs, func_count);\nreturn m;\n}\n""")
@@ -107,6 +124,8 @@ if __name__ == "__main__":
         # One-time
         target.write('#include "libmatoya.h"\n')
 
+        enums = []
+
         functions = []
         for name, section in data.items():
             target.write(f'\n// {name}\n// {section["mbrief"]}\n\n')
@@ -115,5 +134,9 @@ if __name__ == "__main__":
                 valid, args, fname = DeclareFunction(target, function["name"], function["type"], function["args"])
                 if valid:
                     functions.append([function["name"], args, fname])
+            
+            if "enums" in section:
+                [enums.append(enum) for enum in section["enums"]]
         
+        DeclareEnums(target, enums)
         Boilerplate(target, functions)
