@@ -83,9 +83,10 @@ def Boilerplate(handle, functions, enums):
     handle.write("static const JSCFunctionListEntry js_tic_funcs[] = {\n")
 
     for enum in enums:
-        handle.write(f'    //{enum["name"]}\\n')
+        handle.write(f'    //{enum["name"]}\n')
         for value in enum["values"]:
             handle.write(f'    JS_PROP_INT64_DEF("{value["name"]}", {value["value"]}, 0),\n')
+        handle.write("\n")
 
     for func in functions:
         handle.write(f'    JS_CFUNC_DEF("{func[0]}", {func[1]}, {func[2]}),\n')
