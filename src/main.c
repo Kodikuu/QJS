@@ -42,7 +42,7 @@ int main(void) {
 
 	printf("Read main.js\n");
 	size_t size;
-	char *file = MTY_ReadFile("main.js", &size);
+	char *file = MTY_ReadFile("main2.js", &size);
 
 	printf("\nEval main.js\n");
 	JSValue result = JS_Eval(ctx, file, size, "main.js", JS_EVAL_TYPE_MODULE);
