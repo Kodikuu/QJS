@@ -137,6 +137,10 @@ if __name__ == "__main__":
         for name, struct in parsed["structs"].items():
             writeIntermediates(target, struct)
             writeStruct(target, name, struct)
+        
+        # Converters
+
+        # FromPointers
 
         # Functions
 
