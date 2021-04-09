@@ -108,11 +108,11 @@ static JSValue js_string(JSContext* ctx, JSValueConst this_val, int argc, JSValu
         return JS_EXCEPTION;
     }
 
-    char *str = JS_ToCString(ctx, argv[0]);
+    const char *str = JS_ToCString(ctx, argv[0]);
 
     JSValue retval = JS_NewObject(ctx);
     JS_SetPropertyStr(ctx, retval, "high", JS_NewInt32(ctx, ((uint64_t)str)>>32));
-    JS_SetPropertyStr(ctx, retval, "low", JS_NewInt32(ctx, str));
+    JS_SetPropertyStr(ctx, retval, "low", JS_NewInt32(ctx, (uint64_t)str));
     return retval;
 }
 
