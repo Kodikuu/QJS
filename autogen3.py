@@ -35,6 +35,7 @@ def writeIntermediates(handle, struct):
             length = member[:-1].split("[")[1]
             length = int(parsed["enums"].get(length, length))
             
+            target.write(f"// Intermediate object for {ctype}[{length}] array\n")
             beginExport(target, f"{ctype}_{length}")
             for i in range(length):
                 if isObject:

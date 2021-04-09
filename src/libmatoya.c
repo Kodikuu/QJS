@@ -70,6 +70,7 @@ static const JSCFunctionListEntry js_MTY_Axis[] = {
     JS_PROP_INT32_DEF("max", 0, JS_PROP_CONFIGURABLE),
 };
 
+// Intermediate object for bool[64] array
 static const JSCFunctionListEntry js_bool_64[] = {
     JS_PROP_INT32_DEF("0", 0, JS_PROP_CONFIGURABLE),
     JS_PROP_INT32_DEF("1", 0, JS_PROP_CONFIGURABLE),
@@ -137,6 +138,7 @@ static const JSCFunctionListEntry js_bool_64[] = {
     JS_PROP_INT32_DEF("63", 0, JS_PROP_CONFIGURABLE),
 };
 
+// Intermediate object for MTY_Axis[16] array
 static const JSCFunctionListEntry js_MTY_Axis_16[] = {
     JS_OBJECT_DEF("0", js_MTY_Axis, 4, JS_PROP_CONFIGURABLE),
     JS_OBJECT_DEF("1", js_MTY_Axis, 4, JS_PROP_CONFIGURABLE),
@@ -208,6 +210,7 @@ static const JSCFunctionListEntry js_MTY_PenEvent[] = {
     JS_PROP_INT32_DEF("tiltY", 0, JS_PROP_CONFIGURABLE),
 };
 
+// Intermediate object for char[8] array
 static const JSCFunctionListEntry js_char_8[] = {
     JS_PROP_STRING_DEF("0", "", JS_PROP_CONFIGURABLE),
     JS_PROP_STRING_DEF("1", "", JS_PROP_CONFIGURABLE),
