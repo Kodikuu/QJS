@@ -43,6 +43,8 @@ def exportMember(handle, ctype, name):
         handle.write(f'    JS_PROP_DOUBLE_DEF("{name}", 0.0f, JS_PROP_CONFIGURABLE),\n')
     elif "char" in ctype:
         handle.write(f'    JS_PROP_STRING_DEF("{name}", "", JS_PROP_CONFIGURABLE),\n')
+    elif "bool" in ctype:
+        handle.write(f'    JS_PROP_INT32_DEF("{name}", 0, JS_PROP_CONFIGURABLE),\n')
 
 def endExport(handle):
     handle.write("};\n\n")
