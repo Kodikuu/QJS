@@ -599,5 +599,6 @@ JSModuleDef *JS_INIT_MODULE_MTY(JSContext *ctx, const char *module_name)
     if (!m)
         return NULL;
     JS_AddModuleExportList(ctx, m, js_exports, func_count);
-return m;
+
+    JS_AddModuleExport(ctx, m, module_name);
 }

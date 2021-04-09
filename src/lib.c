@@ -289,12 +289,12 @@ static int js_tic_init(JSContext *ctx, JSModuleDef *m)
 
 
 // this is what we use later as the module itself.
-JSModuleDef *JS_INIT_MODULE(JSContext *ctx, const char *module_name)
+JSModuleDef *JS_INIT_MODULE_LIBC(JSContext *ctx, const char *module_name)
 {
     JSModuleDef *m;
     m = JS_NewCModule(ctx, module_name, js_tic_init);
     if (!m)
         return NULL;
     JS_AddModuleExportList(ctx, m, js_tic_funcs, func_count);
-    return m;
+    JS_AddModuleExport(ctx, m, module_name);
 }

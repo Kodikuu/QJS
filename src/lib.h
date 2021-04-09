@@ -4,4 +4,4 @@
 #include "quickjs.h"
 #include "matoya.h"
 
-JSModuleDef *JS_INIT_MODULE(JSContext*, const char*);
+JSModuleDef *JS_INIT_MODULE_LIBC(JSContext*, const char*);
