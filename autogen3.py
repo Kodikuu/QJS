@@ -82,13 +82,12 @@ if __name__ == "__main__":
 
         # Preprocess
         parsed = preprocessing(data)
-
-        # Structs
+        
+        # Intermediate objects and Structs
         for name, struct in parsed["structs"].items():
-            beginExport(target, name)
             for member, ctype in struct.items():
                 isObject = False
-                
+
                 if "char *" in ctype:
                     pass
                 elif "*" in ctype:
@@ -98,7 +97,37 @@ if __name__ == "__main__":
                 elif ctype in parsed["structs"].keys():
                     isObject = True
                 
-                if isObject:
+                if "[" in member:
+                    length = member[:-1].split("[")[1]
+                    length = int(parsed["enums"].get(length, length))
+                    
+                    beginExport(target, f"{ctype}_{length}")
+                    for i in range(length):
+                        if isObject:
+                            exportStruct(target, i, len(parsed["structs"][ctype]), ctype)
+                        else:
+                            exportMember(target, ctype, i)
+                    endExport(target)
+
+            beginExport(target, name)
+            for member, ctype in struct.items():
+                isObject = False
+
+                if "char *" in ctype:
+                    pass
+                elif "*" in ctype:
+                    ctype = "int64_t"
+                elif ctype in parsed["enumsets"]:
+                    ctype = "int32_t"
+                elif ctype in parsed["structs"].keys():
+                    isObject = True
+                
+                if "[" in member:
+                    mname = member[:-1].split("[")[0]
+                    length = member[:-1].split("[")[1]
+                    length = int(parsed["enums"].get(length, length))
+                    exportStruct(target, mname, length, f"{ctype}_{length}")
+                elif isObject:
                     exportStruct(target, member, len(parsed["structs"][ctype]), ctype)
                 else:
                     exportMember(target, ctype, member)
