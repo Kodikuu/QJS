@@ -18,6 +18,56 @@ def preprocessing(data):
             functions[function["name"]] = {"args": {arg["name"]:arg["type"] for arg in function["args"]}, "return": function["type"]}
     return {"functions": functions, "enums": enums, "enumsets": enumsets, "structs": structs}
 
+def writeIntermediates(handle, struct):
+    for member, ctype in struct.items():
+        isObject = False
+
+        if "char *" in ctype:
+            pass
+        elif "*" in ctype:
+            ctype = "int64_t"
+        elif ctype in parsed["enumsets"]:
+            ctype = "int32_t"
+        elif ctype in parsed["structs"].keys():
+            isObject = True
+        
+        if "[" in member:
+            length = member[:-1].split("[")[1]
+            length = int(parsed["enums"].get(length, length))
+            
+            beginExport(target, f"{ctype}_{length}")
+            for i in range(length):
+                if isObject:
+                    exportStruct(target, i, len(parsed["structs"][ctype]), ctype)
+                else:
+                    exportMember(target, ctype, i)
+            endExport(target)
+
+def writeStruct(handle, name, struct):
+    beginExport(target, name)
+    for member, ctype in struct.items():
+        isObject = False
+
+        if "char *" in ctype:
+            pass
+        elif "*" in ctype:
+            ctype = "int64_t"
+        elif ctype in parsed["enumsets"]:
+            ctype = "int32_t"
+        elif ctype in parsed["structs"].keys():
+            isObject = True
+        
+        if "[" in member:
+            mname = member[:-1].split("[")[0]
+            length = member[:-1].split("[")[1]
+            length = int(parsed["enums"].get(length, length))
+            exportStruct(target, mname, length, f"{ctype}_{length}")
+        elif isObject:
+            exportStruct(target, member, len(parsed["structs"][ctype]), ctype)
+        else:
+            exportMember(target, ctype, member)
+    endExport(target)
+
 def beginExport(handle, name):
     handle.write(f"static const JSCFunctionListEntry js_{name}[] = ")
     handle.write("{\n")
@@ -85,53 +135,8 @@ if __name__ == "__main__":
         
         # Intermediate objects and Structs
         for name, struct in parsed["structs"].items():
-            for member, ctype in struct.items():
-                isObject = False
-
-                if "char *" in ctype:
-                    pass
-                elif "*" in ctype:
-                    ctype = "int64_t"
-                elif ctype in parsed["enumsets"]:
-                    ctype = "int32_t"
-                elif ctype in parsed["structs"].keys():
-                    isObject = True
-                
-                if "[" in member:
-                    length = member[:-1].split("[")[1]
-                    length = int(parsed["enums"].get(length, length))
-                    
-                    beginExport(target, f"{ctype}_{length}")
-                    for i in range(length):
-                        if isObject:
-                            exportStruct(target, i, len(parsed["structs"][ctype]), ctype)
-                        else:
-                            exportMember(target, ctype, i)
-                    endExport(target)
-
-            beginExport(target, name)
-            for member, ctype in struct.items():
-                isObject = False
-
-                if "char *" in ctype:
-                    pass
-                elif "*" in ctype:
-                    ctype = "int64_t"
-                elif ctype in parsed["enumsets"]:
-                    ctype = "int32_t"
-                elif ctype in parsed["structs"].keys():
-                    isObject = True
-                
-                if "[" in member:
-                    mname = member[:-1].split("[")[0]
-                    length = member[:-1].split("[")[1]
-                    length = int(parsed["enums"].get(length, length))
-                    exportStruct(target, mname, length, f"{ctype}_{length}")
-                elif isObject:
-                    exportStruct(target, member, len(parsed["structs"][ctype]), ctype)
-                else:
-                    exportMember(target, ctype, member)
-            endExport(target)
+            writeIntermediates(target, struct)
+            writeStruct(target, name, struct)
 
         # Functions
 
