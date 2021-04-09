@@ -1,4 +1,5 @@
 #include "libmatoya.h"
+
 static const JSCFunctionListEntry js_MTY_RenderDesc[] = {
     JS_PROP_INT32_DEF("format", 0, JS_PROP_CONFIGURABLE),
     JS_PROP_INT32_DEF("rotation", 0, JS_PROP_CONFIGURABLE),

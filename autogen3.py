@@ -128,7 +128,7 @@ if __name__ == "__main__":
         data = json.load(source)
     
         # One-time
-        target.write('#include "libmatoya.h"\n')
+        target.write('#include "libmatoya.h"\n\n')
 
         # Preprocess
         parsed = preprocessing(data)
