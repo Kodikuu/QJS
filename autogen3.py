@@ -78,24 +78,24 @@ def exportEnum(handle, name, value):
 
 def exportStruct(handle, name, num, ctype=None):
     if ctype:
-        handle.write(f'    JS_OBJECT_DEF("{name}", js_{ctype}, {num}, JS_PROP_CONFIGURABLE),\n')
+        handle.write(f'    JS_OBJECT_DEF("{name}", js_{ctype}, {num}, JS_PROP_C_W_E),\n')
     else:
-        handle.write(f'    JS_OBJECT_DEF("{name}", js_{name}, {num}, JS_PROP_CONFIGURABLE),\n')
+        handle.write(f'    JS_OBJECT_DEF("{name}", js_{name}, {num}, JS_PROP_C_W_E),\n')
 
 def exportFunc(handle, name, argc):
     handle.write(f'    JS_CFUNC_DEF("{name}", {argc}, js_{name}),\n')
 
 def exportMember(handle, ctype, name):
     if "64" in ctype:
-        handle.write(f'    JS_PROP_INT64_DEF("{name}", 0, JS_PROP_CONFIGURABLE),\n')
+        handle.write(f'    JS_PROP_INT64_DEF("{name}", 0, JS_PROP_C_W_E),\n')
     elif "int" in ctype:
-        handle.write(f'    JS_PROP_INT32_DEF("{name}", 0, JS_PROP_CONFIGURABLE),\n')
+        handle.write(f'    JS_PROP_INT32_DEF("{name}", 0, JS_PROP_C_W_E),\n')
     elif "float" in ctype:
-        handle.write(f'    JS_PROP_DOUBLE_DEF("{name}", 0.0f, JS_PROP_CONFIGURABLE),\n')
+        handle.write(f'    JS_PROP_DOUBLE_DEF("{name}", 0.0f, JS_PROP_C_W_E),\n')
     elif "char" in ctype:
-        handle.write(f'    JS_PROP_STRING_DEF("{name}", "", JS_PROP_CONFIGURABLE),\n')
+        handle.write(f'    JS_PROP_STRING_DEF("{name}", "", JS_PROP_C_W_E),\n')
     elif "bool" in ctype:
-        handle.write(f'    JS_PROP_INT32_DEF("{name}", 0, JS_PROP_CONFIGURABLE),\n')
+        handle.write(f'    JS_PROP_INT32_DEF("{name}", 0, JS_PROP_C_W_E),\n')
 
 def endExport(handle):
     handle.write("};\n\n")
