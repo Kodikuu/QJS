@@ -1,7 +1,8 @@
 OBJS = \
 	src/main.o \
 	src/lib.o \
-	src/libmatoya.o
+	src/libmatoya.o \
+	src/utils.o
 
 INCLUDES = \
 	-Iincludes \
