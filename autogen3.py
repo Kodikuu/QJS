@@ -5,6 +5,7 @@ def preprocessing(data):
     enumsets = []
     structs = {}
     functions = {}
+    typedefs = {}
 
     for name, section in data.items():
         for enum in section.get("enums", []):
@@ -16,7 +17,10 @@ def preprocessing(data):
 
         for function in section.get("functions", []):
             functions[function["name"]] = {"args": {arg["name"]:arg["type"] for arg in function["args"]}, "return": function["type"]}
-    return {"functions": functions, "enums": enums, "enumsets": enumsets, "structs": structs}
+        
+        for typedef in section.get("typedefs", []):
+            typedefs[typedef[0]] = typedef[1]
+    return {"functions": functions, "enums": enums, "enumsets": enumsets, "structs": structs, "typedefs": typedefs}
 
 def beginExport(handle, name):
     handle.write(f"static const JSCFunctionListEntry js_{name}[] = ")
@@ -112,6 +116,10 @@ def writeConvToC(handle, name, struct, parsed):
     for member, ctype in struct.items():
         isIntermediate = "[" in member
         isStruct = ctype in parsed["structs"].keys()
+        isEnum = ctype in parsed["enums"].keys()
+        
+        if parsed["typedefs"].get(ctype, False):
+            ctype = parsed["typedefs"].get(ctype, False)
 
         if "char *" in ctype:
             pass
