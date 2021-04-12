@@ -120,6 +120,22 @@ def writeConvToC(handle, name, struct, parsed):
         elif ctype in parsed["enumsets"]:
             ctype = "int32_t"
         
+        if "64" in ctype:
+            converter = "JSToInt64"
+        elif "int" in ctype:
+            converter = "JSToInt32"
+        elif "float" in ctype:
+            converter = "(float)JSToFloat64"
+        elif "char" in ctype:
+            converter = "JS_ToCString"
+        elif "bool" in ctype:
+            converter = "JS_ToBool"
+        elif isEnum or isStruct:
+            converter = "JS_ToInt64"
+        else:
+            converter = "JS_ToInt64"
+            handle.write(f"// Unknown ctype: {ctype}\n")
+        
         if isIntermediate and isStruct:
             mname = member[:-1].split("[")[0]
             length = member[:-1].split("[")[1]
@@ -138,20 +154,6 @@ def writeConvToC(handle, name, struct, parsed):
             length = member[:-1].split("[")[1]
             length = int(parsed["enums"].get(length, length))
 
-            if "64" in ctype:
-                converter = "JSToInt64"
-            elif "int" in ctype:
-                converter = "JSToInt32"
-            elif "float" in ctype:
-                converter = "(float)JSToFloat64"
-            elif "char" in ctype:
-                converter = "JS_ToCString"
-            elif "bool" in ctype:
-                converter = "JS_ToBool"
-            else:
-                converter = "JS_ToInt64"
-                handle.write(f"// Unknown ctype: {ctype}\n")
-
             if "i" not in workvars:
                 handle.write("    int i;\n")
                 workvars.append("i")
@@ -159,6 +161,14 @@ def writeConvToC(handle, name, struct, parsed):
             handle.write("{\n")
             handle.write(f"        ret.{mname}[i] = {converter}(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, '{mname}'), i));\n")
             handle.write("    }\n\n")
+        
+        elif isStruct:
+            handle.write(f"    ret.{member} = JSToC_{ctype}(jsctx, JS_GetPropertyStr(jsctx, obj, '{member}'));\n\n")
+        
+        else:
+            handle.write(f"    ret.{member} = {converter}(jsctx, JS_GetPropertyStr(jsctx, obj, '{member}'));\n\n")
+        
+            
     
     handle.write("    return ret;\n")
 

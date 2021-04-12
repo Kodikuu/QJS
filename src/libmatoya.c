@@ -288,11 +288,39 @@ static const JSCFunctionListEntry js_MTY_ListNode[] = {
 static MTY_RenderDesc JSToC_MTY_RenderDesc(JSContext* jsctx, JSValue obj) {
     MTY_RenderDesc ret = {0};
 
+    ret.format = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'format'));
+
+    ret.rotation = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'rotation'));
+
+    ret.filter = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'filter'));
+
+    ret.effect = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'effect'));
+
+    ret.imageWidth = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'imageWidth'));
+
+    ret.imageHeight = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'imageHeight'));
+
+    ret.cropWidth = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'cropWidth'));
+
+    ret.cropHeight = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'cropHeight'));
+
+    ret.viewWidth = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'viewWidth'));
+
+    ret.viewHeight = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'viewHeight'));
+
+    ret.aspectRatio = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'aspectRatio'));
+
+    ret.scale = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'scale'));
+
     return ret;
 }
 
 static MTY_Point JSToC_MTY_Point(JSContext* jsctx, JSValue obj) {
     MTY_Point ret = {0};
+
+    ret.x = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'x'));
+
+    ret.y = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'y'));
 
     return ret;
 }
@@ -300,11 +328,25 @@ static MTY_Point JSToC_MTY_Point(JSContext* jsctx, JSValue obj) {
 static MTY_Rect JSToC_MTY_Rect(JSContext* jsctx, JSValue obj) {
     MTY_Rect ret = {0};
 
+    ret.left = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'left'));
+
+    ret.top = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'top'));
+
+    ret.right = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'right'));
+
+    ret.bottom = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'bottom'));
+
     return ret;
 }
 
 static MTY_Vtx JSToC_MTY_Vtx(JSContext* jsctx, JSValue obj) {
     MTY_Vtx ret = {0};
+
+    ret.pos = JSToC_MTY_Point(jsctx, JS_GetPropertyStr(jsctx, obj, 'pos'));
+
+    ret.uv = JSToC_MTY_Point(jsctx, JS_GetPropertyStr(jsctx, obj, 'uv'));
+
+    ret.col = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'col'));
 
     return ret;
 }
@@ -312,11 +354,39 @@ static MTY_Vtx JSToC_MTY_Vtx(JSContext* jsctx, JSValue obj) {
 static MTY_Cmd JSToC_MTY_Cmd(JSContext* jsctx, JSValue obj) {
     MTY_Cmd ret = {0};
 
+    ret.clip = JSToC_MTY_Rect(jsctx, JS_GetPropertyStr(jsctx, obj, 'clip'));
+
+    ret.texture = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'texture'));
+
+    ret.elemCount = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'elemCount'));
+
+    ret.idxOffset = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'idxOffset'));
+
+    ret.vtxOffset = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'vtxOffset'));
+
     return ret;
 }
 
 static MTY_CmdList JSToC_MTY_CmdList(JSContext* jsctx, JSValue obj) {
     MTY_CmdList ret = {0};
+
+    ret.cmd = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'cmd'));
+
+    ret.vtx = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'vtx'));
+
+    ret.idx = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'idx'));
+
+    ret.cmdLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'cmdLength'));
+
+    ret.cmdMax = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'cmdMax'));
+
+    ret.vtxLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'vtxLength'));
+
+    ret.vtxMax = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'vtxMax'));
+
+    ret.idxLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'idxLength'));
+
+    ret.idxMax = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'idxMax'));
 
     return ret;
 }
@@ -324,11 +394,33 @@ static MTY_CmdList JSToC_MTY_CmdList(JSContext* jsctx, JSValue obj) {
 static MTY_DrawData JSToC_MTY_DrawData(JSContext* jsctx, JSValue obj) {
     MTY_DrawData ret = {0};
 
+    ret.displaySize = JSToC_MTY_Point(jsctx, JS_GetPropertyStr(jsctx, obj, 'displaySize'));
+
+    ret.cmdList = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'cmdList'));
+
+    ret.cmdListLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'cmdListLength'));
+
+    ret.cmdListMax = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'cmdListMax'));
+
+    ret.idxTotalLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'idxTotalLength'));
+
+    ret.vtxTotalLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'vtxTotalLength'));
+
+    ret.clear = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'clear'));
+
     return ret;
 }
 
 static MTY_Axis JSToC_MTY_Axis(JSContext* jsctx, JSValue obj) {
     MTY_Axis ret = {0};
+
+    ret.usage = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'usage'));
+
+    ret.value = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'value'));
+
+    ret.min = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'min'));
+
+    ret.max = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'max'));
 
     return ret;
 }
@@ -345,11 +437,29 @@ static MTY_ControllerEvent JSToC_MTY_ControllerEvent(JSContext* jsctx, JSValue o
         ret.axes[i] = JSToC_MTY_Axis(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, 'axes'), i));
     }
 
+    ret.type = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'type'));
+
+    ret.id = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'id'));
+
+    ret.vid = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'vid'));
+
+    ret.pid = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'pid'));
+
+    ret.numButtons = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'numButtons'));
+
+    ret.numAxes = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'numAxes'));
+
     return ret;
 }
 
 static MTY_KeyEvent JSToC_MTY_KeyEvent(JSContext* jsctx, JSValue obj) {
     MTY_KeyEvent ret = {0};
+
+    ret.key = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'key'));
+
+    ret.mod = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'mod'));
+
+    ret.pressed = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'pressed'));
 
     return ret;
 }
@@ -357,11 +467,25 @@ static MTY_KeyEvent JSToC_MTY_KeyEvent(JSContext* jsctx, JSValue obj) {
 static MTY_ScrollEvent JSToC_MTY_ScrollEvent(JSContext* jsctx, JSValue obj) {
     MTY_ScrollEvent ret = {0};
 
+    ret.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'x'));
+
+    ret.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'y'));
+
+    ret.pixels = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'pixels'));
+
     return ret;
 }
 
 static MTY_ButtonEvent JSToC_MTY_ButtonEvent(JSContext* jsctx, JSValue obj) {
     MTY_ButtonEvent ret = {0};
+
+    ret.button = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'button'));
+
+    ret.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'x'));
+
+    ret.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'y'));
+
+    ret.pressed = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'pressed'));
 
     return ret;
 }
@@ -369,11 +493,26 @@ static MTY_ButtonEvent JSToC_MTY_ButtonEvent(JSContext* jsctx, JSValue obj) {
 static MTY_MotionEvent JSToC_MTY_MotionEvent(JSContext* jsctx, JSValue obj) {
     MTY_MotionEvent ret = {0};
 
+    ret.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'x'));
+
+    ret.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'y'));
+
+    ret.relative = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'relative'));
+
+    ret.synth = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'synth'));
+
     return ret;
 }
 
 static MTY_DropEvent JSToC_MTY_DropEvent(JSContext* jsctx, JSValue obj) {
     MTY_DropEvent ret = {0};
+
+    ret.name = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, 'name'));
+
+    ret.buf = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'buf'));
+
+// Unknown ctype: size_t
+    ret.size = JS_ToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'size'));
 
     return ret;
 }
@@ -381,16 +520,59 @@ static MTY_DropEvent JSToC_MTY_DropEvent(JSContext* jsctx, JSValue obj) {
 static MTY_PenEvent JSToC_MTY_PenEvent(JSContext* jsctx, JSValue obj) {
     MTY_PenEvent ret = {0};
 
+    ret.flags = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'flags'));
+
+    ret.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'x'));
+
+    ret.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'y'));
+
+    ret.pressure = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'pressure'));
+
+    ret.rotation = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'rotation'));
+
+    ret.tiltX = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'tiltX'));
+
+    ret.tiltY = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'tiltY'));
+
     return ret;
 }
 
 static MTY_Event JSToC_MTY_Event(JSContext* jsctx, JSValue obj) {
     MTY_Event ret = {0};
 
+    ret.type = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'type'));
+
+    ret.window = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'window'));
+
+// Unknown ctype: UNION_END
+    ret. = JS_ToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, ''));
+
+    ret.controller = JSToC_MTY_ControllerEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'controller'));
+
+    ret.scroll = JSToC_MTY_ScrollEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'scroll'));
+
+    ret.button = JSToC_MTY_ButtonEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'button'));
+
+    ret.motion = JSToC_MTY_MotionEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'motion'));
+
+    ret.drop = JSToC_MTY_DropEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'drop'));
+
+    ret.pen = JSToC_MTY_PenEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'pen'));
+
+    ret.key = JSToC_MTY_KeyEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'key'));
+
+    ret.reopenArg = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, 'reopenArg'));
+
+    ret.hotkey = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'hotkey'));
+
+    ret.trayID = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'trayID'));
+
     int i;
     for (i=0; i<8; i++) {
         ret.text[i] = JS_ToCString(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, 'text'), i));
     }
+
+    ret.focus = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'focus'));
 
     return ret;
 }
@@ -398,11 +580,44 @@ static MTY_Event JSToC_MTY_Event(JSContext* jsctx, JSValue obj) {
 static MTY_MenuItem JSToC_MTY_MenuItem(JSContext* jsctx, JSValue obj) {
     MTY_MenuItem ret = {0};
 
+// Unknown ctype: MTY_MenuItemCheckedFunc
+    ret.checked = JS_ToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'checked'));
+
+    ret.label = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, 'label'));
+
+    ret.trayID = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'trayID'));
+
     return ret;
 }
 
 static MTY_WindowDesc JSToC_MTY_WindowDesc(JSContext* jsctx, JSValue obj) {
     MTY_WindowDesc ret = {0};
+
+    ret.title = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, 'title'));
+
+    ret.origin = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'origin'));
+
+    ret.api = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'api'));
+
+    ret.width = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'width'));
+
+    ret.height = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'height'));
+
+    ret.minWidth = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'minWidth'));
+
+    ret.minHeight = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'minHeight'));
+
+    ret.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'x'));
+
+    ret.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'y'));
+
+    ret.maxHeight = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'maxHeight'));
+
+    ret.fullscreen = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'fullscreen'));
+
+    ret.hidden = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'hidden'));
+
+    ret.vsync = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'vsync'));
 
     return ret;
 }
@@ -410,11 +625,21 @@ static MTY_WindowDesc JSToC_MTY_WindowDesc(JSContext* jsctx, JSValue obj) {
 static MTY_FileDesc JSToC_MTY_FileDesc(JSContext* jsctx, JSValue obj) {
     MTY_FileDesc ret = {0};
 
+    ret.path = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, 'path'));
+
+    ret.name = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, 'name'));
+
+    ret.dir = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'dir'));
+
     return ret;
 }
 
 static MTY_FileList JSToC_MTY_FileList(JSContext* jsctx, JSValue obj) {
     MTY_FileList ret = {0};
+
+    ret.files = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'files'));
+
+    ret.len = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'len'));
 
     return ret;
 }
@@ -422,17 +647,27 @@ static MTY_FileList JSToC_MTY_FileList(JSContext* jsctx, JSValue obj) {
 static MTY_Atomic32 JSToC_MTY_Atomic32(JSContext* jsctx, JSValue obj) {
     MTY_Atomic32 ret = {0};
 
+    ret.value = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'value'));
+
     return ret;
 }
 
 static MTY_Atomic64 JSToC_MTY_Atomic64(JSContext* jsctx, JSValue obj) {
     MTY_Atomic64 ret = {0};
 
+    ret.value = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'value'));
+
     return ret;
 }
 
 static MTY_ListNode JSToC_MTY_ListNode(JSContext* jsctx, JSValue obj) {
     MTY_ListNode ret = {0};
+
+    ret.prev = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'prev'));
+
+    ret.next = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'next'));
+
+    ret.value = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'value'));
 
     return ret;
 }
