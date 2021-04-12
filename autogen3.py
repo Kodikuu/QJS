@@ -18,57 +18,6 @@ def preprocessing(data):
             functions[function["name"]] = {"args": {arg["name"]:arg["type"] for arg in function["args"]}, "return": function["type"]}
     return {"functions": functions, "enums": enums, "enumsets": enumsets, "structs": structs}
 
-def writeIntermediates(handle, struct):
-    for member, ctype in struct.items():
-        isObject = False
-
-        if "char *" in ctype:
-            pass
-        elif "*" in ctype:
-            ctype = "int64_t"
-        elif ctype in parsed["enumsets"]:
-            ctype = "int32_t"
-        elif ctype in parsed["structs"].keys():
-            isObject = True
-        
-        if "[" in member:
-            length = member[:-1].split("[")[1]
-            length = int(parsed["enums"].get(length, length))
-            
-            target.write(f"// Intermediate object for {ctype}[{length}] array\n")
-            beginExport(target, f"{ctype}_{length}")
-            for i in range(length):
-                if isObject:
-                    exportStruct(target, i, len(parsed["structs"][ctype]), ctype)
-                else:
-                    exportMember(target, ctype, i)
-            endExport(target)
-
-def writeStruct(handle, name, struct):
-    beginExport(target, name)
-    for member, ctype in struct.items():
-        isObject = False
-
-        if "char *" in ctype:
-            pass
-        elif "*" in ctype:
-            ctype = "int64_t"
-        elif ctype in parsed["enumsets"]:
-            ctype = "int32_t"
-        elif ctype in parsed["structs"].keys():
-            isObject = True
-        
-        if "[" in member:
-            mname = member[:-1].split("[")[0]
-            length = member[:-1].split("[")[1]
-            length = int(parsed["enums"].get(length, length))
-            exportStruct(target, mname, length, f"{ctype}_{length}")
-        elif isObject:
-            exportStruct(target, member, len(parsed["structs"][ctype]), ctype)
-        else:
-            exportMember(target, ctype, member)
-    endExport(target)
-
 def beginExport(handle, name):
     handle.write(f"static const JSCFunctionListEntry js_{name}[] = ")
     handle.write("{\n")
@@ -100,6 +49,124 @@ def exportMember(handle, ctype, name):
 def endExport(handle):
     handle.write("};\n\n")
 
+def writeIntermediates(handle, struct, parsed):
+    for member, ctype in struct.items():
+        isObject = False
+
+        if "char *" in ctype:
+            pass
+        elif "*" in ctype:
+            ctype = "int64_t"
+        elif ctype in parsed["enumsets"]:
+            ctype = "int32_t"
+        elif ctype in parsed["structs"].keys():
+            isObject = True
+        
+        if "[" in member:
+            length = member[:-1].split("[")[1]
+            length = int(parsed["enums"].get(length, length))
+            
+            target.write(f"// Intermediate object for {ctype}[{length}] array\n")
+            beginExport(target, f"{ctype}_{length}")
+            for i in range(length):
+                if isObject:
+                    exportStruct(target, i, len(parsed["structs"][ctype]), ctype)
+                else:
+                    exportMember(target, ctype, i)
+            endExport(target)
+
+def writeStruct(handle, name, struct, parsed):
+    beginExport(target, name)
+    for member, ctype in struct.items():
+        isObject = False
+
+        if "char *" in ctype:
+            pass
+        elif "*" in ctype:
+            ctype = "int64_t"
+        elif ctype in parsed["enumsets"]:
+            ctype = "int32_t"
+        elif ctype in parsed["structs"].keys():
+            isObject = True
+        
+        if "[" in member:
+            mname = member[:-1].split("[")[0]
+            length = member[:-1].split("[")[1]
+            length = int(parsed["enums"].get(length, length))
+            exportStruct(target, mname, length, f"{ctype}_{length}")
+        elif isObject:
+            exportStruct(target, member, len(parsed["structs"][ctype]), ctype)
+        else:
+            exportMember(target, ctype, member)
+    endExport(target)
+
+def writeConvToC(handle, name, struct, parsed):
+    handle.write(f"static {name} JSToC_{name}(JSContext* jsctx, JSValue obj) ")
+    handle.write("{\n")
+
+    handle.write(f"    {name} ret = ")
+    handle.write("{0};\n\n")
+
+    workvars = []
+    
+    for member, ctype in struct.items():
+        isIntermediate = "[" in member
+        isStruct = ctype in parsed["structs"].keys()
+
+        if "char *" in ctype:
+            pass
+        elif "*" in ctype:
+            ctype = "int64_t"
+        elif ctype in parsed["enumsets"]:
+            ctype = "int32_t"
+        
+        if isIntermediate and isStruct:
+            mname = member[:-1].split("[")[0]
+            length = member[:-1].split("[")[1]
+            length = int(parsed["enums"].get(length, length))
+
+            if "i" not in workvars:
+                handle.write("    int i;\n")
+                workvars.append("i")
+            handle.write(f"    for (i=0; i<{length}; i++) ")
+            handle.write("{\n")
+            handle.write(f"        ret.{mname}[i] = JSToC_{ctype}(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, '{mname}'), i));\n")
+            handle.write("    }\n\n")
+        
+        elif isIntermediate:
+            mname = member[:-1].split("[")[0]
+            length = member[:-1].split("[")[1]
+            length = int(parsed["enums"].get(length, length))
+
+            if "64" in ctype:
+                converter = "JSToInt64"
+            elif "int" in ctype:
+                converter = "JSToInt32"
+            elif "float" in ctype:
+                converter = "(float)JSToFloat64"
+            elif "char" in ctype:
+                converter = "JS_ToCString"
+            elif "bool" in ctype:
+                converter = "JS_ToBool"
+            else:
+                converter = "JS_ToInt64"
+                handle.write(f"// Unknown ctype: {ctype}\n")
+
+            if "i" not in workvars:
+                handle.write("    int i;\n")
+                workvars.append("i")
+            handle.write(f"    for (i=0; i<{length}; i++) ")
+            handle.write("{\n")
+            handle.write(f"        ret.{mname}[i] = {converter}(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, '{mname}'), i));\n")
+            handle.write("    }\n\n")
+    
+    handle.write("    return ret;\n")
+
+    handle.write("}\n\n")
+
+def writeConvToJS(handle, name, struct, parsed):
+    pass
+
 
 def boilerplate(handle):    handle.write("""
 static const int func_count = (int)(sizeof(js_exports)/sizeof(js_exports[0]));
@@ -130,17 +197,20 @@ if __name__ == "__main__":
         data = json.load(source)
     
         # One-time
-        target.write('#include "libmatoya.h"\n\n')
+        target.write('#include "libmatoya.h"\n#include "utils.h"\n\n')
 
         # Preprocess
         parsed = preprocessing(data)
         
         # Intermediate objects and Structs
         for name, struct in parsed["structs"].items():
-            writeIntermediates(target, struct)
-            writeStruct(target, name, struct)
+            writeIntermediates(target, struct, parsed)
+            writeStruct(target, name, struct, parsed)
         
         # Converters
+        for name, struct in parsed["structs"].items():
+            writeConvToC(target, name, struct, parsed)
+            writeConvToJS(target, name, struct, parsed)
 
         # FromPointers
 

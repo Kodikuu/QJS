@@ -1,4 +1,5 @@
 #include "libmatoya.h"
+#include "utils.h"
 
 static const JSCFunctionListEntry js_MTY_RenderDesc[] = {
     JS_PROP_INT32_DEF("format", 0, JS_PROP_C_W_E),
@@ -283,6 +284,158 @@ static const JSCFunctionListEntry js_MTY_ListNode[] = {
     JS_PROP_INT64_DEF("next", 0, JS_PROP_C_W_E),
     JS_PROP_INT64_DEF("value", 0, JS_PROP_C_W_E),
 };
+
+static MTY_RenderDesc JSToC_MTY_RenderDesc(JSContext* jsctx, JSValue obj) {
+    MTY_RenderDesc ret = {0};
+
+    return ret;
+}
+
+static MTY_Point JSToC_MTY_Point(JSContext* jsctx, JSValue obj) {
+    MTY_Point ret = {0};
+
+    return ret;
+}
+
+static MTY_Rect JSToC_MTY_Rect(JSContext* jsctx, JSValue obj) {
+    MTY_Rect ret = {0};
+
+    return ret;
+}
+
+static MTY_Vtx JSToC_MTY_Vtx(JSContext* jsctx, JSValue obj) {
+    MTY_Vtx ret = {0};
+
+    return ret;
+}
+
+static MTY_Cmd JSToC_MTY_Cmd(JSContext* jsctx, JSValue obj) {
+    MTY_Cmd ret = {0};
+
+    return ret;
+}
+
+static MTY_CmdList JSToC_MTY_CmdList(JSContext* jsctx, JSValue obj) {
+    MTY_CmdList ret = {0};
+
+    return ret;
+}
+
+static MTY_DrawData JSToC_MTY_DrawData(JSContext* jsctx, JSValue obj) {
+    MTY_DrawData ret = {0};
+
+    return ret;
+}
+
+static MTY_Axis JSToC_MTY_Axis(JSContext* jsctx, JSValue obj) {
+    MTY_Axis ret = {0};
+
+    return ret;
+}
+
+static MTY_ControllerEvent JSToC_MTY_ControllerEvent(JSContext* jsctx, JSValue obj) {
+    MTY_ControllerEvent ret = {0};
+
+    int i;
+    for (i=0; i<64; i++) {
+        ret.buttons[i] = JS_ToBool(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, 'buttons'), i));
+    }
+
+    for (i=0; i<16; i++) {
+        ret.axes[i] = JSToC_MTY_Axis(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, 'axes'), i));
+    }
+
+    return ret;
+}
+
+static MTY_KeyEvent JSToC_MTY_KeyEvent(JSContext* jsctx, JSValue obj) {
+    MTY_KeyEvent ret = {0};
+
+    return ret;
+}
+
+static MTY_ScrollEvent JSToC_MTY_ScrollEvent(JSContext* jsctx, JSValue obj) {
+    MTY_ScrollEvent ret = {0};
+
+    return ret;
+}
+
+static MTY_ButtonEvent JSToC_MTY_ButtonEvent(JSContext* jsctx, JSValue obj) {
+    MTY_ButtonEvent ret = {0};
+
+    return ret;
+}
+
+static MTY_MotionEvent JSToC_MTY_MotionEvent(JSContext* jsctx, JSValue obj) {
+    MTY_MotionEvent ret = {0};
+
+    return ret;
+}
+
+static MTY_DropEvent JSToC_MTY_DropEvent(JSContext* jsctx, JSValue obj) {
+    MTY_DropEvent ret = {0};
+
+    return ret;
+}
+
+static MTY_PenEvent JSToC_MTY_PenEvent(JSContext* jsctx, JSValue obj) {
+    MTY_PenEvent ret = {0};
+
+    return ret;
+}
+
+static MTY_Event JSToC_MTY_Event(JSContext* jsctx, JSValue obj) {
+    MTY_Event ret = {0};
+
+    int i;
+    for (i=0; i<8; i++) {
+        ret.text[i] = JS_ToCString(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, 'text'), i));
+    }
+
+    return ret;
+}
+
+static MTY_MenuItem JSToC_MTY_MenuItem(JSContext* jsctx, JSValue obj) {
+    MTY_MenuItem ret = {0};
+
+    return ret;
+}
+
+static MTY_WindowDesc JSToC_MTY_WindowDesc(JSContext* jsctx, JSValue obj) {
+    MTY_WindowDesc ret = {0};
+
+    return ret;
+}
+
+static MTY_FileDesc JSToC_MTY_FileDesc(JSContext* jsctx, JSValue obj) {
+    MTY_FileDesc ret = {0};
+
+    return ret;
+}
+
+static MTY_FileList JSToC_MTY_FileList(JSContext* jsctx, JSValue obj) {
+    MTY_FileList ret = {0};
+
+    return ret;
+}
+
+static MTY_Atomic32 JSToC_MTY_Atomic32(JSContext* jsctx, JSValue obj) {
+    MTY_Atomic32 ret = {0};
+
+    return ret;
+}
+
+static MTY_Atomic64 JSToC_MTY_Atomic64(JSContext* jsctx, JSValue obj) {
+    MTY_Atomic64 ret = {0};
+
+    return ret;
+}
+
+static MTY_ListNode JSToC_MTY_ListNode(JSContext* jsctx, JSValue obj) {
+    MTY_ListNode ret = {0};
+
+    return ret;
+}
 
 static const JSCFunctionListEntry js_exports[] = {
     JS_PROP_INT32_DEF("MTY_GFX_NONE", 0, 0),
