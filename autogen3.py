@@ -117,6 +117,9 @@ def writeConvToC(handle, name, struct, parsed):
         isIntermediate = "[" in member
         isStruct = ctype in parsed["structs"].keys()
         isEnum = ctype in parsed["enums"].keys()
+
+        if not member or not ctype:
+            continue
         
         if parsed["typedefs"].get(ctype, False):
             ctype = parsed["typedefs"].get(ctype, False)
@@ -139,9 +142,9 @@ def writeConvToC(handle, name, struct, parsed):
         elif "bool" in ctype:
             converter = "JS_ToBool"
         elif isEnum or isStruct:
-            converter = "JS_ToInt64"
+            converter = "JSToInt64"
         else:
-            converter = "JS_ToInt64"
+            converter = "JSToInt64"
             handle.write(f"// Unknown ctype: {ctype}\n")
         
         if isIntermediate and isStruct:
