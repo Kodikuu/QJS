@@ -97,6 +97,20 @@ def processConstants(data):
     return consts
 
 
+def writeExportConsts(handle, typedict, consts):
+    for const, value in consts.items():
+        ctype = typedict[const]
+
+        if "char" in ctype:
+            handle.write(f'    JS_PROP_STRING_DEF("{const}", {value}, 0),\n')
+        elif "int" in ctype or "enum" in ctype:
+            handle.write(f'    JS_PROP_INT32_DEF("{const}", {value}, 0),\n')
+        elif "float" in ctype:
+            handle.write(f'    JS_PROP_DOUBLE_DEF("{const}", {value}, 0),\n')
+        else:
+            raise TypeError(f"{const} of type {ctype} is unhandled.")
+
+
 def processStructs(data, consts):
     structs = {}  # "name": {"fields": {}, "prereqs": [], "union": """}
 
