@@ -102,21 +102,42 @@ def processStructs(data, typedict, consts):
     return structs
 
 
+def writeExportStructs(handle, structs):
+    for struct, details in structs.items():
+        handle.write(f'    JS_OBJECT_DEF("{struct}", js_{struct}, {len(details["fields"])}, JS_PROP_C_W_E),\n')
+
+
 def processFunctions(data, typedict, consts, structs):
-    functions = {}
+    functions = {}  # "name": {"args": {}, "in": 0, "out": 0}
     return functions
 
 
-def writeStructs(target, structs):
+def writeFunctions(handle, functions):
     pass
 
 
-def writeFunctions(target, structs):
-    pass
+def writeExportFunctions(handle, functions):
+    for function, details in functions.items():
+        handle.write(f'    JS_CFUNC_DEF("{function}", {details["in"]}, js_{function}),\n')
 
 
-def writeExports(target, consts, structs, functions):
-    pass
+def writeImports(handle):
+    handle.write(f'#include "{NAME}.h"\n\n')
+
+
+
+def writeExports(handle, typedict, consts, structs, functions):
+    handle.write("static const JSCFunctionListEntry js_exports[] = {\n")
+    
+    writeExportConsts(handle, typedict, consts)
+
+    writeExportStructs(handle, structs)
+
+    writeExportFunctions(handle, functions)
+
+    handle.write("};\n")
+
+
 
 
 def writeBoilerplate(target):
@@ -140,5 +161,5 @@ if __name__ == "__main__":
         writeStructs(target, structs)
         writeFunctions(target, functions)
 
-        writeExports(target, consts, structs, functions)
+        writeExports(target, typedict, consts, structs, functions)
         writeBoilerplate(target)
