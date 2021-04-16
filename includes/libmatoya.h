@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-
 #include "quickjs.h"
 #include "matoya.h"
 
-JSModuleDef *JS_INIT_MODULE_MTY(JSContext*, const char*);
+JSModuleDef *js_init_module_matoya(JSContext*, const char*);

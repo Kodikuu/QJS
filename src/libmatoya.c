@@ -1,5 +1,4 @@
 #include "libmatoya.h"
-#include "utils.h"
 
 static const JSCFunctionListEntry js_MTY_RenderDesc[] = {
     JS_PROP_INT32_DEF("format", 0, JS_PROP_C_W_E),
@@ -14,25 +13,25 @@ static const JSCFunctionListEntry js_MTY_RenderDesc[] = {
     JS_PROP_INT32_DEF("viewHeight", 0, JS_PROP_C_W_E),
     JS_PROP_DOUBLE_DEF("aspectRatio", 0.0f, JS_PROP_C_W_E),
     JS_PROP_DOUBLE_DEF("scale", 0.0f, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_Point[] = {
     JS_PROP_DOUBLE_DEF("x", 0.0f, JS_PROP_C_W_E),
     JS_PROP_DOUBLE_DEF("y", 0.0f, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_Rect[] = {
     JS_PROP_DOUBLE_DEF("left", 0.0f, JS_PROP_C_W_E),
     JS_PROP_DOUBLE_DEF("top", 0.0f, JS_PROP_C_W_E),
     JS_PROP_DOUBLE_DEF("right", 0.0f, JS_PROP_C_W_E),
     JS_PROP_DOUBLE_DEF("bottom", 0.0f, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_Vtx[] = {
-    JS_OBJECT_DEF("pos", js_MTY_Point, 2, JS_PROP_C_W_E),
-    JS_OBJECT_DEF("uv", js_MTY_Point, 2, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("pos", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("uv", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("col", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_Cmd[] = {
     JS_OBJECT_DEF("clip", js_MTY_Rect, 4, JS_PROP_C_W_E),
@@ -40,38 +39,37 @@ static const JSCFunctionListEntry js_MTY_Cmd[] = {
     JS_PROP_INT32_DEF("elemCount", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("idxOffset", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("vtxOffset", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_CmdList[] = {
     JS_PROP_INT64_DEF("cmd", 0, JS_PROP_C_W_E),
     JS_PROP_INT64_DEF("vtx", 0, JS_PROP_C_W_E),
-    JS_PROP_INT64_DEF("idx", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("idx", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("cmdLength", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("cmdMax", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("vtxLength", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("vtxMax", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("idxLength", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("idxMax", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_DrawData[] = {
-    JS_OBJECT_DEF("displaySize", js_MTY_Point, 2, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("displaySize", 0, JS_PROP_C_W_E),
     JS_PROP_INT64_DEF("cmdList", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("cmdListLength", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("cmdListMax", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("idxTotalLength", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("vtxTotalLength", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("clear", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_Axis[] = {
     JS_PROP_INT32_DEF("usage", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("value", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("min", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("max", 0, JS_PROP_C_W_E),
-};
+}
 
-// Intermediate object for bool[64] array
 static const JSCFunctionListEntry js_bool_64[] = {
     JS_PROP_INT32_DEF("0", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("1", 0, JS_PROP_C_W_E),
@@ -137,9 +135,8 @@ static const JSCFunctionListEntry js_bool_64[] = {
     JS_PROP_INT32_DEF("61", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("62", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("63", 0, JS_PROP_C_W_E),
-};
+}
 
-// Intermediate object for MTY_Axis[16] array
 static const JSCFunctionListEntry js_MTY_Axis_16[] = {
     JS_OBJECT_DEF("0", js_MTY_Axis, 4, JS_PROP_C_W_E),
     JS_OBJECT_DEF("1", js_MTY_Axis, 4, JS_PROP_C_W_E),
@@ -157,7 +154,7 @@ static const JSCFunctionListEntry js_MTY_Axis_16[] = {
     JS_OBJECT_DEF("13", js_MTY_Axis, 4, JS_PROP_C_W_E),
     JS_OBJECT_DEF("14", js_MTY_Axis, 4, JS_PROP_C_W_E),
     JS_OBJECT_DEF("15", js_MTY_Axis, 4, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_ControllerEvent[] = {
     JS_OBJECT_DEF("buttons", js_bool_64, 64, JS_PROP_C_W_E),
@@ -168,38 +165,39 @@ static const JSCFunctionListEntry js_MTY_ControllerEvent[] = {
     JS_PROP_INT32_DEF("pid", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("numButtons", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("numAxes", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_KeyEvent[] = {
     JS_PROP_INT32_DEF("key", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("mod", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("pressed", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_ScrollEvent[] = {
     JS_PROP_INT32_DEF("x", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("y", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("pixels", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_ButtonEvent[] = {
     JS_PROP_INT32_DEF("button", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("x", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("y", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("pressed", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_MotionEvent[] = {
     JS_PROP_INT32_DEF("x", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("y", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("relative", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("synth", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_DropEvent[] = {
     JS_PROP_STRING_DEF("name", "", JS_PROP_C_W_E),
     JS_PROP_INT64_DEF("buf", 0, JS_PROP_C_W_E),
-};
+    JS_PROP_INT64_DEF("size", 0, JS_PROP_C_W_E),
+}
 
 static const JSCFunctionListEntry js_MTY_PenEvent[] = {
     JS_PROP_INT32_DEF("flags", 0, JS_PROP_C_W_E),
@@ -209,9 +207,8 @@ static const JSCFunctionListEntry js_MTY_PenEvent[] = {
     JS_PROP_INT32_DEF("rotation", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("tiltX", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("tiltY", 0, JS_PROP_C_W_E),
-};
+}
 
-// Intermediate object for char[8] array
 static const JSCFunctionListEntry js_char_8[] = {
     JS_PROP_STRING_DEF("0", "", JS_PROP_C_W_E),
     JS_PROP_STRING_DEF("1", "", JS_PROP_C_W_E),
@@ -221,10 +218,11 @@ static const JSCFunctionListEntry js_char_8[] = {
     JS_PROP_STRING_DEF("5", "", JS_PROP_C_W_E),
     JS_PROP_STRING_DEF("6", "", JS_PROP_C_W_E),
     JS_PROP_STRING_DEF("7", "", JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_Event[] = {
     JS_PROP_INT32_DEF("type", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("window", 0, JS_PROP_C_W_E),
     JS_OBJECT_DEF("controller", js_MTY_ControllerEvent, 8, JS_PROP_C_W_E),
     JS_OBJECT_DEF("scroll", js_MTY_ScrollEvent, 3, JS_PROP_C_W_E),
     JS_OBJECT_DEF("button", js_MTY_ButtonEvent, 4, JS_PROP_C_W_E),
@@ -237,12 +235,13 @@ static const JSCFunctionListEntry js_MTY_Event[] = {
     JS_PROP_INT32_DEF("trayID", 0, JS_PROP_C_W_E),
     JS_OBJECT_DEF("text", js_char_8, 8, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("focus", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_MenuItem[] = {
+    JS_PROP_INT64_DEF("checked", 0, JS_PROP_C_W_E),
     JS_PROP_STRING_DEF("label", "", JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("trayID", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_WindowDesc[] = {
     JS_PROP_STRING_DEF("title", "", JS_PROP_C_W_E),
@@ -258,418 +257,31 @@ static const JSCFunctionListEntry js_MTY_WindowDesc[] = {
     JS_PROP_INT32_DEF("fullscreen", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("hidden", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("vsync", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_FileDesc[] = {
     JS_PROP_STRING_DEF("path", "", JS_PROP_C_W_E),
     JS_PROP_STRING_DEF("name", "", JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("dir", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_FileList[] = {
     JS_PROP_INT64_DEF("files", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("len", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_Atomic32[] = {
     JS_PROP_INT32_DEF("value", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_Atomic64[] = {
     JS_PROP_INT64_DEF("value", 0, JS_PROP_C_W_E),
-};
+}
 
 static const JSCFunctionListEntry js_MTY_ListNode[] = {
     JS_PROP_INT64_DEF("prev", 0, JS_PROP_C_W_E),
     JS_PROP_INT64_DEF("next", 0, JS_PROP_C_W_E),
     JS_PROP_INT64_DEF("value", 0, JS_PROP_C_W_E),
-};
-
-static MTY_RenderDesc JSToC_MTY_RenderDesc(JSContext* jsctx, JSValue obj) {
-    MTY_RenderDesc ret = {0};
-
-    ret.format = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'format'));
-
-    ret.rotation = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'rotation'));
-
-    ret.filter = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'filter'));
-
-    ret.effect = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'effect'));
-
-    ret.imageWidth = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'imageWidth'));
-
-    ret.imageHeight = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'imageHeight'));
-
-    ret.cropWidth = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'cropWidth'));
-
-    ret.cropHeight = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'cropHeight'));
-
-    ret.viewWidth = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'viewWidth'));
-
-    ret.viewHeight = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'viewHeight'));
-
-    ret.aspectRatio = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'aspectRatio'));
-
-    ret.scale = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'scale'));
-
-    return ret;
-}
-
-static MTY_Point JSToC_MTY_Point(JSContext* jsctx, JSValue obj) {
-    MTY_Point ret = {0};
-
-    ret.x = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'x'));
-
-    ret.y = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'y'));
-
-    return ret;
-}
-
-static MTY_Rect JSToC_MTY_Rect(JSContext* jsctx, JSValue obj) {
-    MTY_Rect ret = {0};
-
-    ret.left = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'left'));
-
-    ret.top = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'top'));
-
-    ret.right = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'right'));
-
-    ret.bottom = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'bottom'));
-
-    return ret;
-}
-
-static MTY_Vtx JSToC_MTY_Vtx(JSContext* jsctx, JSValue obj) {
-    MTY_Vtx ret = {0};
-
-    ret.pos = JSToC_MTY_Point(jsctx, JS_GetPropertyStr(jsctx, obj, 'pos'));
-
-    ret.uv = JSToC_MTY_Point(jsctx, JS_GetPropertyStr(jsctx, obj, 'uv'));
-
-    ret.col = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'col'));
-
-    return ret;
-}
-
-static MTY_Cmd JSToC_MTY_Cmd(JSContext* jsctx, JSValue obj) {
-    MTY_Cmd ret = {0};
-
-    ret.clip = JSToC_MTY_Rect(jsctx, JS_GetPropertyStr(jsctx, obj, 'clip'));
-
-    ret.texture = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'texture'));
-
-    ret.elemCount = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'elemCount'));
-
-    ret.idxOffset = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'idxOffset'));
-
-    ret.vtxOffset = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'vtxOffset'));
-
-    return ret;
-}
-
-static MTY_CmdList JSToC_MTY_CmdList(JSContext* jsctx, JSValue obj) {
-    MTY_CmdList ret = {0};
-
-    ret.cmd = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'cmd'));
-
-    ret.vtx = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'vtx'));
-
-    ret.idx = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'idx'));
-
-    ret.cmdLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'cmdLength'));
-
-    ret.cmdMax = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'cmdMax'));
-
-    ret.vtxLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'vtxLength'));
-
-    ret.vtxMax = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'vtxMax'));
-
-    ret.idxLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'idxLength'));
-
-    ret.idxMax = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'idxMax'));
-
-    return ret;
-}
-
-static MTY_DrawData JSToC_MTY_DrawData(JSContext* jsctx, JSValue obj) {
-    MTY_DrawData ret = {0};
-
-    ret.displaySize = JSToC_MTY_Point(jsctx, JS_GetPropertyStr(jsctx, obj, 'displaySize'));
-
-    ret.cmdList = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'cmdList'));
-
-    ret.cmdListLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'cmdListLength'));
-
-    ret.cmdListMax = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'cmdListMax'));
-
-    ret.idxTotalLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'idxTotalLength'));
-
-    ret.vtxTotalLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'vtxTotalLength'));
-
-    ret.clear = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'clear'));
-
-    return ret;
-}
-
-static MTY_Axis JSToC_MTY_Axis(JSContext* jsctx, JSValue obj) {
-    MTY_Axis ret = {0};
-
-    ret.usage = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'usage'));
-
-    ret.value = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'value'));
-
-    ret.min = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'min'));
-
-    ret.max = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'max'));
-
-    return ret;
-}
-
-static MTY_ControllerEvent JSToC_MTY_ControllerEvent(JSContext* jsctx, JSValue obj) {
-    MTY_ControllerEvent ret = {0};
-
-    int i;
-    for (i=0; i<64; i++) {
-        ret.buttons[i] = JS_ToBool(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, 'buttons'), i));
-    }
-
-    for (i=0; i<16; i++) {
-        ret.axes[i] = JSToC_MTY_Axis(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, 'axes'), i));
-    }
-
-    ret.type = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'type'));
-
-    ret.id = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'id'));
-
-    ret.vid = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'vid'));
-
-    ret.pid = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'pid'));
-
-    ret.numButtons = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'numButtons'));
-
-    ret.numAxes = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'numAxes'));
-
-    return ret;
-}
-
-static MTY_KeyEvent JSToC_MTY_KeyEvent(JSContext* jsctx, JSValue obj) {
-    MTY_KeyEvent ret = {0};
-
-    ret.key = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'key'));
-
-    ret.mod = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'mod'));
-
-    ret.pressed = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'pressed'));
-
-    return ret;
-}
-
-static MTY_ScrollEvent JSToC_MTY_ScrollEvent(JSContext* jsctx, JSValue obj) {
-    MTY_ScrollEvent ret = {0};
-
-    ret.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'x'));
-
-    ret.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'y'));
-
-    ret.pixels = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'pixels'));
-
-    return ret;
-}
-
-static MTY_ButtonEvent JSToC_MTY_ButtonEvent(JSContext* jsctx, JSValue obj) {
-    MTY_ButtonEvent ret = {0};
-
-    ret.button = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'button'));
-
-    ret.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'x'));
-
-    ret.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'y'));
-
-    ret.pressed = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'pressed'));
-
-    return ret;
-}
-
-static MTY_MotionEvent JSToC_MTY_MotionEvent(JSContext* jsctx, JSValue obj) {
-    MTY_MotionEvent ret = {0};
-
-    ret.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'x'));
-
-    ret.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'y'));
-
-    ret.relative = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'relative'));
-
-    ret.synth = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'synth'));
-
-    return ret;
-}
-
-static MTY_DropEvent JSToC_MTY_DropEvent(JSContext* jsctx, JSValue obj) {
-    MTY_DropEvent ret = {0};
-
-    ret.name = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, 'name'));
-
-    ret.buf = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'buf'));
-
-// Unknown ctype: size_t
-    ret.size = JS_ToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'size'));
-
-    return ret;
-}
-
-static MTY_PenEvent JSToC_MTY_PenEvent(JSContext* jsctx, JSValue obj) {
-    MTY_PenEvent ret = {0};
-
-    ret.flags = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'flags'));
-
-    ret.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'x'));
-
-    ret.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'y'));
-
-    ret.pressure = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'pressure'));
-
-    ret.rotation = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'rotation'));
-
-    ret.tiltX = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'tiltX'));
-
-    ret.tiltY = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'tiltY'));
-
-    return ret;
-}
-
-static MTY_Event JSToC_MTY_Event(JSContext* jsctx, JSValue obj) {
-    MTY_Event ret = {0};
-
-    ret.type = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'type'));
-
-    ret.window = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'window'));
-
-// Unknown ctype: UNION_END
-    ret. = JS_ToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, ''));
-
-    ret.controller = JSToC_MTY_ControllerEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'controller'));
-
-    ret.scroll = JSToC_MTY_ScrollEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'scroll'));
-
-    ret.button = JSToC_MTY_ButtonEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'button'));
-
-    ret.motion = JSToC_MTY_MotionEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'motion'));
-
-    ret.drop = JSToC_MTY_DropEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'drop'));
-
-    ret.pen = JSToC_MTY_PenEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'pen'));
-
-    ret.key = JSToC_MTY_KeyEvent(jsctx, JS_GetPropertyStr(jsctx, obj, 'key'));
-
-    ret.reopenArg = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, 'reopenArg'));
-
-    ret.hotkey = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'hotkey'));
-
-    ret.trayID = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'trayID'));
-
-    int i;
-    for (i=0; i<8; i++) {
-        ret.text[i] = JS_ToCString(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, 'text'), i));
-    }
-
-    ret.focus = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'focus'));
-
-    return ret;
-}
-
-static MTY_MenuItem JSToC_MTY_MenuItem(JSContext* jsctx, JSValue obj) {
-    MTY_MenuItem ret = {0};
-
-// Unknown ctype: MTY_MenuItemCheckedFunc
-    ret.checked = JS_ToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'checked'));
-
-    ret.label = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, 'label'));
-
-    ret.trayID = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'trayID'));
-
-    return ret;
-}
-
-static MTY_WindowDesc JSToC_MTY_WindowDesc(JSContext* jsctx, JSValue obj) {
-    MTY_WindowDesc ret = {0};
-
-    ret.title = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, 'title'));
-
-    ret.origin = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'origin'));
-
-    ret.api = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'api'));
-
-    ret.width = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'width'));
-
-    ret.height = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'height'));
-
-    ret.minWidth = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'minWidth'));
-
-    ret.minHeight = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'minHeight'));
-
-    ret.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'x'));
-
-    ret.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'y'));
-
-    ret.maxHeight = (float)JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, obj, 'maxHeight'));
-
-    ret.fullscreen = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'fullscreen'));
-
-    ret.hidden = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'hidden'));
-
-    ret.vsync = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'vsync'));
-
-    return ret;
-}
-
-static MTY_FileDesc JSToC_MTY_FileDesc(JSContext* jsctx, JSValue obj) {
-    MTY_FileDesc ret = {0};
-
-    ret.path = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, 'path'));
-
-    ret.name = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, 'name'));
-
-    ret.dir = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, 'dir'));
-
-    return ret;
-}
-
-static MTY_FileList JSToC_MTY_FileList(JSContext* jsctx, JSValue obj) {
-    MTY_FileList ret = {0};
-
-    ret.files = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'files'));
-
-    ret.len = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'len'));
-
-    return ret;
-}
-
-static MTY_Atomic32 JSToC_MTY_Atomic32(JSContext* jsctx, JSValue obj) {
-    MTY_Atomic32 ret = {0};
-
-    ret.value = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, 'value'));
-
-    return ret;
-}
-
-static MTY_Atomic64 JSToC_MTY_Atomic64(JSContext* jsctx, JSValue obj) {
-    MTY_Atomic64 ret = {0};
-
-    ret.value = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'value'));
-
-    return ret;
-}
-
-static MTY_ListNode JSToC_MTY_ListNode(JSContext* jsctx, JSValue obj) {
-    MTY_ListNode ret = {0};
-
-    ret.prev = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'prev'));
-
-    ret.next = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'next'));
-
-    ret.value = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, 'value'));
-
-    return ret;
 }
 
 static const JSCFunctionListEntry js_exports[] = {
@@ -945,6 +557,9 @@ static const JSCFunctionListEntry js_exports[] = {
     JS_PROP_INT32_DEF("MTY_OS_TVOS", 0x40000000, 0),
     JS_PROP_INT32_DEF("MTY_TLS_TYPE_TLS", 1, 0),
     JS_PROP_INT32_DEF("MTY_TLS_TYPE_DTLS", 2, 0),
+    JS_PROP_INT32_DEF("MTY_VERSION", 4, 0),
+    JS_PROP_STRING_DEF("MTY_VERSION_STRING", "4", 0),
+    JS_PROP_STRING_DEF("MTY_VERSION_STRINGW", L"4", 0),
     JS_OBJECT_DEF("MTY_RenderDesc", js_MTY_RenderDesc, 12, JS_PROP_C_W_E),
     JS_OBJECT_DEF("MTY_Point", js_MTY_Point, 2, JS_PROP_C_W_E),
     JS_OBJECT_DEF("MTY_Rect", js_MTY_Rect, 4, JS_PROP_C_W_E),
@@ -969,23 +584,3 @@ static const JSCFunctionListEntry js_exports[] = {
     JS_OBJECT_DEF("MTY_Atomic64", js_MTY_Atomic64, 1, JS_PROP_C_W_E),
     JS_OBJECT_DEF("MTY_ListNode", js_MTY_ListNode, 3, JS_PROP_C_W_E),
 };
-
-
-static const int func_count = (int)(sizeof(js_exports)/sizeof(js_exports[0]));
-
-// initializes the module with the export functions list and it's length
-static int js_tic_init(JSContext *ctx, JSModuleDef *m)
-{
-        return JS_SetModuleExportList(ctx, m, js_exports, func_count);
-}
-
-// this is what we use later as the module itself.
-JSModuleDef *JS_INIT_MODULE_MTY(JSContext *ctx, const char *module_name)
-{
-    JSModuleDef *m;
-    m = JS_NewCModule(ctx, module_name, js_tic_init);
-    if (!m)
-        return NULL;
-    JS_AddModuleExportList(ctx, m, js_exports, func_count);
-    JS_AddModuleExport(ctx, m, module_name);
-}
