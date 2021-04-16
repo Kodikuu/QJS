@@ -150,6 +150,80 @@ def processStructs(data, consts):
     return structs
 
 
+def writeStructs(handle, structs, typedict):
+    for name, struct in structs.items():
+
+        # Prereqs
+        for prereq in struct["prereqs"]:
+            pcount = int(prereq.split("#")[1])
+            pctype = prereq.split("#")[0]
+            pname = "_".join(prereq.split("#"))
+
+            handle.write(f"static const JSCFunctionListEntry js_{pname}[] = ")
+            handle.write("{\n")
+
+            for i in range(pcount):
+                if "64" in pctype:
+                    handle.write(f'    JS_PROP_INT64_DEF("{i}", 0, JS_PROP_C_W_E),\n')
+                elif "int" in pctype:
+                    handle.write(f'    JS_PROP_INT32_DEF("{i}", 0, JS_PROP_C_W_E),\n')
+                elif "float" in pctype:
+                    handle.write(f'    JS_PROP_DOUBLE_DEF("{i}", 0.0f, JS_PROP_C_W_E),\n')
+                elif "char" in pctype:
+                    handle.write(f'    JS_PROP_STRING_DEF("{i}", "", JS_PROP_C_W_E),\n')
+                elif "bool" in pctype:
+                    handle.write(f'    JS_PROP_INT32_DEF("{i}", 0, JS_PROP_C_W_E),\n')
+                elif pctype in structs.keys():
+                    handle.write(f'    JS_OBJECT_DEF("{i}", js_{pctype}, {len(structs[pctype]["fields"])}, JS_PROP_C_W_E),\n')
+            
+            handle.write("}\n\n")
+        
+        # Actual structs        
+        handle.write(f"static const JSCFunctionListEntry js_{name}[] = ")
+        handle.write("{\n")
+
+        for field, info in struct["fields"].items():
+            ctype = info[0]
+            array = info[1]
+
+            if "tdef" in typedict.get(ctype, ""):
+                ctype = typedict.get(ctype, "").split()[1]
+            elif "size_t" in ctype:
+                ctype = POINTER
+
+            if array:
+                handle.write(f'    JS_OBJECT_DEF("{field}", js_{ctype}_{array}, {array}, JS_PROP_C_W_E),\n')
+            elif "64" in ctype:
+                handle.write(f'    JS_PROP_INT64_DEF("{field}", 0, JS_PROP_C_W_E),\n')
+            elif "int" in ctype:
+                handle.write(f'    JS_PROP_INT32_DEF("{field}", 0, JS_PROP_C_W_E),\n')
+            elif ctype in ["float", "double"]:
+                handle.write(f'    JS_PROP_DOUBLE_DEF("{field}", 0.0f, JS_PROP_C_W_E),\n')
+            elif "char" in ctype:
+                handle.write(f'    JS_PROP_STRING_DEF("{field}", "", JS_PROP_C_W_E),\n')
+            elif "bool" in ctype:
+                handle.write(f'    JS_PROP_INT32_DEF("{field}", 0, JS_PROP_C_W_E),\n')
+            elif "void" in ctype:  # pointer
+                handle.write(f'    JS_PROP_INT64_DEF("{field}", 0, JS_PROP_C_W_E),\n')
+            elif "*" in ctype and ctype.split()[0] in structs.keys():  # pointer to struct
+                handle.write(f'    JS_PROP_INT64_DEF("{field}", 0, JS_PROP_C_W_E),\n')
+            elif ctype in structs.keys():
+                handle.write(f'    JS_OBJECT_DEF("{field}", js_{ctype}, {len(structs[ctype]["fields"])}, JS_PROP_C_W_E),\n') 
+            elif typedict.get(ctype, "") == "enum":
+                handle.write(f'    JS_PROP_INT32_DEF("{field}", 0, JS_PROP_C_W_E),\n')
+
+        handle.write("}\n\n")
+
+
+def writeStructConverters(handle, structs):
+    # To JS
+    for name, struct in structs.items():
+        handle.write(f"static JSValue {name}_ToJS(JSContext* jsctx, {name} obj) ")
+        handle.write("{\n")
+        handle.write(f"    JSValue retval = JS_NewObject(ctx);")
+
+    # To C
+
 def writeExportStructs(handle, structs):
     for struct, details in structs.items():
         handle.write(f'    JS_OBJECT_DEF("{struct}", js_{struct}, {len(details["fields"])}, JS_PROP_C_W_E),\n')
@@ -206,7 +280,9 @@ if __name__ == "__main__":
     functions = processFunctions(data, typedict, consts, structs)
 
     with open("src/libmatoya.c", "w") as target:
-        writeStructs(target, structs)
+        writeImports(target)
+        writeStructs(target, structs, typedict)
+        writeStructConverters(target, structs)
         writeFunctions(target, functions)
 
         writeExports(target, typedict, consts, structs, functions)
