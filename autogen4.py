@@ -89,7 +89,7 @@ def processConstants(data):
     for sectionName, section in data.items():
         for enum in section.get("enums", []):
             for value in enum["values"]:
-                typedict[value["name"]] = value["value"]
+                consts[value["name"]] = value["value"]
     
     for define in section.get("defines", []):
         consts[define["name"]] = define["value"]
