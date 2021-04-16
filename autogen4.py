@@ -48,9 +48,9 @@ def processTypes(data):
         
         # Enums all cast to int32
         for enum in section.get("enums", []):
-            typedict[enum["name"]] = "int32"
+            typedict[enum["name"]] = "enum"
             for value in enum["values"]:
-                typedict[value["name"]] = "int32"
+                typedict[value["name"]] = "enum"
         
         # Structs are run through dedicated converters back and forth
         for struct in section.get("structs", []):
@@ -58,14 +58,14 @@ def processTypes(data):
         
         # TODO: Figure out how on earth to give a js func as a callback
         for ftdef in section.get("function_typedefs", []):
-            typedict[ftdef["name"]] = POINTER
+            typedict[ftdef["name"]] = f"ftdef {POINTER}"
         
         # Treat typedef'd names as the original type
         for tdef in section.get("typedefs", []):
             if "64" in tdef[1]:
-                typedict[tdef[0]] = "int64"
+                typedict[tdef[0]] = "tdef int64"
             elif "int" in tdef[1]:
-                typedict[tdef[0]] = "int32"  # quickjs has nothing smaller than an int32
+                typedict[tdef[0]] = "tdef int32"  # quickjs has nothing smaller than an int32
             else:
                 print(f"Unhandled typedef: {tdef}")
 
