@@ -97,8 +97,42 @@ def processConstants(data):
     return consts
 
 
-def processStructs(data, typedict, consts):
-    structs = {}  # "name": {"fields": [], "prereqs": []}
+def processStructs(data, consts):
+    structs = {}  # "name": {"fields": {}, "prereqs": [], "union": """}
+
+    for sectionName, section in data.items():
+        for struct in section.get("structs", []):
+            name = struct["name"]
+            structs[name] = {"fields": {}, "prereqs": [], "unions": []}
+            unionpart = False
+            for field in struct["members"]:
+                fname = field["name"].split("[")[0]
+                ftype = field["type"]
+                unioncases = []
+
+                if not ftype:
+                    continue
+
+                if "UNION_BEGIN" in ftype:
+                    unionpart = structs[name]["fields"]["type"][0]
+                    structs[name]["unions"].append(unionpart)
+                elif "UNION_END" in ftype:
+                    unionpart = False
+                elif unionpart:
+                    unioncases.append(unionpart)
+                    for key in consts.keys():
+                        if key in field["brief"]:
+                            unioncases.append(key)
+                    print(unioncases)
+
+
+                if len(field["name"].split("[")) > 1:
+                    array = int(consts.get(field["name"][:-1].split("[")[1], field["name"][:-1].split("[")[1]))
+                    structs[name]["prereqs"].append(f"{ftype}#{array}")
+                else:
+                    array = 0
+                structs[name]["fields"][fname] = [ftype, array, unioncases]
+
     return structs
 
 
@@ -153,7 +187,7 @@ if __name__ == "__main__":
     typedict = processTypes(data)
     consts = processConstants(data)
 
-    structs = processStructs(data, typedict, consts)
+    structs = processStructs(data, consts)
 
     functions = processFunctions(data, typedict, consts, structs)
 
