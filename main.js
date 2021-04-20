@@ -1,7 +1,7 @@
 let WINDOWS = 0
 
-let SESSION = "2397ff38705eeab6936bd4d68de8350bac20d4e4de123bac9eca36e268b315d3"
-let PEER = "1qwBs8IQb3nNitf969HIrxoXtHH"
+let SESSION = ""
+let PEER = ""
 
 function appFunc() {
     
