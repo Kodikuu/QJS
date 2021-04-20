@@ -1,16 +1,45 @@
-OBJS = \
-	src/main.o \
-	src/lib.o \
-	src/libmatoya.o \
-	src/utils.o
-
 INCLUDES = \
 	-Iincludes \
 	-Isrc
 
 LIBS = \
-	deps/libmatoya.a \
-	deps/libquickjs.a
+	deps/matoya.lib \
+	deps/quickjs.lib \
+	bcrypt.lib \
+	d3d11.lib \
+	d3d9.lib \
+	hid.lib \
+	uuid.lib \
+	dxguid.lib \
+	opengl32.lib \
+	ws2_32.lib \
+	user32.lib \
+	gdi32.lib \
+	xinput9_1_0.lib \
+	ole32.lib \
+	shell32.lib \
+	windowscodecs.lib \
+	shlwapi.lib \
+	imm32.lib \
+	winmm.lib \
+	Advapi32.lib \
+	Userenv.lib
+
+CFILES =  \
+	src/main.c \
+	src/utils.c \
+	src/libmatoya.c \
+	src/libparsec.c
+
+OBJS = \
+	main.o \
+	utils.o \
+	libmatoya.o \
+	libparsec.o
+
+INCLUDES = \
+	-Iincludes \
+	-Isrc
 
 FLAGS = \
 	-Os
@@ -18,14 +47,6 @@ FLAGS = \
 
 CFLAGS = $(INCLUDES) $(FLAGS)
 
-all: clean $(OBJS)
-	@gcc $(OBJS) $(LIBS) $(INCLUDES) -lpthread -lm -ldl -o main -flto
-	@strip --strip-unneeded main
-	@chmod +x main
-	@rm src/*.o
-	@echo running main
-	@echo
-
-clean: 
-	@rm -f src/*.o
-	@rm -f main
+all:
+   clang $(CFILES) $(INCLUDES) -c
+   link $(OBJS) $(LIBS)

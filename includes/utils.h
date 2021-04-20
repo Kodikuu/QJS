@@ -1,7 +1,8 @@
+#pragma once
 #include "quickjs.h"
 
-static int32_t JSToInt32(JSContext *ctx, JSValueConst val);
+int32_t JSToInt32(JSContext *, JSValueConst);
 
-static int64_t JSToInt64(JSContext *ctx, JSValueConst val);
+int64_t JSToInt64(JSContext *, JSValueConst);
 
-static double JSToFloat64(JSContext *ctx, JSValueConst val);
+double JSToFloat64(JSContext *, JSValueConst);
