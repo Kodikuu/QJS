@@ -19,9 +19,7 @@ function appFunc() {
     let scale = MTY_WindowGetScreenScale(app, 0)
     ParsecClientSetDimensions(0, size.width, size.height, scale)
     ParsecClientGLRenderFrame(0, 0)
-    print("3")
     MTY_WindowPresent(app, 0, 0)
-    print("4")
 }
 
 function eventFunc(event) {
