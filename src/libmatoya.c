@@ -3,6 +3,7 @@
 
 // Objects
 
+// Render module
 static const JSCFunctionListEntry js_mty_render_desc[] = {
     JS_PROP_INT32_DEF("format", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("rotation", 0, JS_PROP_C_W_E),
@@ -78,6 +79,8 @@ static const JSCFunctionListEntry js_mty_draw_data[] = {
     JS_PROP_INT32_DEF("clear", 0, JS_PROP_C_W_E),
 };
 
+// End render module
+
 static const JSCFunctionListEntry js_mty_window_desc[] = {
     JS_PROP_STRING_DEF("title", "", JS_PROP_C_W_E),
 
@@ -99,6 +102,7 @@ static const JSCFunctionListEntry js_mty_window_desc[] = {
 
 // Converters
 
+// Render module
 static const MTY_RenderDesc convCMTY_RenderDesc(JSContext *jsctx, JSValue object) {
     MTY_RenderDesc renderDesc = { 0 };
     renderDesc.format = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "format"));
@@ -287,6 +291,8 @@ static JSValue convJSMTY_DrawData(JSContext *jsctx, MTY_DrawData drawdata) {
 
     return retval;
 }
+// End render module
+
 
 static MTY_WindowDesc convCMTY_WindowDesc(JSContext *jsctx, JSValue object) {
     MTY_WindowDesc winDesc = { 0 };
@@ -410,7 +416,7 @@ static void eventFunc(const MTY_Event *evt, void *opaque) {
 }
 
 // Functions
-
+// Render module
 static JSValue js_mty_renderer_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
     if (argc != 0) {
@@ -559,6 +565,8 @@ static JSValue js_mty_free_render_state(JSContext* jsctx, JSValueConst this_val,
     MTY_FreeRenderState(&state);
     return JS_NewBool(jsctx, 1);
 }
+// End render module
+
 
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
@@ -752,6 +760,8 @@ static JSValue js_mty_audio_queue(JSContext* jsctx, JSValueConst this_val, int a
 // list of exported functions, the string is how they'll appear in the module
 static const JSCFunctionListEntry js_mty_funcs[] = {
 // Definitions
+    JS_PROP_INT32_DEF("MTY_WINDOW_MAX", 8, 0),
+
     JS_PROP_INT32_DEF("MTY_SHA1_SIZE", 20, 0),
     JS_PROP_INT32_DEF("MTY_SHA1_HEX_MAX", 48, 0),
     JS_PROP_INT32_DEF("MTY_SHA256_SIZE", 32, 0),
@@ -1116,6 +1126,7 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
 // END Enums
 
 // Structs
+    // Render
     JS_OBJECT_DEF("MTY_RenderDesc", js_mty_render_desc, 12, JS_PROP_C_W_E),
     JS_OBJECT_DEF("MTY_Point", js_mty_point, 2, JS_PROP_C_W_E),
     JS_OBJECT_DEF("MTY_Rect", js_mty_rect, 4, JS_PROP_C_W_E),
@@ -1123,11 +1134,13 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_OBJECT_DEF("MTY_Cmd", js_mty_cmd, 5, JS_PROP_C_W_E),
     JS_OBJECT_DEF("MTY_CmdList", js_mty_cmd_list, 9, JS_PROP_C_W_E),
     JS_OBJECT_DEF("MTY_DrawData", js_mty_draw_data, 7, JS_PROP_C_W_E),
+    // End render
 
     JS_OBJECT_DEF("MTY_WindowDesc", js_mty_window_desc, 13, JS_PROP_C_W_E),
 // END Structs
 
 // Functions
+    // Render
     JS_CFUNC_DEF("MTY_RendererCreate", 0, js_mty_renderer_create),
     JS_CFUNC_DEF("MTY_RendererDestroy", 1, js_mty_renderer_destroy),
     JS_CFUNC_DEF("MTY_RendererDrawQuad", 7, js_mty_renderer_draw_quad),
@@ -1138,6 +1151,7 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_GetRenderState", 3, js_mty_get_render_state),
     JS_CFUNC_DEF("MTY_SetRenderState", 4, js_mty_set_render_state),
     JS_CFUNC_DEF("MTY_FreeRenderState", 1, js_mty_free_render_state),
+    // End render
 
     JS_CFUNC_DEF("print", 1, js_print),
     JS_CFUNC_DEF("MTY_AppCreate", 2, js_mty_app_create),
