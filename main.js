@@ -38,6 +38,10 @@ function eventFunc(eventType, window, event) {
     return 1
 }
 
+function audioFunc(audio) {
+    MTY_AudioQueue(audio)
+}
+
 function makeWindow(w, h) {
     let winDesc = MTY_WindowDesc
     winDesc.width = w
