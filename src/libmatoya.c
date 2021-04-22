@@ -25,6 +25,30 @@ static const JSCFunctionListEntry js_mty_point[] = {
     JS_PROP_DOUBLE_DEF("y", 0.0f, JS_PROP_C_W_E),
 };
 
+static const JSCFunctionListEntry js_mty_rect[] = {
+
+    JS_PROP_DOUBLE_DEF("left", 0.0f, JS_PROP_C_W_E),
+    JS_PROP_DOUBLE_DEF("top", 0.0f, JS_PROP_C_W_E),
+    JS_PROP_DOUBLE_DEF("right", 0.0f, JS_PROP_C_W_E),
+    JS_PROP_DOUBLE_DEF("bottom", 0.0f, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_mty_vtx[] = {
+
+    JS_OBJECT_DEF("pos", js_mty_point, 2, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("uv", js_mty_point, 2, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("col", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_mty_cmd[] = {
+
+    JS_OBJECT_DEF("clip", js_mty_rect, 2, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("texture", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("elemCount", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("idxOffset", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("vtxOffset", 0, JS_PROP_C_W_E),
+};
+
 static const JSCFunctionListEntry js_mty_window_desc[] = {
     JS_PROP_STRING_DEF("title", "", JS_PROP_C_W_E),
 
@@ -99,6 +123,72 @@ static JSValue convJSMTY_Point(JSContext *jsctx, MTY_Point point) {
     
     JS_SetPropertyStr(jsctx, retval, "x", JS_NewFloat64(jsctx, point.x));
     JS_SetPropertyStr(jsctx, retval, "y", JS_NewFloat64(jsctx, point.y));
+
+    return retval;
+}
+
+static const MTY_Rect convCMTY_Rect(JSContext *jsctx, JSValue object) {
+    MTY_Rect rect = { 0 };
+
+    rect.left = JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, object, "left"));
+    rect.top = JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, object, "top"));
+    rect.right = JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, object, "right"));
+    rect.bottom = JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, object, "bottom"));
+
+    return rect;
+}
+
+static JSValue convJSMTY_Rect(JSContext *jsctx, MTY_Rect rect) {
+    JSValue retval = JS_NewObject(jsctx);
+    
+    JS_SetPropertyStr(jsctx, retval, "left", JS_NewFloat64(jsctx, rect.left));
+    JS_SetPropertyStr(jsctx, retval, "top", JS_NewFloat64(jsctx, rect.top));
+    JS_SetPropertyStr(jsctx, retval, "right", JS_NewFloat64(jsctx, rect.right));
+    JS_SetPropertyStr(jsctx, retval, "bottom", JS_NewFloat64(jsctx, rect.bottom));
+
+    return retval;
+}
+
+static const MTY_Vtx convCMTY_Vtx(JSContext *jsctx, JSValue object) {
+    MTY_Vtx vtx = { 0 };
+
+    vtx.pos = convCMTY_Point(jsctx, JS_GetPropertyStr(jsctx, object, "pos"));
+    vtx.uv = convCMTY_Point(jsctx, JS_GetPropertyStr(jsctx, object, "uv"));
+    vtx.col = JS_NewInt32(jsctx, JS_GetPropertyStr(jsctx, object, "col"));
+
+    return vtx;
+}
+
+static JSValue convJSMTY_Vtx(JSContext *jsctx, MTY_Vtx vtx) {
+    JSValue retval = JS_NewObject(jsctx);
+    
+    JS_SetPropertyStr(jsctx, retval, "pos", convJSMTY_Point(jsctx, vtx.pos));
+    JS_SetPropertyStr(jsctx, retval, "uv", convJSMTY_Point(jsctx, vtx.uv));
+    JS_SetPropertyStr(jsctx, retval, "col", JS_NewInt32(jsctx, vtx.col));
+
+    return retval;
+}
+
+static const MTY_Cmd convCMTY_Cmd(JSContext *jsctx, JSValue object) {
+    MTY_Cmd cmd = { 0 };
+
+    cmd.clip = convCMTY_Rect(jsctx, JS_GetPropertyStr(jsctx, object, "clip"));
+    cmd.texture = JS_NewInt32(jsctx, JS_GetPropertyStr(jsctx, object, "texture"));
+    cmd.elemCount = JS_NewInt32(jsctx, JS_GetPropertyStr(jsctx, object, "elemCount"));
+    cmd.idxOffset = JS_NewInt32(jsctx, JS_GetPropertyStr(jsctx, object, "idxOffset"));
+    cmd.vtxOffset = JS_NewInt32(jsctx, JS_GetPropertyStr(jsctx, object, "vtxOffset"));
+
+    return cmd;
+}
+
+static JSValue convJSMTY_Cmd(JSContext *jsctx, MTY_Cmd cmd) {
+    JSValue retval = JS_NewObject(jsctx);
+    
+    JS_SetPropertyStr(jsctx, retval, "clip", convJSMTY_Rect(jsctx, cmd.clip));
+    JS_SetPropertyStr(jsctx, retval, "texture", JS_NewInt32(jsctx, cmd.texture));
+    JS_SetPropertyStr(jsctx, retval, "elemCount", JS_NewInt32(jsctx, cmd.elemCount));
+    JS_SetPropertyStr(jsctx, retval, "idxOffset", JS_NewInt32(jsctx, cmd.idxOffset));
+    JS_SetPropertyStr(jsctx, retval, "vtxOffset", JS_NewInt32(jsctx, cmd.vtxOffset));
 
     return retval;
 }
@@ -783,6 +873,10 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
 // Structs
     JS_OBJECT_DEF("MTY_RenderDesc", js_mty_render_desc, 12, JS_PROP_C_W_E),
     JS_OBJECT_DEF("MTY_Point", js_mty_point, 2, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_Rect", js_mty_rect, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_Vtx", js_mty_vtx, 3, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_Cmd", js_mty_cmd, 5, JS_PROP_C_W_E),
+
     JS_OBJECT_DEF("MTY_WindowDesc", js_mty_window_desc, 13, JS_PROP_C_W_E),
 // END Structs
 
