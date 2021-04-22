@@ -24,6 +24,45 @@ static const JSCFunctionListEntry js_mty_window_desc[] = {
 
 // Converters
 
+static const MTY_RenderDesc convCMTY_RenderDesc(JSContext *jsctx, JSValue object) {
+    MTY_RenderDesc renderDesc = { 0 };
+    renderDesc.format = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "format"));
+    renderDesc.rotation = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "rotation"));
+    renderDesc.filter = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "filter"));
+    renderDesc.effect = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "effect"));
+    renderDesc.imageWidth = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "imageWidth"));
+    renderDesc.imageHeight = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "imageHeight"));
+    renderDesc.cropWidth = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "cropWidth"));
+    renderDesc.cropHeight = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "cropHeight"));
+    renderDesc.viewWidth = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "viewWidth"));
+    renderDesc.viewHeight = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "viewHeight"));
+
+    renderDesc.aspectRatio = JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, object, "aspectRatio"));
+    renderDesc.scale = JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, object, "scale"));
+
+    return renderDesc;
+}
+
+static JSValue convJSMTY_RenderDesc(JSContext *jsctx, MTY_RenderDesc renderDesc) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "format", JS_NewInt32(jsctx, renderDesc.format));
+    JS_SetPropertyStr(jsctx, retval, "rotation", JS_NewInt32(jsctx, renderDesc.rotation));
+    JS_SetPropertyStr(jsctx, retval, "filter", JS_NewInt32(jsctx, renderDesc.filter));
+    JS_SetPropertyStr(jsctx, retval, "effect", JS_NewInt32(jsctx, renderDesc.effect));
+    JS_SetPropertyStr(jsctx, retval, "imageWidth", JS_NewInt32(jsctx, renderDesc.imageWidth));
+    JS_SetPropertyStr(jsctx, retval, "imageHeight", JS_NewInt32(jsctx, renderDesc.imageHeight));
+    JS_SetPropertyStr(jsctx, retval, "cropWidth", JS_NewInt32(jsctx, renderDesc.cropWidth));
+    JS_SetPropertyStr(jsctx, retval, "cropHeight", JS_NewInt32(jsctx, renderDesc.cropHeight));
+    JS_SetPropertyStr(jsctx, retval, "viewWidth", JS_NewInt32(jsctx, renderDesc.viewWidth));
+    JS_SetPropertyStr(jsctx, retval, "viewHeight", JS_NewInt32(jsctx, renderDesc.viewHeight));
+    
+    JS_SetPropertyStr(jsctx, retval, "aspectRatio", JS_NewFloat64(jsctx, renderDesc.aspectRatio));
+    JS_SetPropertyStr(jsctx, retval, "scale", JS_NewFloat64(jsctx, renderDesc.scale));
+
+    return retval;
+}
+
 static MTY_WindowDesc convCMTY_WindowDesc(JSContext *jsctx, JSValue object) {
     MTY_WindowDesc winDesc = { 0 };
 
