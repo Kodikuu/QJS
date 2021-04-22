@@ -1516,6 +1516,458 @@ static JSValue js_mty_app_set_input_mode(JSContext* jsctx, JSValueConst this_val
     return JS_NewBool(jsctx, 1);
 }
 
+static JSValue js_mty_window_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    const MTY_WindowDesc desc = convCMTY_WindowDesc(jsctx, argv[1]);
+
+    uint32_t window = MTY_WindowCreate(app, &desc);
+
+    return JS_NewInt32(jsctx, window);
+}
+
+static JSValue js_mty_window_destroy(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+
+    MTY_WindowDestroy(app, window);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_window_get_size(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+
+    uint32_t width, height;
+    MTY_WindowGetSize(app, window, &width, &height);
+
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "width", JS_NewUint32(jsctx, width));
+    JS_SetPropertyStr(jsctx, retval, "height", JS_NewUint32(jsctx, height));
+    return retval;
+}
+
+static JSValue js_mty_window_get_position(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+
+    int32_t x, y;
+    MTY_WindowGetPosition(app, window, &x, &y);
+
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "x", JS_NewInt32(jsctx, x));
+    JS_SetPropertyStr(jsctx, retval, "y", JS_NewInt32(jsctx, y));
+    return retval;
+}
+
+static JSValue js_mty_window_get_screen_size(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+
+    uint32_t x, y;
+    bool success = MTY_WindowGetScreenSize(app, window, &x, &y);
+
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "x", JS_NewUint32(jsctx, x));
+    JS_SetPropertyStr(jsctx, retval, "y", JS_NewUint32(jsctx, y));
+    JS_SetPropertyStr(jsctx, retval, "success", JS_NewBool(jsctx, success));
+    return retval;
+}
+
+static JSValue js_mty_window_get_screen_scale(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+
+    float scale = MTY_WindowGetScreenScale(app, window);
+
+    return JS_NewFloat64(jsctx, scale);
+}
+
+static JSValue js_mty_window_set_title(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 3) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+    const char *title = JS_ToCString(jsctx, argv[2]);
+
+    MTY_WindowSetTitle(app, window, title);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_window_is_visible(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+
+    bool visible = MTY_WindowIsVisible(app, window);
+
+    return JS_NewBool(jsctx, visible);
+}
+
+static JSValue js_mty_window_is_active(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+
+    bool active = MTY_WindowIsActive(app, window);
+
+    return JS_NewBool(jsctx, active);
+}
+
+static JSValue js_mty_window_activate(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 3) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+    bool enable = JS_ToBool(jsctx, argv[2]);
+
+    MTY_WindowActivate(app, window, enable);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_window_exists(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+
+    bool exists = MTY_WindowExists(app, window);
+
+    return JS_NewBool(jsctx, exists);
+}
+
+static JSValue js_mty_window_is_fullscreen(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+
+    bool fullscreen = MTY_WindowIsFullscreen(app, window);
+
+    return JS_NewBool(jsctx, fullscreen);
+}
+
+static JSValue js_mty_window_set_fullscreen(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 3) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+    bool enable = JS_ToBool(jsctx, argv[2]);
+
+    MTY_WindowSetFullscreen(app, window, enable);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_window_warp_cursor(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 4) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+    
+    MTY_WindowWarpCursor(app, window, JSToInt32(jsctx, argv[2]), JSToInt32(jsctx, argv[3]));
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_window_get_device(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+
+    size_t device = (size_t)MTY_WindowGetDevice(app, window);
+    return JS_NewBigInt64(jsctx, device);
+}
+
+static JSValue js_mty_window_get_context(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+
+    size_t context = (size_t)MTY_WindowGetContext(app, window);
+    return JS_NewBigInt64(jsctx, context);
+}
+
+static JSValue js_mty_window_get_surface(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+
+    size_t surface = (size_t)MTY_WindowGetSurface(app, window);
+    return JS_NewBigInt64(jsctx, surface);
+}
+
+static JSValue js_mty_window_draw_quad(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 4) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+    const void *image = (const void *)JSToInt64(jsctx, argv[2]);
+    MTY_RenderDesc desc = convCMTY_RenderDesc(jsctx, argv[3]);
+
+    MTY_WindowDrawQuad(app, window, image, &desc);
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_window_draw_ui(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 3) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+    const MTY_DrawData dd = convCMTY_DrawData(jsctx, argv[2]);
+
+    MTY_WindowDrawUI(app, window, &dd);
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_window_has_ui_texture(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 3) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+    uint32_t id = JSToInt32(jsctx, argv[2]);
+    
+    bool has = MTY_WindowHasUITexture(app, window, id);
+    return JS_NewBool(jsctx, has);
+}
+
+static JSValue js_mty_window_set_ui_texture(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 6) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+    uint32_t id = JSToInt32(jsctx, argv[2]);
+    const void *rgba = (const void *)JSToInt64(jsctx, argv[3]); // Pointer
+    uint32_t width = JSToInt32(jsctx, argv[4]);
+    uint32_t height = JSToInt32(jsctx, argv[5]);
+
+    bool ret = MTY_WindowSetUITexture(app, window, id, rgba, width, height);
+    return JS_NewBool(jsctx, ret);
+}
+
+static JSValue js_mty_window_make_current(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 3) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t window = JSToInt32(jsctx, argv[1]);
+    bool current = JS_ToBool(jsctx, argv[2]);
+
+    MTY_WindowMakeCurrent(app, window, current);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_window_present(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    /*
+    Args (3); Pointer, String, Obj (C *MTY_App, const char*, MTY_WindowDesc)
+    Returns; Int32 (JS Int32)
+    */
+    
+    // Check arg list length
+    if (argc != 3) {
+        return JS_EXCEPTION;
+    }
+    
+    
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    int8_t window = JSToInt32(jsctx, argv[1]);
+    uint32_t numFrames = JSToInt32(jsctx, argv[2]);
+
+    MTY_WindowPresent(app, window, numFrames);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_window_get_gfx(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    int8_t window = JSToInt32(jsctx, argv[1]);
+
+    uint32_t gfx = MTY_WindowGetGFX(app, window);
+
+    return JS_NewInt32(jsctx, gfx);
+}
+
+static JSValue js_mty_window_set_gfx(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    /*
+    Args (3); Pointer, String, Obj (C *MTY_App, const char*, MTY_WindowDesc)
+    Returns; Int32 (JS Int32)
+    */
+    
+    // Check arg list length
+    if (argc != 4) {
+        return JS_EXCEPTION;
+    }
+    
+    
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    int8_t window = JSToInt32(jsctx, argv[1]);
+    MTY_GFX gfx = JSToInt32(jsctx, argv[2]);
+    bool vsync = JS_ToBool(jsctx, argv[3]);
+
+    bool success = MTY_WindowSetGFX(app, window, gfx, vsync);
+
+    return JS_NewBool(jsctx, success);
+}
+
+static JSValue js_mty_window_get_context_state(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    int8_t window = JSToInt32(jsctx, argv[1]);
+
+    uint32_t state = MTY_WindowGetContextState(app, window);
+
+    return JS_NewInt32(jsctx, state);
+}
+
+static JSValue js_mty_hotkey_to_string(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 4) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Mod mod = JSToInt32(jsctx, argv[0]);
+    MTY_Key key = JSToInt32(jsctx, argv[1]);
+
+    char *string;
+    size_t size;
+    
+    MTY_HotkeyToString(mod, key, string, size);
+
+    return JS_NewString(jsctx, string);
+}
+
+static JSValue js_mty_set_app_id(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *id = JS_ToCString(jsctx, argv[0]);
+
+    MTY_SetAppID(id);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_print_event(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const MTY_Event evt = convCMTY_Event(jsctx, argv[0]);
+
+    MTY_PrintEvent(&evt);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_gl_get_proc_address(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *name = JS_ToCString(jsctx, argv[0]);
+    
+    size_t ptr = (size_t)MTY_GLGetProcAddress(name);
+
+    return JS_NewBigInt64(jsctx, ptr);
+}
+
 // End App module
 
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -1536,123 +1988,6 @@ static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValue
     const char* string = JS_ToCString(ctx, argv[0]);
     printf("- [lib] \"%s\"\n", string);
     return JS_NewInt32(ctx, strlen(string)); // length of string
-}
-
-static JSValue js_mty_window_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    /*
-    Args (3); Pointer, String, Obj (C *MTY_App, const char*, MTY_WindowDesc)
-    Returns; Int32 (JS Int32)
-    */
-    
-    // Check arg list length
-    if (argc != 1) {
-        return JS_EXCEPTION;
-    }
-
-    Context *ctx = JS_GetContextOpaque(jsctx);
-    if (ctx->windows > 2) {
-        return JS_NewBool(jsctx, 0);
-    }
-
-    const MTY_WindowDesc winDesc = convCMTY_WindowDesc(ctx->jsctx, argv[0]);
-
-    MTY_Window window = MTY_WindowCreate(ctx->app, &winDesc);
-    ctx->window[ctx->windows] = true;
-    ctx->windows++;
-
-    return JS_NewInt32(jsctx, ctx->windows);
-}
-
-static JSValue js_mty_window_make_current(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    /*
-    Args (3); Pointer, String, Obj (C *MTY_App, const char*, MTY_WindowDesc)
-    Returns; Int32 (JS Int32)
-    */
-    
-    // Check arg list length
-    if (argc != 1) {
-        return JS_EXCEPTION;
-    }
-
-    Context *ctx = JS_GetContextOpaque(jsctx);
-    
-    
-    int8_t window = JSToInt32(ctx->jsctx, argv[0]);
-
-    if (ctx->windows > window+1) {
-        return JS_NewBool(jsctx, 0);
-    }
-
-    MTY_WindowMakeCurrent(ctx->app, window, true);
-
-    return JS_NewBool(jsctx, 1);
-}
-
-static JSValue js_mty_window_present(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    /*
-    Args (3); Pointer, String, Obj (C *MTY_App, const char*, MTY_WindowDesc)
-    Returns; Int32 (JS Int32)
-    */
-    
-    // Check arg list length
-    if (argc != 2) {
-        return JS_EXCEPTION;
-    }
-
-    Context *ctx = JS_GetContextOpaque(jsctx);
-    
-    
-    int8_t window = JSToInt32(ctx->jsctx, argv[0]);
-    uint32_t numFrames = JSToInt32(ctx->jsctx, argv[1]);
-
-    if (ctx->windows > window+1) {
-        return JS_NewBool(jsctx, 0);
-    }
-
-    MTY_WindowPresent(ctx->app, window, numFrames);
-
-    return JS_NewBool(jsctx, 1);
-}
-
-static JSValue js_mty_window_get_size(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-    if (argc != 1) {
-        return JS_EXCEPTION;
-    }
-
-    Context *ctx = JS_GetContextOpaque(jsctx);
-    int8_t window = JSToInt32(ctx->jsctx, argv[0]);
-
-    uint32_t w = 0, h = 0;
-    MTY_WindowGetSize(ctx->app, window, &w, &h);
-    JSValue retval = JS_NewObject(ctx->jsctx);
-    JS_SetPropertyStr(jsctx, retval, "w", JS_NewInt32(jsctx, w));
-    JS_SetPropertyStr(jsctx, retval, "h", JS_NewInt32(jsctx, h));
-    return retval;
-}
-
-static JSValue js_mty_window_get_scale(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-    if (argc != 1) {
-        return JS_EXCEPTION;
-    }
-
-    Context *ctx = JS_GetContextOpaque(jsctx);
-    int8_t window = JSToInt32(jsctx, argv[0]);
-
-    float scale = MTY_WindowGetScreenScale(ctx->app, window);
-    return JS_NewFloat64(jsctx, scale);
-}
-
-static JSValue js_mty_window_warp_cursor(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-    if (argc != 2) {
-        return JS_EXCEPTION;
-    }
-
-    Context *ctx = JS_GetContextOpaque(jsctx);
-    MTY_WindowWarpCursor(ctx->app, 0, JSToInt32(ctx->jsctx, argv[0]), JSToInt32(ctx->jsctx, argv[1]));
-    return JS_NewBool(jsctx, 1);
 }
 
 static JSValue js_mty_audio_queue(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -2116,16 +2451,40 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_AppEnablePen", 2, js_mty_app_enable_pen),
     JS_CFUNC_DEF("MTY_AppGetInputMode", 1, js_mty_app_get_input_mode),
     JS_CFUNC_DEF("MTY_AppSetInputMode", 2, js_mty_app_set_input_mode),
+    JS_CFUNC_DEF("MTY_WindowCreate", 2, js_mty_window_create),
+    JS_CFUNC_DEF("MTY_WindowDestroy", 2, js_mty_window_destroy),
+    JS_CFUNC_DEF("MTY_WindowGetSize", 2, js_mty_window_get_size),
+    JS_CFUNC_DEF("MTY_WindowGetPosition", 2, js_mty_window_get_position),
+    JS_CFUNC_DEF("MTY_WindowGetScreenSize", 2, js_mty_window_get_screen_size),
+    JS_CFUNC_DEF("MTY_WindowGetScreenScale", 2, js_mty_window_get_screen_scale),
+    JS_CFUNC_DEF("MTY_WindowSetTitle", 3, js_mty_window_set_title),
+    JS_CFUNC_DEF("MTY_WindowIsVisible", 2, js_mty_window_is_visible),
+    JS_CFUNC_DEF("MTY_WindowIsActive", 2, js_mty_window_is_active),
+    JS_CFUNC_DEF("MTY_WindowActivate", 3, js_mty_window_activate),
+    JS_CFUNC_DEF("MTY_WindowExists", 2, js_mty_window_exists),
+    JS_CFUNC_DEF("MTY_WindowIsFullscreen", 2, js_mty_window_is_fullscreen),
+    JS_CFUNC_DEF("MTY_WindowSetFullscreen", 3, js_mty_window_set_fullscreen),
+    JS_CFUNC_DEF("MTY_WindowWarpCursor", 4, js_mty_window_warp_cursor),
+    JS_CFUNC_DEF("MTY_WindowGetDevice", 2, js_mty_window_get_device),
+    JS_CFUNC_DEF("MTY_WindowGetContext", 2, js_mty_window_get_context),
+    JS_CFUNC_DEF("MTY_WindowGetSurface", 2, js_mty_window_get_surface),
+    JS_CFUNC_DEF("MTY_WindowDrawQuad", 4, js_mty_window_draw_quad),
+    JS_CFUNC_DEF("MTY_WindowDrawUI", 3, js_mty_window_draw_ui),
+    JS_CFUNC_DEF("MTY_WindowHasUITexture", 3, js_mty_window_has_ui_texture),
+    JS_CFUNC_DEF("MTY_WindowSetUITexture", 6, js_mty_window_set_ui_texture),
+    JS_CFUNC_DEF("MTY_WindowMakeCurrent", 3, js_mty_window_make_current),
+    JS_CFUNC_DEF("MTY_WindowPresent", 3, js_mty_window_present),
+    JS_CFUNC_DEF("MTY_WindowGetGFX", 2, js_mty_window_get_gfx),
+    JS_CFUNC_DEF("MTY_WindowSetGFX", 3, js_mty_window_set_gfx),
+    JS_CFUNC_DEF("MTY_WindowGetContextState", 2, js_mty_window_get_context_state),
+    JS_CFUNC_DEF("MTY_HotkeyToString", 4, js_mty_hotkey_to_string),
+    JS_CFUNC_DEF("MTY_SetAppID", 1, js_mty_set_app_id),
+    JS_CFUNC_DEF("MTY_PrintEvent", 1, js_mty_print_event),
+    JS_CFUNC_DEF("MTY_GLGetProcAddress", 3, js_mty_gl_get_proc_address),
     // End App module
 
     JS_CFUNC_DEF("print", 1, js_print),
-    JS_CFUNC_DEF("MTY_WindowCreate", 2, js_mty_window_create),
-    JS_CFUNC_DEF("MTY_WindowMakeCurrent", 2, js_mty_window_make_current),
-    JS_CFUNC_DEF("MTY_WindowPresent", 2, js_mty_window_present),
-    JS_CFUNC_DEF("MTY_WindowGetSize", 1, js_mty_window_get_size),
-    JS_CFUNC_DEF("MTY_WindowGetScreenScale", 1, js_mty_window_get_scale),
     JS_CFUNC_DEF("MTY_AudioQueue", 1, js_mty_audio_queue),
-    JS_CFUNC_DEF("MTY_WindowWarpCursor", 1, js_mty_window_warp_cursor),
 // END Functions
 };
 
