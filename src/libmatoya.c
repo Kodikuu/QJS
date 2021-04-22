@@ -304,8 +304,23 @@ static JSValue js_mty_window_warp_cursor(JSContext* jsctx, JSValueConst this_val
     return JS_NewBool(jsctx, 1);
 }
 
+static JSValue js_mty_audio_queue(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    Context *ctx = JS_GetContextOpaque(jsctx);
+    size_t frames;
+
+    const int16_t *pcm = (int16_t *)JS_GetArrayBuffer(jsctx, &frames, argv[0]);
+    MTY_AudioQueue(ctx->audio, pcm, frames);
+    return JS_NewBool(jsctx, 1);
+}
+
 // list of exported functions, the string is how they'll appear in the module
 static const JSCFunctionListEntry js_mty_funcs[] = {
+// Functions
     JS_CFUNC_DEF("print", 1, js_print),
     JS_CFUNC_DEF("MTY_AppCreate", 2, js_mty_app_create),
     JS_CFUNC_DEF("MTY_WindowCreate", 2, js_mty_window_create),
@@ -314,9 +329,11 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_WindowGetSize", 1, js_mty_window_get_size),
     JS_CFUNC_DEF("MTY_WindowGetScreenScale", 1, js_mty_window_get_scale),
     JS_CFUNC_DEF("MTY_AppRun", 0, js_mty_app_run),
+    JS_CFUNC_DEF("MTY_AudioQueue", 1, js_mty_audio_queue),
     JS_CFUNC_DEF("MTY_AppSetRelativeMouse", 1, js_mty_app_set_relative),
     JS_CFUNC_DEF("MTY_WindowWarpCursor", 1, js_mty_window_warp_cursor),
     JS_OBJECT_DEF("MTY_WindowDesc", js_mty_window_desc, 13, JS_PROP_C_W_E),
+// END Functions
 };
 
 static const int func_count = (int)(sizeof(js_mty_funcs)/sizeof(js_mty_funcs[0]));

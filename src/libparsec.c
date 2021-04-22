@@ -1,11 +1,20 @@
 #include "libparsec.h"
 #include "utils.h"
 
-static void frameFunc(const ParsecFrame *frame, const void *image, void *opaque) {
+// Callbacks
+
+static void audioFunc(const int16_t *pcm, uint32_t frames, void *opaque) {
 	struct Context* ctx = (struct Context*)opaque;
 
-    JS_Call(ctx->jsctx, ctx->eventFunc, JS_UNDEFINED, 0, NULL);
+    JSValue audio = JS_NewArrayBuffer(ctx->jsctx, pcm, frames, FreeArray, NULL, false);
+    JSValue args[1] = {audio};
+    
+    JS_Call(ctx->jsctx, ctx->audioFunc, JS_UNDEFINED, 1, args);
+
+    MTY_AudioQueue(ctx->audio, pcm, frames);
 }
+
+// Functions
 
 static JSValue js_parsecclientconnect(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
@@ -87,6 +96,23 @@ static JSValue js_parsecclientpollevents(JSContext* jsctx, JSValueConst this_val
     }
 
     return retval;
+}
+
+static JSValue js_parsecclientpollaudio(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    Context *ctx = JS_GetContextOpaque(jsctx);
+    uint32_t timeout = JSToInt32(jsctx, argv[0]);
+    
+    ParsecClientStatus status;
+
+    ParsecStatus ret = ParsecClientPollAudio(ctx->ps, audioFunc, timeout, ctx);
+    
+
+    return JS_NewUint32(jsctx, ret);
 }
 
 static JSValue js_parsecclientsendmessage(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -172,8 +198,10 @@ static const JSCFunctionListEntry js_parsec_funcs[] = {
     JS_CFUNC_DEF("ParsecClientGetStatus", 0, js_parsecclientgetstatus),
     JS_CFUNC_DEF("ParsecClientSendMessage", 2, js_parsecclientsendmessage),
     JS_CFUNC_DEF("ParsecClientPollEvents", 1, js_parsecclientpollevents),
+    JS_CFUNC_DEF("ParsecClientPollAudio", 1, js_parsecclientpollaudio),
     JS_CFUNC_DEF("ParsecClientSetDimensions", 4, js_parsec_client_set_dimensions),
     JS_CFUNC_DEF("ParsecClientGLRenderFrame", 2, js_parsec_client_gl_render_frame),
+// END Functions
 };
 
 static const int func_count = (int)(sizeof(js_parsec_funcs)/sizeof(js_parsec_funcs[0]));

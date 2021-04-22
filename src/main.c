@@ -39,7 +39,12 @@ int prepareQuickJS(Context *ctx) {
 	return 0;
 }
 
-int main(void) {
+int prepareMatoya(Context *ctx) {
+	ctx->audio = MTY_AudioCreate(48000, 0, 100);
+	return 0;
+}
+
+int main(int argc, const char *argv[]) {
 	Context ctx = {0};
 	ctx.running = true;
 	ctx.windows = 0;
@@ -47,6 +52,14 @@ int main(void) {
 	MTY_SetLogFunc(logFunc, &ctx);
 
 	bool ret;
+
+	printf("Matoya: ");
+	ret = prepareMatoya(&ctx);
+	if (!ret) {
+		printf("Success\n");
+	} else {
+		printf("Fail\n");
+	}
 	
 	printf("Parsec: ");
 	ret = prepareParsec(&ctx, "deps/parsec32.dll");
