@@ -5,13 +5,16 @@ function appFunc() {
     let event = ParsecClientPollEvents(0)
 
     if (event.new) {
-        if (event.type = 1 && event.modeUpdate) {
+        if (event.type = CLIENT_EVENT_CURSOR && event.modeUpdate) {
             MTY_AppSetRelativeMouse(event.relative)
             if (!event.relative) {
                 MTY_WindowWarpCursor(event.positionX, event.positionY)
             }
         }
     }
+
+    ParsecClientPollAudio(0)
+
 
     let size = MTY_WindowGetSize(0);
     let scale = MTY_WindowGetScreenScale(0)
@@ -29,11 +32,11 @@ function eventFunc(eventType, window, event) {
     
     // Mouse Buttons
     } else if (eventType == 9) {
-        ParsecClientSendMessage(2, event)
+        ParsecClientSendMessage(MESSAGE_MOUSE_BUTTON, event)
     
     // Mouse Motion
     } else if (eventType == 10) {
-        ParsecClientSendMessage(4, event)
+        ParsecClientSendMessage(MESSAGE_MOUSE_MOTION, event)
     }
     return 1
 }
