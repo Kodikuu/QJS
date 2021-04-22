@@ -154,7 +154,7 @@ static const MTY_Vtx convCMTY_Vtx(JSContext *jsctx, JSValue object) {
 
     vtx.pos = convCMTY_Point(jsctx, JS_GetPropertyStr(jsctx, object, "pos"));
     vtx.uv = convCMTY_Point(jsctx, JS_GetPropertyStr(jsctx, object, "uv"));
-    vtx.col = JS_NewInt32(jsctx, JS_GetPropertyStr(jsctx, object, "col"));
+    vtx.col = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "col"));
 
     return vtx;
 }
@@ -173,10 +173,10 @@ static const MTY_Cmd convCMTY_Cmd(JSContext *jsctx, JSValue object) {
     MTY_Cmd cmd = { 0 };
 
     cmd.clip = convCMTY_Rect(jsctx, JS_GetPropertyStr(jsctx, object, "clip"));
-    cmd.texture = JS_NewInt32(jsctx, JS_GetPropertyStr(jsctx, object, "texture"));
-    cmd.elemCount = JS_NewInt32(jsctx, JS_GetPropertyStr(jsctx, object, "elemCount"));
-    cmd.idxOffset = JS_NewInt32(jsctx, JS_GetPropertyStr(jsctx, object, "idxOffset"));
-    cmd.vtxOffset = JS_NewInt32(jsctx, JS_GetPropertyStr(jsctx, object, "vtxOffset"));
+    cmd.texture = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "texture"));
+    cmd.elemCount = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "elemCount"));
+    cmd.idxOffset = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "idxOffset"));
+    cmd.vtxOffset = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "vtxOffset"));
 
     return cmd;
 }
