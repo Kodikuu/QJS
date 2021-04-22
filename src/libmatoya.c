@@ -81,6 +81,179 @@ static const JSCFunctionListEntry js_mty_draw_data[] = {
 
 // End render module
 
+// App module
+
+static const JSCFunctionListEntry js_mty_key_event[] = {
+
+    JS_PROP_INT32_DEF("key", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("mod", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("pressed", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_mty_scroll_event[] = {
+
+    JS_PROP_INT32_DEF("x", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("y", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("pixels", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_mty_button_event[] = {
+
+    JS_PROP_INT32_DEF("button", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("x", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("y", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("pressed", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_mty_motion_event[] = {
+
+    JS_PROP_INT32_DEF("x", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("y", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("relative", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("synth", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_mty_drop_event[] = {
+
+    JS_PROP_STRING_DEF("name", "", JS_PROP_C_W_E),
+    JS_PROP_INT64_DEF("buf", 0, JS_PROP_C_W_E), //Pointer
+    JS_PROP_INT32_DEF("size", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_mty_axis[] = {
+
+    JS_PROP_INT32_DEF("usage", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("value", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("min", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("max", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_mty_axes[] = {
+    // MTY_CAXIS_MAX
+    JS_OBJECT_DEF("0", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("1", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("2", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("3", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("4", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("5", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("6", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("7", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("8", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("9", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("10", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("11", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("12", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("13", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("14", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("15", js_mty_axis, 4, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_mty_buttons[] = {
+    // MTY_CBUTTON_MAX
+    JS_PROP_INT32_DEF("0", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("1", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("2", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("3", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("4", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("5", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("6", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("7", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("8", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("9", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("10", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("11", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("12", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("13", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("14", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("15", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("16", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("17", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("18", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("19", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("20", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("30", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("31", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("32", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("33", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("34", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("35", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("36", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("37", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("38", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("39", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("40", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("41", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("42", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("43", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("44", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("45", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("46", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("47", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("48", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("49", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("50", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("51", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("52", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("53", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("54", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("55", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("56", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("57", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("58", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("59", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("60", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("61", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("62", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("63", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_mty_controller_event[] = {
+
+    JS_OBJECT_DEF("buttons", js_mty_buttons, MTY_CBUTTON_MAX, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("axes", js_mty_axes, MTY_CAXIS_MAX, JS_PROP_C_W_E),
+
+    JS_PROP_INT32_DEF("type", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("id", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("pid", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("vid", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("numButtons", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("numAxes", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_mty_pen_event[] = {
+
+    JS_PROP_INT32_DEF("flags", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("x", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("y", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("pressure", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("rotation", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("tiltX", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("tiltY", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_mty_event[] = {
+
+    JS_PROP_INT32_DEF("type", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("window", 0, JS_PROP_C_W_E),
+    
+    // Union
+    JS_OBJECT_DEF("controller", js_mty_controller_event, 8, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("scroll", js_mty_scroll_event, 3, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("button", js_mty_button_event, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("motion", js_mty_motion_event, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("drop", js_mty_drop_event, 3, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("pen", js_mty_pen_event, 7, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("key", js_mty_key_event, 3, JS_PROP_C_W_E),
+
+    JS_PROP_STRING_DEF("reopenArgy", "", JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("hotkey", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("trayID", 0, JS_PROP_C_W_E),
+    JS_PROP_STRING_DEF("text", "", JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("focus", 0, JS_PROP_C_W_E),
+};
+
+// TODO; MTY_MenuItem
+
 static const JSCFunctionListEntry js_mty_window_desc[] = {
     JS_PROP_STRING_DEF("title", "", JS_PROP_C_W_E),
 
@@ -99,6 +272,8 @@ static const JSCFunctionListEntry js_mty_window_desc[] = {
     JS_PROP_INT32_DEF("hidden", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("vsync", 0, JS_PROP_C_W_E),
 };
+
+// End App module
 
 // Converters
 
@@ -292,6 +467,10 @@ static JSValue convJSMTY_DrawData(JSContext *jsctx, MTY_DrawData drawdata) {
     return retval;
 }
 // End render module
+
+// App module
+
+// End App module
 
 
 static MTY_WindowDesc convCMTY_WindowDesc(JSContext *jsctx, JSValue object) {
@@ -567,6 +746,9 @@ static JSValue js_mty_free_render_state(JSContext* jsctx, JSValueConst this_val,
 }
 // End render module
 
+// App module
+
+// End App module
 
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
@@ -1136,7 +1318,20 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_OBJECT_DEF("MTY_DrawData", js_mty_draw_data, 7, JS_PROP_C_W_E),
     // End render
 
+    // App module
+    JS_OBJECT_DEF("MTY_KeyEvent", js_mty_key_event, 3, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_ScrollEvent", js_mty_scroll_event, 3, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_ButtonEvent", js_mty_button_event, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_MotionEvent", js_mty_motion_event, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_DropEvent", js_mty_drop_event, 3, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_Axis", js_mty_axis, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_ControllerEvent", js_mty_controller_event, 8, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_PenEvent", js_mty_pen_event, 7, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_Event", js_mty_event, 14, JS_PROP_C_W_E),
+    // TODO; MTY_MenuItem
     JS_OBJECT_DEF("MTY_WindowDesc", js_mty_window_desc, 13, JS_PROP_C_W_E),
+    // End App module
+
 // END Structs
 
 // Functions
@@ -1152,6 +1347,10 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_SetRenderState", 4, js_mty_set_render_state),
     JS_CFUNC_DEF("MTY_FreeRenderState", 1, js_mty_free_render_state),
     // End render
+
+    // App module
+
+    // End App module
 
     JS_CFUNC_DEF("print", 1, js_print),
     JS_CFUNC_DEF("MTY_AppCreate", 2, js_mty_app_create),
