@@ -24,7 +24,7 @@ static const JSCFunctionListEntry js_mty_window_desc[] = {
 
 // Converters
 
-static const MTY_WindowDesc convMTY_WindowDesc(JSContext *jsctx, JSValue object) {
+static MTY_WindowDesc convCMTY_WindowDesc(JSContext *jsctx, JSValue object) {
     MTY_WindowDesc winDesc = { 0 };
 
     winDesc.title = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, object, "title"));
@@ -198,7 +198,7 @@ static JSValue js_mty_window_create(JSContext* jsctx, JSValueConst this_val, int
         return JS_NewBool(jsctx, 0);
     }
 
-    const MTY_WindowDesc winDesc = convMTY_WindowDesc(ctx->jsctx, argv[0]);
+    const MTY_WindowDesc winDesc = convCMTY_WindowDesc(ctx->jsctx, argv[0]);
 
     MTY_Window window = MTY_WindowCreate(ctx->app, &winDesc);
     ctx->window[ctx->windows] = true;
