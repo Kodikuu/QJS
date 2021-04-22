@@ -1,8 +1,5 @@
 let WINDOWS = 0
 
-let SESSION = ""
-let PEER = ""
-
 function appFunc() {
     
     let event = ParsecClientPollEvents(0)

@@ -26,16 +26,22 @@ int prepareParsec(Context *ctx, char *path) {
 	return e;
 }
 
-int prepareQuickJS(Context *ctx) {
+int prepareQuickJS(Context *ctx, const char *session, const char *peer) {
 	ctx->jsrt = JS_NewRuntime();
 	//JS_SetModuleLoaderFunc(ctx->jsrt, NULL, loadmodule, NULL);
 	ctx->jsctx = JS_NewContext(ctx->jsrt);
+    JSValue global_obj = JS_GetGlobalObject(ctx->jsctx);
+
 	JS_SetContextOpaque(ctx->jsctx, ctx);
 	JS_EnableBignumExt(ctx->jsctx, true);
 
 	// Intrinsics don't need importing
 	JS_AddIntrinsicMatoya(ctx->jsctx);
 	JS_AddIntrinsicParsec(ctx->jsctx);
+
+	// Set session and peer
+	JS_SetPropertyStr(ctx->jsctx, global_obj, "SESSION", JS_NewString(ctx->jsctx, session));
+	JS_SetPropertyStr(ctx->jsctx, global_obj, "PEER", JS_NewString(ctx->jsctx, peer));
 	return 0;
 }
 
@@ -45,6 +51,14 @@ int prepareMatoya(Context *ctx) {
 }
 
 int main(int argc, const char *argv[]) {
+
+	if (argc != 3) {
+		printf("main SessionID PeerID");
+		return 1;
+	}
+	const char *session = argv[1];
+	const char *peer = argv[2];
+
 	Context ctx = {0};
 	ctx.running = true;
 	ctx.windows = 0;
@@ -70,7 +84,7 @@ int main(int argc, const char *argv[]) {
 	}
 
 	printf("QuickJS: ");
-	ret = prepareQuickJS(&ctx);
+	ret = prepareQuickJS(&ctx, session, peer);
 	if (!ret) {
 		printf("Success\n");
 	} else {
