@@ -19,6 +19,12 @@ static const JSCFunctionListEntry js_mty_render_desc[] = {
     JS_PROP_DOUBLE_DEF("scale", 0.0f, JS_PROP_C_W_E),
 };
 
+static const JSCFunctionListEntry js_mty_point[] = {
+
+    JS_PROP_DOUBLE_DEF("x", 0.0f, JS_PROP_C_W_E),
+    JS_PROP_DOUBLE_DEF("y", 0.0f, JS_PROP_C_W_E),
+};
+
 static const JSCFunctionListEntry js_mty_window_desc[] = {
     JS_PROP_STRING_DEF("title", "", JS_PROP_C_W_E),
 
@@ -75,6 +81,24 @@ static JSValue convJSMTY_RenderDesc(JSContext *jsctx, MTY_RenderDesc renderDesc)
     
     JS_SetPropertyStr(jsctx, retval, "aspectRatio", JS_NewFloat64(jsctx, renderDesc.aspectRatio));
     JS_SetPropertyStr(jsctx, retval, "scale", JS_NewFloat64(jsctx, renderDesc.scale));
+
+    return retval;
+}
+
+static const MTY_Point convCMTY_Point(JSContext *jsctx, JSValue object) {
+    MTY_Point point = { 0 };
+
+    point.x = JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, object, "x"));
+    point.y = JSToFloat64(jsctx, JS_GetPropertyStr(jsctx, object, "y"));
+
+    return point;
+}
+
+static JSValue convJSMTY_Point(JSContext *jsctx, MTY_Point point) {
+    JSValue retval = JS_NewObject(jsctx);
+    
+    JS_SetPropertyStr(jsctx, retval, "x", JS_NewFloat64(jsctx, point.x));
+    JS_SetPropertyStr(jsctx, retval, "y", JS_NewFloat64(jsctx, point.y));
 
     return retval;
 }
