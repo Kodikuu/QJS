@@ -1970,6 +1970,81 @@ static JSValue js_mty_gl_get_proc_address(JSContext* jsctx, JSValueConst this_va
 
 // End App module
 
+// Audio module
+
+static JSValue js_mty_audio_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 3) {
+        return JS_EXCEPTION;
+    }
+
+    uint32_t sampleRate = JSToInt32(jsctx, argv[0]);
+    uint32_t minBuffer = JSToInt32(jsctx, argv[1]);
+    uint32_t maxBuffer = JSToInt32(jsctx, argv[2]);
+    
+    size_t ptr = (size_t)MTY_AudioCreate(sampleRate, minBuffer, maxBuffer);
+
+    return JS_NewBigInt64(jsctx, ptr);
+}
+
+static JSValue js_mty_audio_destroy(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Audio *audio = (MTY_Audio *)JSToInt64(jsctx, argv[0]);
+    
+    MTY_AudioDestroy(&audio);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_audio_reset(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Audio *audio = (MTY_Audio *)JSToInt64(jsctx, argv[0]);
+    
+    MTY_AudioReset(audio);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_audio_get_queued(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Audio *audio = (MTY_Audio *)JSToInt64(jsctx, argv[0]);
+    
+    uint32_t milliseconds = MTY_AudioGetQueued(audio);
+
+    return JS_NewInt32(jsctx, milliseconds);
+}
+
+static JSValue js_mty_audio_queue(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    uint32_t frames;
+    
+    Context *ctx = JS_GetContextOpaque(jsctx);
+    //MTY_Audio *audio = (MTY_Audio *)JSToInt64(jsctx, argv[0]);
+    const int16_t *pcm = (int16_t *)JS_GetArrayBuffer(jsctx, &frames, argv[0]);
+
+    MTY_AudioQueue(ctx->audio, pcm, frames);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+// End Audio module
+
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
     Args (1); String (C const char*)
@@ -1988,20 +2063,6 @@ static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValue
     const char* string = JS_ToCString(ctx, argv[0]);
     printf("- [lib] \"%s\"\n", string);
     return JS_NewInt32(ctx, strlen(string)); // length of string
-}
-
-static JSValue js_mty_audio_queue(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-    if (argc != 1) {
-        return JS_EXCEPTION;
-    }
-
-    Context *ctx = JS_GetContextOpaque(jsctx);
-    size_t frames;
-
-    const int16_t *pcm = (int16_t *)JS_GetArrayBuffer(jsctx, &frames, argv[0]);
-    MTY_AudioQueue(ctx->audio, pcm, frames);
-    return JS_NewBool(jsctx, 1);
 }
 
 // list of exported functions, the string is how they'll appear in the module
@@ -2483,8 +2544,15 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_GLGetProcAddress", 3, js_mty_gl_get_proc_address),
     // End App module
 
-    JS_CFUNC_DEF("print", 1, js_print),
+    // Audio module
+    JS_CFUNC_DEF("MTY_AudioCreate", 3, js_mty_audio_create),
+    JS_CFUNC_DEF("MTY_AudioDestroy", 1, js_mty_audio_destroy),
+    JS_CFUNC_DEF("MTY_AudioReset", 1, js_mty_audio_reset),
+    JS_CFUNC_DEF("MTY_AudioGetQueued", 1, js_mty_audio_get_queued),
     JS_CFUNC_DEF("MTY_AudioQueue", 1, js_mty_audio_queue),
+    // End audio module
+
+    JS_CFUNC_DEF("print", 1, js_print),
 // END Functions
 };
 

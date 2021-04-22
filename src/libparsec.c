@@ -6,15 +6,26 @@
 static void audioFunc(const int16_t *pcm, uint32_t frames, void *opaque) {
 	struct Context* ctx = (struct Context*)opaque;
 
-    JSValue audio = JS_NewArrayBuffer(ctx->jsctx, (uint8_t *)pcm, frames, FreeArray, NULL, false);
+    JSValue audio = JS_NewArrayBuffer(ctx->jsctx, pcm, frames, FreeArray, NULL, false);
     JSValue args[1] = {audio};
     
     JS_Call(ctx->jsctx, ctx->audioFunc, JS_UNDEFINED, 1, args);
-
-    MTY_AudioQueue(ctx->audio, pcm, frames);
 }
 
 // Functions
+
+static JSValue js_parsecsetaudiocallback(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    Context *ctx = JS_GetContextOpaque(jsctx);
+
+    ctx->audioFunc = argv[0];
+    
+    return JS_NewBool(jsctx, 1);
+}
 
 static JSValue js_parsecclientconnect(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
@@ -685,6 +696,9 @@ static const JSCFunctionListEntry js_parsec_funcs[] = {
     JS_CFUNC_DEF("ParsecClientPollAudio", 1, js_parsecclientpollaudio),
     JS_CFUNC_DEF("ParsecClientSetDimensions", 4, js_parsec_client_set_dimensions),
     JS_CFUNC_DEF("ParsecClientGLRenderFrame", 2, js_parsec_client_gl_render_frame),
+
+	// Special
+    JS_CFUNC_DEF("ParsecSetAudioCallback", 2, js_parsecsetaudiocallback),
 // END Functions
 };
 

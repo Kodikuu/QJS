@@ -1,5 +1,8 @@
 let WINDOWS = 0
+
+// Pointers
 let app = 0
+let audio = 0
 
 function appFunc() {
     let event = ParsecClientPollEvents(1)
@@ -40,8 +43,8 @@ function eventFunc(event) {
     return 1
 }
 
-function audioFunc(audio) {
-    MTY_AudioQueue(audio)
+function audioFunc(pcm) {
+    MTY_AudioQueue(pcm)
 }
 
 function makeWindow(app, w, h) {
@@ -61,6 +64,10 @@ print("Make window")
 makeWindow(app, 1920, 1080)
 print("Focus window")
 MTY_WindowMakeCurrent(app, 0, true);
+
+print("Init audio")
+//audio = MTY_AudioCreate(48000, 25, 100)
+ParsecSetAudioCallback(audioFunc)
 
 print("Connect")
 ParsecClientConnect(SESSION, PEER)
