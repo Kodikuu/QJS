@@ -20,22 +20,22 @@ function appFunc() {
     let scale = MTY_WindowGetScreenScale(0)
     ParsecClientSetDimensions(0, size.w, size.h, scale)
     ParsecClientGLRenderFrame(0, 0)
-    MTY_WindowPresent(0, 1)
+    MTY_WindowPresent(0, 0)
 }
 
 function eventFunc(eventType, window, event) {
 
     // Close Window
-    if (eventType == 1) {
+    if (eventType == MTY_EVENT_CLOSE) {
         ParsecClientDisconnect()
         return 0
     
     // Mouse Buttons
-    } else if (eventType == 9) {
+    } else if (eventType == MTY_EVENT_BUTTON) {
         ParsecClientSendMessage(MESSAGE_MOUSE_BUTTON, event)
     
     // Mouse Motion
-    } else if (eventType == 10) {
+    } else if (eventType == MTY_EVENT_MOTION) {
         ParsecClientSendMessage(MESSAGE_MOUSE_MOTION, event)
     }
     return 1
