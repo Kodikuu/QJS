@@ -46,7 +46,7 @@ int prepareQuickJS(Context *ctx, const char *session, const char *peer) {
 }
 
 int prepareMatoya(Context *ctx) {
-	ctx->audio = MTY_AudioCreate(48000, 0, 100);
+	ctx->audio = MTY_AudioCreate(48000, 25, 100);
 	return 0;
 }
 

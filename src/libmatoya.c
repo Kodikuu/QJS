@@ -66,8 +66,6 @@ static void eventFunc(const MTY_Event *evt, void *opaque) {
     
     JSValue retval = JS_NewObject(ctx->jsctx);
 
-    bool call = false;
-
     switch (evt->type) {
         case MTY_EVENT_CONTROLLER:
         case MTY_EVENT_CONNECT:
@@ -77,21 +75,18 @@ static void eventFunc(const MTY_Event *evt, void *opaque) {
             JS_SetPropertyStr(ctx->jsctx, retval, "x", JS_NewInt32(ctx->jsctx, evt->scroll.x));
             JS_SetPropertyStr(ctx->jsctx, retval, "y", JS_NewInt32(ctx->jsctx, evt->scroll.y));
             JS_SetPropertyStr(ctx->jsctx, retval, "pixels", JS_NewInt32(ctx->jsctx, evt->scroll.pixels));
-            call = true;
             break;
         case MTY_EVENT_BUTTON:
             JS_SetPropertyStr(ctx->jsctx, retval, "button", JS_NewInt32(ctx->jsctx, evt->button.button));
             JS_SetPropertyStr(ctx->jsctx, retval, "x", JS_NewInt32(ctx->jsctx, evt->button.x));
             JS_SetPropertyStr(ctx->jsctx, retval, "y", JS_NewInt32(ctx->jsctx, evt->button.y));
             JS_SetPropertyStr(ctx->jsctx, retval, "pressed", JS_NewInt32(ctx->jsctx, evt->button.pressed));
-            call = true;
             break;
         case MTY_EVENT_MOTION:
             JS_SetPropertyStr(ctx->jsctx, retval, "x", JS_NewInt32(ctx->jsctx, evt->motion.x));
             JS_SetPropertyStr(ctx->jsctx, retval, "y", JS_NewInt32(ctx->jsctx, evt->motion.y));
             JS_SetPropertyStr(ctx->jsctx, retval, "relative", JS_NewInt32(ctx->jsctx, evt->motion.relative));
             JS_SetPropertyStr(ctx->jsctx, retval, "synth", JS_NewInt32(ctx->jsctx, evt->motion.synth));
-            call = true;
             break;
         case MTY_EVENT_DROP:
             break;
@@ -101,7 +96,6 @@ static void eventFunc(const MTY_Event *evt, void *opaque) {
             JS_SetPropertyStr(ctx->jsctx, retval, "key", JS_NewInt32(ctx->jsctx, evt->key.key));
             JS_SetPropertyStr(ctx->jsctx, retval, "mod", JS_NewInt32(ctx->jsctx, evt->key.mod));
             JS_SetPropertyStr(ctx->jsctx, retval, "pressed", JS_NewInt32(ctx->jsctx, evt->key.pressed));
-            call = true;
             break;
         case MTY_EVENT_REOPEN:
             break;
@@ -114,17 +108,15 @@ static void eventFunc(const MTY_Event *evt, void *opaque) {
         case MTY_EVENT_FOCUS:
             break;
         case MTY_EVENT_CLOSE:
-            call = true;
             break;
         default:
             break;
     }
 
-    if (call) {
-        args[2] = retval;
-        JSValue ret = JS_Call(ctx->jsctx, ctx->eventFunc, JS_UNDEFINED, 3, args);
-        ctx->running = JS_ToBool(ctx->jsctx, ret);
-    }
+    args[2] = retval;
+    JSValue ret = JS_Call(ctx->jsctx, ctx->eventFunc, JS_UNDEFINED, 3, args);
+    ctx->running = JS_ToBool(ctx->jsctx, ret);
+
     MTY_Free(args);
 }
 
