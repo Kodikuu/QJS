@@ -37,12 +37,14 @@ static const JSCFunctionListEntry js_mty_vtx[] = {
 
     JS_OBJECT_DEF("pos", js_mty_point, 2, JS_PROP_C_W_E),
     JS_OBJECT_DEF("uv", js_mty_point, 2, JS_PROP_C_W_E),
+
     JS_PROP_INT32_DEF("col", 0, JS_PROP_C_W_E),
 };
 
 static const JSCFunctionListEntry js_mty_cmd[] = {
 
     JS_OBJECT_DEF("clip", js_mty_rect, 2, JS_PROP_C_W_E),
+
     JS_PROP_INT32_DEF("texture", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("elemCount", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("idxOffset", 0, JS_PROP_C_W_E),
@@ -54,12 +56,26 @@ static const JSCFunctionListEntry js_mty_cmd_list[] = {
     JS_PROP_INT64_DEF("cmd", 0, JS_PROP_C_W_E), // Pointer to MTY_Cmd array
     JS_PROP_INT64_DEF("vtx", 0, JS_PROP_C_W_E), // Pointer to MTY_Vtx array
     JS_PROP_INT64_DEF("idx", 0, JS_PROP_C_W_E), // Pointer to uint16_t array
+
     JS_PROP_INT32_DEF("cmdLength", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("cmdMax", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("vtxLength", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("vtxMax", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("idxLength", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("idxMax", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_mty_draw_data[] = {
+
+    JS_OBJECT_DEF("displaySize", js_mty_point, 2, JS_PROP_C_W_E),
+
+    JS_PROP_INT64_DEF("cmdList", 0, JS_PROP_C_W_E), // Pointer to MTY_CmdList array
+
+    JS_PROP_INT32_DEF("cmdListLength", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("cmdListMax", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("idxTotalLength", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("vtxTotalLength", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("clear", 0, JS_PROP_C_W_E),
 };
 
 static const JSCFunctionListEntry js_mty_window_desc[] = {
@@ -234,6 +250,40 @@ static JSValue convJSMTY_CmdList(JSContext *jsctx, MTY_CmdList cmdlist) {
     JS_SetPropertyStr(jsctx, retval, "vtxMax", JS_NewInt32(jsctx, cmdlist.vtxMax));
     JS_SetPropertyStr(jsctx, retval, "idxLength", JS_NewInt32(jsctx, cmdlist.idxLength));
     JS_SetPropertyStr(jsctx, retval, "idxMax", JS_NewInt32(jsctx, cmdlist.idxMax));
+
+    return retval;
+}
+
+static const MTY_DrawData convCMTY_DrawData(JSContext *jsctx, JSValue object) {
+    MTY_DrawData drawdata = { 0 };
+
+    drawdata.displaySize = convCMTY_Point(jsctx, JS_GetPropertyStr(jsctx, object, "displaySize"));
+
+    drawdata.cmdList = (MTY_CmdList *)JSToInt64(jsctx, JS_GetPropertyStr(jsctx, object, "cmdList")); // Pointer
+
+    drawdata.cmdListLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "cmdListLength"));
+    drawdata.cmdListMax = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "cmdListMax"));
+    drawdata.idxTotalLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "idxTotalLength"));
+    drawdata.vtxTotalLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "vtxTotalLength"));
+
+    drawdata.clear = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, object, "clear"));
+
+    return drawdata;
+}
+
+static JSValue convJSMTY_DrawData(JSContext *jsctx, MTY_DrawData drawdata) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "displaySize", convJSMTY_Point(jsctx, drawdata.displaySize));
+
+    JS_SetPropertyStr(jsctx, retval, "cmdList", JS_NewBigInt64(jsctx, (size_t)drawdata.cmdList)); // Pointer
+
+    JS_SetPropertyStr(jsctx, retval, "cmdListLength", JS_NewInt32(jsctx, drawdata.cmdListLength));
+    JS_SetPropertyStr(jsctx, retval, "cmdListMax", JS_NewInt32(jsctx, drawdata.cmdListMax));
+    JS_SetPropertyStr(jsctx, retval, "idxTotalLength", JS_NewInt32(jsctx, drawdata.idxTotalLength));
+    JS_SetPropertyStr(jsctx, retval, "vtxTotalLength", JS_NewInt32(jsctx, drawdata.vtxTotalLength));
+
+    JS_SetPropertyStr(jsctx, retval, "clear", JS_NewInt32(jsctx, drawdata.clear));
 
     return retval;
 }
@@ -922,6 +972,7 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_OBJECT_DEF("MTY_Vtx", js_mty_vtx, 3, JS_PROP_C_W_E),
     JS_OBJECT_DEF("MTY_Cmd", js_mty_cmd, 5, JS_PROP_C_W_E),
     JS_OBJECT_DEF("MTY_CmdList", js_mty_cmd_list, 9, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_DrawData", js_mty_draw_data, 7, JS_PROP_C_W_E),
 
     JS_OBJECT_DEF("MTY_WindowDesc", js_mty_window_desc, 13, JS_PROP_C_W_E),
 // END Structs
