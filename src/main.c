@@ -63,7 +63,6 @@ int main(int argc, const char *argv[]) {
 
 	Context ctx = {0};
 	ctx.running = true;
-	ctx.windows = 0;
 
 	MTY_SetLogFunc(logFunc, &ctx);
 

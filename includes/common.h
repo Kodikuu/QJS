@@ -8,8 +8,6 @@ typedef struct Context {
 	// Matoya
 	MTY_App *app;
 	MTY_Audio *audio;
-	bool window[3];
-    int8_t windows;
 	bool running;
 
 	// QuickJS

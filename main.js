@@ -2,7 +2,7 @@ let WINDOWS = 0
 let app = 0
 
 function appFunc() {
-    let event = ParsecClientPollEvents(0)
+    let event = ParsecClientPollEvents(1)
 
     if (event.new) {
         if (event.type = CLIENT_EVENT_CURSOR && event.modeUpdate) {
@@ -13,12 +13,12 @@ function appFunc() {
         }
     }
 
-    ParsecClientPollAudio(0)
+    ParsecClientPollAudio(1)
 
     let size = MTY_WindowGetSize(app, 0);
     let scale = MTY_WindowGetScreenScale(app, 0)
     ParsecClientSetDimensions(0, size.width, size.height, scale)
-    ParsecClientGLRenderFrame(0, 0)
+    ParsecClientGLRenderFrame(0, 1)
     MTY_WindowPresent(app, 0, 0)
 }
 
