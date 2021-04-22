@@ -5,6 +5,7 @@
 
 static const JSCFunctionListEntry js_mty_window_desc[] = {
     JS_PROP_STRING_DEF("title", "", JS_PROP_C_W_E),
+
     JS_PROP_INT32_DEF("origin", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("api", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("width", 0, JS_PROP_C_W_E),
@@ -13,7 +14,9 @@ static const JSCFunctionListEntry js_mty_window_desc[] = {
     JS_PROP_INT32_DEF("minHeight", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("x", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("y", 0, JS_PROP_C_W_E),
+
     JS_PROP_DOUBLE_DEF("maxHeight", 0.0f, JS_PROP_C_W_E),
+
     JS_PROP_INT32_DEF("fullscreen", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("hidden", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("vsync", 0, JS_PROP_C_W_E),
@@ -41,6 +44,28 @@ static const MTY_WindowDesc convMTY_WindowDesc(JSContext *jsctx, JSValue object)
     winDesc.vsync = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, object, "vsync"));
 
     return winDesc;
+}
+
+static JSValue convJSMTY_WindowDesc(JSContext *jsctx, MTY_WindowDesc winDesc) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "title", JS_NewString(jsctx, winDesc.title));
+    JS_SetPropertyStr(jsctx, retval, "origin", JS_NewInt32(jsctx, winDesc.origin));
+    JS_SetPropertyStr(jsctx, retval, "api", JS_NewInt32(jsctx, winDesc.api));
+    JS_SetPropertyStr(jsctx, retval, "width", JS_NewInt32(jsctx, winDesc.width));
+    JS_SetPropertyStr(jsctx, retval, "height", JS_NewInt32(jsctx, winDesc.height));
+    JS_SetPropertyStr(jsctx, retval, "minWidth", JS_NewInt32(jsctx, winDesc.minWidth));
+    JS_SetPropertyStr(jsctx, retval, "minHeight", JS_NewInt32(jsctx, winDesc.minHeight));
+    JS_SetPropertyStr(jsctx, retval, "x", JS_NewInt32(jsctx, winDesc.x));
+    JS_SetPropertyStr(jsctx, retval, "y", JS_NewInt32(jsctx, winDesc.y));
+    
+    JS_SetPropertyStr(jsctx, retval, "maxHeight", JS_NewFloat64(jsctx, winDesc.maxHeight));
+    
+    JS_SetPropertyStr(jsctx, retval, "fullscreen", JS_NewBool(jsctx, winDesc.fullscreen));
+    JS_SetPropertyStr(jsctx, retval, "hidden", JS_NewBool(jsctx, winDesc.hidden));
+    JS_SetPropertyStr(jsctx, retval, "vsync", JS_NewBool(jsctx, winDesc.vsync));
+
+    return retval;
 }
 
 // Callbacks
