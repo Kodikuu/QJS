@@ -410,6 +410,156 @@ static void eventFunc(const MTY_Event *evt, void *opaque) {
 }
 
 // Functions
+
+static JSValue js_mty_renderer_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    size_t renderer = (size_t)MTY_RendererCreate(); // MTY_Renderer * pointer
+    return JS_NewBigInt64(jsctx, renderer);
+}
+
+static JSValue js_mty_renderer_destroy(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Pointer
+    MTY_RendererDestroy(&renderer);
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_renderer_draw_quad(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 7) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Pointer
+    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[2]); // Pointer
+    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[3]); // Pointer
+    const void *image = (const void *)JSToInt64(jsctx, argv[4]); // Pointer
+    MTY_Surface *dst = (MTY_Surface *)JSToInt64(jsctx, argv[6]); // Pointer
+
+    MTY_GFX api = JSToInt32(jsctx, argv[1]);
+
+    MTY_RenderDesc desc = convCMTY_RenderDesc(jsctx, argv[5]);
+
+    bool ret = MTY_RendererDrawQuad(renderer, api, device, context, image, &desc, dst);
+    return JS_NewBool(jsctx, ret);
+}
+
+static JSValue js_mty_renderer_draw_ui(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 6) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Pointer
+    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[2]); // Pointer
+    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[3]); // Pointer
+    MTY_Surface *dst = (MTY_Surface *)JSToInt64(jsctx, argv[5]); // Pointer
+
+    MTY_GFX api = JSToInt32(jsctx, argv[1]);
+
+    MTY_DrawData dd = convCMTY_DrawData(jsctx, argv[4]);
+
+    bool ret = MTY_RendererDrawUI(renderer, api, device, context, &dd, dst);
+    return JS_NewBool(jsctx, ret);
+}
+
+static JSValue js_mty_renderer_set_texture(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 8) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Pointer
+    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[2]); // Pointer
+    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[3]); // Pointer
+    const void *rgba = (const void *)JSToInt64(jsctx, argv[5]); // Pointer
+
+    MTY_GFX api = JSToInt32(jsctx, argv[1]);
+    uint32_t id = JSToInt32(jsctx, argv[4]);
+    uint32_t width = JSToInt32(jsctx, argv[6]);
+    uint32_t height = JSToInt32(jsctx, argv[7]);
+
+    bool ret = MTY_RendererSetUITexture(renderer, api, device, context, id, rgba, width, height);
+    return JS_NewBool(jsctx, ret);
+}
+
+static JSValue js_mty_renderer_has_texture(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Pointer
+    uint32_t id = JSToInt32(jsctx, argv[1]);
+
+    bool ret = MTY_RendererHasUITexture(renderer, id);
+    return JS_NewBool(jsctx, ret);
+}
+
+static JSValue js_mty_get_available_gfx(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_GFX *apis = MTY_Alloc(MTY_GFX_MAX, sizeof(MTY_GFX));
+    MTY_GetAvailableGFX(apis);
+
+    JSValue ret = JS_NewArrayBuffer(jsctx, (uint8_t *)apis, sizeof(apis), FreeArray, NULL, false);
+    return ret;
+}
+
+static JSValue js_mty_get_render_state(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 3) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[1]); // Pointer
+    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[2]); // Pointer
+
+    MTY_GFX api = JSToInt32(jsctx, argv[0]);
+
+    size_t state = (size_t)MTY_GetRenderState(api, device, context); // Pointer
+    return JS_NewBigInt64(jsctx, state);
+}
+
+static JSValue js_mty_set_render_state(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 4) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[1]); // Pointer
+    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[2]); // Pointer
+    MTY_RenderState *state = (MTY_RenderState *)JSToInt64(jsctx, argv[3]); // Pointer
+
+    MTY_GFX api = JSToInt32(jsctx, argv[0]);
+
+    MTY_SetRenderState(api, device, context, state);
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_free_render_state(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_RenderState *state = (MTY_RenderState *)JSToInt64(jsctx, argv[3]); // Pointer
+
+    MTY_FreeRenderState(&state);
+    return JS_NewBool(jsctx, 1);
+}
+
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
     Args (1); String (C const char*)
@@ -978,6 +1128,17 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
 // END Structs
 
 // Functions
+    JS_CFUNC_DEF("MTY_RendererCreate", 0, js_mty_renderer_create),
+    JS_CFUNC_DEF("MTY_RendererDestroy", 1, js_mty_renderer_destroy),
+    JS_CFUNC_DEF("MTY_RendererDrawQuad", 7, js_mty_renderer_draw_quad),
+    JS_CFUNC_DEF("MTY_RendererDrawUI", 6, js_mty_renderer_draw_ui),
+    JS_CFUNC_DEF("MTY_RendererSetUITexture", 8, js_mty_renderer_set_texture),
+    JS_CFUNC_DEF("MTY_RendererHasUITexture", 2, js_mty_renderer_has_texture),
+    JS_CFUNC_DEF("MTY_GetAvailableGFX", 0, js_mty_get_available_gfx),
+    JS_CFUNC_DEF("MTY_GetRenderState", 3, js_mty_get_render_state),
+    JS_CFUNC_DEF("MTY_SetRenderState", 4, js_mty_set_render_state),
+    JS_CFUNC_DEF("MTY_FreeRenderState", 1, js_mty_free_render_state),
+
     JS_CFUNC_DEF("print", 1, js_print),
     JS_CFUNC_DEF("MTY_AppCreate", 2, js_mty_app_create),
     JS_CFUNC_DEF("MTY_WindowCreate", 2, js_mty_window_create),
