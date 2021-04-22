@@ -29,13 +29,15 @@ CFILES =  \
 	src/main.c \
 	src/utils.c \
 	src/libmatoya.c \
-	src/libparsec.c
+	src/libparsec.c \
+	src/libmtymap.c
 
 OBJS = \
 	main.o \
 	utils.o \
 	libmatoya.o \
-	libparsec.o
+	libparsec.o \
+	libmtymap.o
 
 INCLUDES = \
 	-Iincludes \

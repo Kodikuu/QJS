@@ -4,6 +4,7 @@
 #include "common.h"
 #include "libmatoya.h"
 #include "libparsec.h"
+#include "libmtymap.h"
 
 static void logFunc(const char *msg, void *opaque) {
 	printf("%s\n", msg);
@@ -38,6 +39,7 @@ int prepareQuickJS(Context *ctx, const char *session, const char *peer) {
 	// Intrinsics don't need importing
 	JS_AddIntrinsicMatoya(ctx->jsctx);
 	JS_AddIntrinsicParsec(ctx->jsctx);
+	JS_AddIntrinsicMap(ctx->jsctx);
 
 	// Set session and peer
 	JS_SetPropertyStr(ctx->jsctx, global_obj, "SESSION", JS_NewString(ctx->jsctx, session));
