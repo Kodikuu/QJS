@@ -1,12 +1,12 @@
 let WINDOWS = 0
+let app = 0
 
 function appFunc() {
-    
     let event = ParsecClientPollEvents(0)
 
     if (event.new) {
         if (event.type = CLIENT_EVENT_CURSOR && event.modeUpdate) {
-            MTY_AppSetRelativeMouse(event.relative)
+            MTY_AppSetRelativeMouse(app, event.relative)
             if (!event.relative) {
                 MTY_WindowWarpCursor(event.positionX, event.positionY)
             }
@@ -55,11 +55,16 @@ function makeWindow(w, h) {
     WINDOWS = MTY_WindowCreate(winDesc)
 }
 
-MTY_AppCreate(appFunc, eventFunc)
+print("Create app")
+app = MTY_AppCreate(appFunc, eventFunc)
 
+print("Make window")
 makeWindow(1920, 1080)
+print("Focus window")
 MTY_WindowMakeCurrent(0);
 
+print("Connect")
 ParsecClientConnect(SESSION, PEER)
 
-MTY_AppRun()
+print("Run")
+MTY_AppRun(app)

@@ -253,7 +253,7 @@ static const JSCFunctionListEntry js_mty_event[] = {
     // Union End
 };
 
-// TODO; MTY_MenuItem
+// TODO; js_mty_menu_item
 
 static const JSCFunctionListEntry js_mty_window_desc[] = {
     JS_PROP_STRING_DEF("title", "", JS_PROP_C_W_E),
@@ -789,7 +789,7 @@ static JSValue convJSMTY_Event(JSContext *jsctx, MTY_Event obj) {
     return retval;
 }
 
-// TODO; MTY_MenuItem
+// TODO; MTY_MenuItem converters
 
 static MTY_WindowDesc convCMTY_WindowDesc(JSContext *jsctx, JSValue object) {
     MTY_WindowDesc winDesc = { 0 };
@@ -842,7 +842,7 @@ static JSValue convJSMTY_WindowDesc(JSContext *jsctx, MTY_WindowDesc winDesc) {
 static bool appFunc(void* opaque) {
 	struct Context* ctx = (struct Context*)opaque;
 
-	JS_Call(ctx->jsctx, ctx->appFunc, JS_UNDEFINED, 0, NULL);
+    JS_Call(ctx->jsctx, ctx->appFunc, JS_UNDEFINED, 0, NULL);
 
 	return ctx->running;
 }
@@ -1015,6 +1015,507 @@ static JSValue js_mty_free_render_state(JSContext* jsctx, JSValueConst this_val,
 
 // App module
 
+static JSValue js_mty_app_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    Context *ctx = JS_GetContextOpaque(jsctx);
+    ctx->appFunc = argv[0];
+    ctx->eventFunc = argv[1];
+
+    ctx->app = MTY_AppCreate(appFunc, eventFunc, ctx);
+
+    return JS_NewBigInt64(jsctx, (int64_t)ctx->app);
+}
+
+static JSValue js_mty_app_destroy(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    Context *ctx = JS_GetContextOpaque(jsctx);
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    MTY_AppDestroy(&app);
+    ctx->app = NULL;
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_run(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    MTY_AppRun(app);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+
+static JSValue js_mty_app_set_timeout(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t timeout = JSToInt32(jsctx, argv[1]);
+
+    MTY_AppSetTimeout(app, timeout);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+
+static JSValue js_mty_app_is_active(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    bool active = MTY_AppIsActive(app);
+
+    return JS_NewBool(jsctx, active);
+}
+
+
+static JSValue js_mty_app_activate(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    bool active = JS_ToBool(jsctx, argv[1]);
+
+    MTY_AppActivate(app, active);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+// TODO: js_mty_app_set_tray
+
+
+static JSValue js_mty_app_remove_tray(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    MTY_AppRemoveTray(app);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+// TODO: js_mty_send_notification. Requires js_mty_app_set_tray.
+
+static JSValue js_mty_app_get_clipboard(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    char *string = MTY_AppGetClipboard(app);
+
+    return JS_NewString(jsctx, string);
+}
+
+
+static JSValue js_mty_app_set_clipboard(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    const char *string = JS_ToCString(jsctx, argv[1]);
+
+    MTY_AppSetClipboard(app, string);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+
+static JSValue js_mty_app_stay_awake(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    bool awake = JS_ToBool(jsctx, argv[1]);
+
+    MTY_AppStayAwake(app, awake);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_get_detach_state(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    MTY_DetachState state = MTY_AppGetDetachState(app);
+
+    return JS_NewInt32(jsctx, state);
+}
+
+static JSValue js_mty_app_set_detach_state(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    MTY_DetachState state = JSToInt32(jsctx, argv[1]);
+
+    MTY_AppSetDetachState(app, state);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_is_mouse_grabbed(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    bool grabbed = MTY_AppIsMouseGrabbed(app);
+
+    return JS_NewBool(jsctx, grabbed);
+}
+
+static JSValue js_mty_app_grab_mouse(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    bool grab = JS_ToBool(jsctx, argv[1]);
+
+    MTY_AppGrabMouse(app, grab);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_get_relative_mode(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    bool relative = MTY_AppGetRelativeMouse(app);
+
+    return JS_NewBool(jsctx, relative);
+}
+
+static JSValue js_mty_app_set_relative_mode(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    bool relative = JS_ToBool(jsctx, argv[1]);
+
+    MTY_AppSetRelativeMouse(app, relative);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_set_png_cursor(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 5) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    size_t bufsize;
+    const void *image = JS_GetArrayBuffer(jsctx, &bufsize, argv[1]);
+    size_t size = JSToInt64(jsctx, argv[2]);
+    
+    size_t hotX = JSToInt32(jsctx, argv[3]);
+    size_t hotY = JSToInt32(jsctx, argv[4]);
+
+    MTY_AppSetPNGCursor(app, image, size, hotX, hotY);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_use_default_cursor(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    bool useDefault = JS_ToBool(jsctx, argv[1]);
+
+    MTY_AppUseDefaultCursor(app, useDefault);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_show_cursor(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    bool show = JS_ToBool(jsctx, argv[1]);
+
+    MTY_AppShowCursor(app, show);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_can_warp_cursor(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    bool warp = MTY_AppCanWarpCursor(app);
+
+    return JS_NewBool(jsctx, warp);
+}
+
+static JSValue js_mty_app_is_keyboard_grabbed(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    bool grabbed = MTY_AppIsKeyboardGrabbed(app);
+
+    return JS_NewBool(jsctx, grabbed);
+}
+
+static JSValue js_mty_app_grab_keyboard(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    bool grab = JS_ToBool(jsctx, argv[1]);
+
+    MTY_AppShowCursor(app, grab);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_get_hotkey(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 4) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    MTY_Scope scope = JSToInt32(jsctx, argv[1]);
+    MTY_Mod mod = JSToInt32(jsctx, argv[2]);
+    MTY_Key key = JSToInt32(jsctx, argv[3]);
+
+    uint32_t id = MTY_AppGetHotkey(app, scope, mod, key);
+
+    return JS_NewInt32(jsctx, id);
+}
+
+static JSValue js_mty_app_set_hotkey(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 5) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    MTY_Scope scope = JSToInt32(jsctx, argv[1]);
+    MTY_Mod mod = JSToInt32(jsctx, argv[2]);
+    MTY_Key key = JSToInt32(jsctx, argv[3]);
+    uint32_t id = JSToInt32(jsctx, argv[4]);
+
+    MTY_AppSetHotkey(app, scope, mod, key, id);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_remove_hotkeys(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    MTY_Scope scope = JSToInt32(jsctx, argv[1]);
+
+    MTY_AppRemoveHotkeys(app, scope);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_enable_global_hotkeys(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    bool enable = JS_ToBool(jsctx, argv[1]);
+
+    MTY_AppEnableGlobalHotkeys(app, enable);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_is_soft_keyboard_showing(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    bool showing = MTY_AppIsSoftKeyboardShowing(app);
+
+    return JS_NewBool(jsctx, showing);
+}
+
+static JSValue js_mty_app_show_soft_keyboard(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    bool show = JS_ToBool(jsctx, argv[1]);
+
+    MTY_AppShowSoftKeyboard(app, show);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_get_orientation(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    MTY_Orientation orientation = MTY_AppGetOrientation(app);
+
+    return JS_NewInt32(jsctx, orientation);
+}
+
+static JSValue js_mty_app_set_orientation(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    MTY_Orientation orientation = JSToInt32(jsctx, argv[1]);
+
+    MTY_AppSetOrientation(app, orientation);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_RumbleController(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 4) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    uint32_t id = JSToInt32(jsctx, argv[1]);
+    uint16_t low = JSToInt32(jsctx, argv[1]);
+    uint16_t high = JSToInt32(jsctx, argv[1]);
+
+    MTY_AppRumbleController(app, id, low, high);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_is_pen_enabled(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    bool enabled = MTY_AppIsPenEnabled(app);
+
+    return JS_NewBool(jsctx, enabled);
+}
+
+static JSValue js_mty_app_enable_pen(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    bool enable = JS_ToBool(jsctx, argv[1]);
+    
+    MTY_AppEnablePen(app, enable);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_app_get_input_mode(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+
+    MTY_InputMode mode = MTY_AppGetInputMode(app);
+
+    return JS_NewInt32(jsctx, mode);
+}
+
+static JSValue js_mty_app_set_input_mode(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
+    MTY_InputMode mode = JSToInt32(jsctx, argv[1]);
+
+    MTY_AppSetInputMode(app, mode);
+
+    return JS_NewBool(jsctx, 1);
+}
+
 // End App module
 
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -1035,22 +1536,6 @@ static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValue
     const char* string = JS_ToCString(ctx, argv[0]);
     printf("- [lib] \"%s\"\n", string);
     return JS_NewInt32(ctx, strlen(string)); // length of string
-}
-
-static JSValue js_mty_app_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-    if (argc != 2) {
-        return JS_EXCEPTION;
-    }
-
-    Context *ctx = JS_GetContextOpaque(jsctx);
-    ctx->appFunc = argv[0];
-    ctx->eventFunc = argv[1];
-
-    ctx->app = MTY_AppCreate(appFunc, eventFunc, ctx);
-	JS_SetContextOpaque(ctx->jsctx, ctx);
-
-    return JS_NewBool(jsctx, 1);
 }
 
 static JSValue js_mty_window_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -1159,36 +1644,14 @@ static JSValue js_mty_window_get_scale(JSContext* jsctx, JSValueConst this_val, 
     return JS_NewFloat64(jsctx, scale);
 }
 
-static JSValue js_mty_app_run(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-    if (argc != 0) {
-        return JS_EXCEPTION;
-    }
-
-    Context *ctx = JS_GetContextOpaque(jsctx);
-    MTY_AppRun(ctx->app);
-    return JS_NewBool(jsctx, 1);
-}
-
-static JSValue js_mty_app_set_relative(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-    if (argc != 1) {
-        return JS_EXCEPTION;
-    }
-
-    Context *ctx = JS_GetContextOpaque(jsctx);
-    MTY_AppSetRelativeMouse(ctx->app, JS_ToBool(ctx->jsctx, argv[0]));
-    return JS_NewBool(jsctx, 1);
-}
-
 static JSValue js_mty_window_warp_cursor(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
-    if (argc != 1) {
+    if (argc != 2) {
         return JS_EXCEPTION;
     }
 
     Context *ctx = JS_GetContextOpaque(jsctx);
-    MTY_WindowWarpCursor(ctx->app, 0, JSToInt32(ctx->jsctx, argv[0]), JSToInt32(ctx->jsctx, argv[0]));
+    MTY_WindowWarpCursor(ctx->app, 0, JSToInt32(ctx->jsctx, argv[0]), JSToInt32(ctx->jsctx, argv[1]));
     return JS_NewBool(jsctx, 1);
 }
 
@@ -1616,19 +2079,52 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     // End render
 
     // App module
-
+    JS_CFUNC_DEF("MTY_AppCreate", 2, js_mty_app_create),
+    JS_CFUNC_DEF("MTY_AppDestroy", 1, js_mty_app_destroy),
+    JS_CFUNC_DEF("MTY_AppRun", 1, js_mty_app_run),
+    JS_CFUNC_DEF("MTY_AppSetTimeout", 2, js_mty_app_set_timeout),
+    JS_CFUNC_DEF("MTY_AppIsActive", 1, js_mty_app_is_active),
+    JS_CFUNC_DEF("MTY_AppActivate", 2, js_mty_app_activate),
+    // TODO; MTY_AppSetTray
+    JS_CFUNC_DEF("MTY_AppRemoveTray", 1, js_mty_app_remove_tray),
+    // TODO; MTY_AppSendNotification, requires MTY_AppSetTray
+    JS_CFUNC_DEF("MTY_AppGetClipboard", 1, js_mty_app_get_clipboard),
+    JS_CFUNC_DEF("MTY_AppSetClipboard", 2, js_mty_app_set_clipboard),
+    JS_CFUNC_DEF("MTY_AppStayAwake", 2, js_mty_app_stay_awake),
+    JS_CFUNC_DEF("MTY_AppGetDetachState", 1, js_mty_app_get_detach_state),
+    JS_CFUNC_DEF("MTY_AppSetDetachState", 2, js_mty_app_set_detach_state),
+    JS_CFUNC_DEF("MTY_AppIsMouseGrabbed", 1, js_mty_app_is_mouse_grabbed),
+    JS_CFUNC_DEF("MTY_AppGrabMouse", 2, js_mty_app_grab_mouse),
+    JS_CFUNC_DEF("MTY_AppGetRelativeMouse", 1, js_mty_app_get_relative_mode),
+    JS_CFUNC_DEF("MTY_AppSetRelativeMouse", 2, js_mty_app_set_relative_mode),
+    JS_CFUNC_DEF("MTY_AppSetPNGCursor", 5, js_mty_app_set_png_cursor),
+    JS_CFUNC_DEF("MTY_AppUseDefaultCursor", 2, js_mty_app_use_default_cursor),
+    JS_CFUNC_DEF("MTY_AppShowCursor", 2, js_mty_app_show_cursor),
+    JS_CFUNC_DEF("MTY_AppCanWarpCursor", 1, js_mty_app_can_warp_cursor),
+    JS_CFUNC_DEF("MTY_AppIsKeyboardGrabbed", 1, js_mty_app_is_keyboard_grabbed),
+    JS_CFUNC_DEF("MTY_AppGrabKeyboard", 2, js_mty_app_grab_keyboard),
+    JS_CFUNC_DEF("MTY_AppGetHotkey", 4, js_mty_app_get_hotkey),
+    JS_CFUNC_DEF("MTY_AppSetHotkey", 5, js_mty_app_set_hotkey),
+    JS_CFUNC_DEF("MTY_AppRemoveHotkeys", 2, js_mty_app_remove_hotkeys),
+    JS_CFUNC_DEF("MTY_AppEnableGlobalHotkeys", 2, js_mty_app_enable_global_hotkeys),
+    JS_CFUNC_DEF("MTY_AppIsSoftKeyboardShowing", 1, js_mty_app_is_soft_keyboard_showing),
+    JS_CFUNC_DEF("MTY_AppShowSoftKeyboard", 2, js_mty_app_show_soft_keyboard),
+    JS_CFUNC_DEF("MTY_AppGetOrientation", 1, js_mty_app_get_orientation),
+    JS_CFUNC_DEF("MTY_AppSetOrientation", 2, js_mty_app_set_orientation),
+    JS_CFUNC_DEF("MTY_AppRumbleController", 4, js_mty_app_RumbleController),
+    JS_CFUNC_DEF("MTY_AppIsPenEnabled", 1, js_mty_app_is_pen_enabled),
+    JS_CFUNC_DEF("MTY_AppEnablePen", 2, js_mty_app_enable_pen),
+    JS_CFUNC_DEF("MTY_AppGetInputMode", 1, js_mty_app_get_input_mode),
+    JS_CFUNC_DEF("MTY_AppSetInputMode", 2, js_mty_app_set_input_mode),
     // End App module
 
     JS_CFUNC_DEF("print", 1, js_print),
-    JS_CFUNC_DEF("MTY_AppCreate", 2, js_mty_app_create),
     JS_CFUNC_DEF("MTY_WindowCreate", 2, js_mty_window_create),
     JS_CFUNC_DEF("MTY_WindowMakeCurrent", 2, js_mty_window_make_current),
     JS_CFUNC_DEF("MTY_WindowPresent", 2, js_mty_window_present),
     JS_CFUNC_DEF("MTY_WindowGetSize", 1, js_mty_window_get_size),
     JS_CFUNC_DEF("MTY_WindowGetScreenScale", 1, js_mty_window_get_scale),
-    JS_CFUNC_DEF("MTY_AppRun", 0, js_mty_app_run),
     JS_CFUNC_DEF("MTY_AudioQueue", 1, js_mty_audio_queue),
-    JS_CFUNC_DEF("MTY_AppSetRelativeMouse", 1, js_mty_app_set_relative),
     JS_CFUNC_DEF("MTY_WindowWarpCursor", 1, js_mty_window_warp_cursor),
 // END Functions
 };
