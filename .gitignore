@@ -47,3 +47,4 @@ Module.symvers
 Mkfile.old
 dkms.conf
 *.json
+*.txt
