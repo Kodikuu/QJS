@@ -250,6 +250,7 @@ static const JSCFunctionListEntry js_mty_event[] = {
     JS_PROP_INT32_DEF("trayID", 0, JS_PROP_C_W_E),
     JS_PROP_STRING_DEF("text", "", JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("focus", 0, JS_PROP_C_W_E),
+    // Union End
 };
 
 // TODO; MTY_MenuItem
@@ -470,8 +471,325 @@ static JSValue convJSMTY_DrawData(JSContext *jsctx, MTY_DrawData drawdata) {
 
 // App module
 
-// End App module
+static const MTY_KeyEvent convCMTY_KeyEvent(JSContext *jsctx, JSValue obj) {
+    MTY_KeyEvent retval = { 0 };
 
+    retval.key = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "key"));
+    retval.mod = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "mod"));
+    retval.pressed = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, "pressed"));
+
+    return retval;
+}
+
+static JSValue convJSMTY_KeyEvent(JSContext *jsctx, MTY_KeyEvent obj) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "key", JS_NewInt32(jsctx, obj.key));
+    JS_SetPropertyStr(jsctx, retval, "mod", JS_NewInt32(jsctx, obj.mod));
+    JS_SetPropertyStr(jsctx, retval, "pressed", JS_NewBool(jsctx, obj.pressed));
+
+    return retval;
+}
+
+static const MTY_ScrollEvent convCMTY_ScrollEvent(JSContext *jsctx, JSValue obj) {
+    MTY_ScrollEvent retval = { 0 };
+
+    retval.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "x"));
+    retval.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "y"));
+    retval.pixels = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, "pixels"));
+
+    return retval;
+}
+
+static JSValue convJSMTY_ScrollEvent(JSContext *jsctx, MTY_ScrollEvent obj) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "x", JS_NewInt32(jsctx, obj.x));
+    JS_SetPropertyStr(jsctx, retval, "y", JS_NewInt32(jsctx, obj.y));
+    JS_SetPropertyStr(jsctx, retval, "pixels", JS_NewBool(jsctx, obj.pixels));
+
+    return retval;
+}
+
+static const MTY_ButtonEvent convCMTY_ButtonEvent(JSContext *jsctx, JSValue obj) {
+    MTY_ButtonEvent retval = { 0 };
+
+    retval.button = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "button"));
+    retval.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "x"));
+    retval.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "y"));
+    retval.pressed = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, "pressed"));
+
+    return retval;
+}
+
+static JSValue convJSMTY_ButtonEvent(JSContext *jsctx, MTY_ButtonEvent obj) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "button", JS_NewInt32(jsctx, obj.button));
+    JS_SetPropertyStr(jsctx, retval, "x", JS_NewInt32(jsctx, obj.x));
+    JS_SetPropertyStr(jsctx, retval, "y", JS_NewInt32(jsctx, obj.y));
+    JS_SetPropertyStr(jsctx, retval, "pressed", JS_NewBool(jsctx, obj.pressed));
+
+    return retval;
+}
+
+static const MTY_MotionEvent convCMTY_MotionEvent(JSContext *jsctx, JSValue obj) {
+    MTY_MotionEvent retval = { 0 };
+
+    retval.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "x"));
+    retval.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "y"));
+    retval.relative = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, "relative"));
+    retval.synth = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, "synth"));
+
+    return retval;
+}
+
+static JSValue convJSMTY_MotionEvent(JSContext *jsctx, MTY_MotionEvent obj) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "x", JS_NewInt32(jsctx, obj.x));
+    JS_SetPropertyStr(jsctx, retval, "y", JS_NewInt32(jsctx, obj.y));
+    JS_SetPropertyStr(jsctx, retval, "relative", JS_NewBool(jsctx, obj.relative));
+    JS_SetPropertyStr(jsctx, retval, "synth", JS_NewBool(jsctx, obj.synth));
+
+    return retval;
+}
+
+// I'm leery about this one
+static const MTY_DropEvent convCMTY_DropEvent(JSContext *jsctx, JSValue obj) {
+    MTY_DropEvent retval = { 0 };
+
+    retval.name = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, "name"));
+    size_t size;
+    retval.buf = (const void *)JS_GetArrayBuffer(jsctx, &size, JS_GetPropertyStr(jsctx, obj, "buf"));
+    retval.size = JSToInt64(jsctx, JS_GetPropertyStr(jsctx, obj, "size"));
+
+    return retval;
+}
+
+static JSValue convJSMTY_DropEvent(JSContext *jsctx, MTY_DropEvent obj) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "name", JS_NewString(jsctx, obj.name));
+    JS_SetPropertyStr(jsctx, retval, "buf", JS_NewArrayBuffer(jsctx, (uint8_t *)obj.buf, sizeof(obj.buf), NULL, NULL, false));
+    JS_SetPropertyStr(jsctx, retval, "relative", JS_NewBigInt64(jsctx, obj.size));
+
+    return retval;
+}
+
+static const MTY_Axis convCMTY_Axis(JSContext *jsctx, JSValue obj) {
+    MTY_Axis retval = { 0 };
+
+    retval.usage = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "usage"));
+    retval.value = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "value"));
+    retval.min = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "min"));
+    retval.max = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "max"));
+
+    return retval;
+}
+
+static JSValue convJSMTY_Axis(JSContext *jsctx, MTY_Axis obj) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "usage", JS_NewInt32(jsctx, obj.usage));
+    JS_SetPropertyStr(jsctx, retval, "value", JS_NewInt32(jsctx, obj.value));
+    JS_SetPropertyStr(jsctx, retval, "min", JS_NewInt32(jsctx, obj.min));
+    JS_SetPropertyStr(jsctx, retval, "max", JS_NewInt32(jsctx, obj.max));
+
+    return retval;
+}
+
+static const MTY_ControllerEvent convCMTY_ControllerEvent(JSContext *jsctx, JSValue obj) {
+    MTY_ControllerEvent retval = { 0 };
+
+    int i;
+    for (i=0; i<MTY_CBUTTON_MAX; i++) {
+        retval.buttons[i] = JS_ToBool(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, "buttons"), i));
+    }
+    for (i=0; i<MTY_CAXIS_MAX; i++) {
+        retval.axes[i] = convCMTY_Axis(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, "axes"), i));
+    }
+
+    retval.type = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "type"));
+    retval.id = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "id"));
+    retval.vid = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "vid"));
+    retval.pid = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "pid"));
+    retval.numButtons = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "numButtons"));
+    retval.numAxes = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "numAxes"));
+
+    return retval;
+}
+
+static JSValue convJSMTY_ControllerEvent(JSContext *jsctx, MTY_ControllerEvent obj) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    int i;
+
+    JSValue Buttons = JS_NewObject(jsctx);
+    for (i=0; i<MTY_CBUTTON_MAX; i++) {
+        JS_SetPropertyUint32(jsctx, Buttons, i, JS_NewBool(jsctx, obj.buttons[i]));
+    }
+    JS_SetPropertyStr(jsctx, retval, "buttons", Buttons);
+
+    JSValue Axes = JS_NewObject(jsctx);
+    for (i=0; i<MTY_CAXIS_MAX; i++) {
+        JS_SetPropertyUint32(jsctx, Axes, i, convJSMTY_Axis(jsctx, obj.axes[i]));
+    }
+    JS_SetPropertyStr(jsctx, retval, "axes", Axes);
+
+    JS_SetPropertyStr(jsctx, retval, "type", JS_NewInt32(jsctx, obj.type));
+    JS_SetPropertyStr(jsctx, retval, "id", JS_NewInt32(jsctx, obj.id));
+    JS_SetPropertyStr(jsctx, retval, "vid", JS_NewInt32(jsctx, obj.vid));
+    JS_SetPropertyStr(jsctx, retval, "pid", JS_NewInt32(jsctx, obj.pid));
+    JS_SetPropertyStr(jsctx, retval, "numButtons", JS_NewInt32(jsctx, obj.numButtons));
+    JS_SetPropertyStr(jsctx, retval, "numAxes", JS_NewInt32(jsctx, obj.numAxes));
+
+    return retval;
+}
+
+static const MTY_PenEvent convCMTY_PenEvent(JSContext *jsctx, JSValue obj) {
+    MTY_PenEvent retval = { 0 };
+
+    retval.flags = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "flags"));
+    retval.x = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "x"));
+    retval.y = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "y"));
+    retval.pressure = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "pressure"));
+    retval.rotation = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "rotation"));
+    retval.tiltX = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "tiltX"));
+    retval.tiltY = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "tiltY"));
+
+    return retval;
+}
+
+static JSValue convJSMTY_PenEvent(JSContext *jsctx, MTY_PenEvent obj) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "flags", JS_NewInt32(jsctx, obj.flags));
+    JS_SetPropertyStr(jsctx, retval, "x", JS_NewInt32(jsctx, obj.x));
+    JS_SetPropertyStr(jsctx, retval, "y", JS_NewInt32(jsctx, obj.y));
+    JS_SetPropertyStr(jsctx, retval, "pressure", JS_NewInt32(jsctx, obj.pressure));
+    JS_SetPropertyStr(jsctx, retval, "rotation", JS_NewInt32(jsctx, obj.rotation));
+    JS_SetPropertyStr(jsctx, retval, "tiltX", JS_NewInt32(jsctx, obj.tiltX));
+    JS_SetPropertyStr(jsctx, retval, "tiltY", JS_NewInt32(jsctx, obj.tiltY));
+
+    return retval;
+}
+
+static const MTY_Event convCMTY_Event(JSContext *jsctx, JSValue obj) {
+    MTY_Event retval = { 0 };
+
+    retval.type = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "type"));
+    retval.window = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "window"));
+    
+    // Union
+    switch (retval.type) {
+        case MTY_EVENT_CONTROLLER:
+        case MTY_EVENT_CONNECT:
+        case MTY_EVENT_DISCONNECT:
+            retval.controller = convCMTY_ControllerEvent(jsctx, JS_GetPropertyStr(jsctx, obj, "controller"));
+            break;
+        case MTY_EVENT_SCROLL:
+            retval.scroll = convCMTY_ScrollEvent(jsctx, JS_GetPropertyStr(jsctx, obj, "scroll"));
+            break;
+        case MTY_EVENT_BUTTON:
+            retval.button = convCMTY_ButtonEvent(jsctx, JS_GetPropertyStr(jsctx, obj, "button"));
+            break;
+        case MTY_EVENT_MOTION:
+            retval.motion = convCMTY_MotionEvent(jsctx, JS_GetPropertyStr(jsctx, obj, "motion"));
+            break;
+        case MTY_EVENT_DROP:
+            retval.drop = convCMTY_DropEvent(jsctx, JS_GetPropertyStr(jsctx, obj, "drop"));
+            break;
+        case MTY_EVENT_PEN:
+            retval.pen = convCMTY_PenEvent(jsctx, JS_GetPropertyStr(jsctx, obj, "pen"));
+            break;
+        case MTY_EVENT_KEY:
+            retval.key = convCMTY_KeyEvent(jsctx, JS_GetPropertyStr(jsctx, obj, "key"));
+            break;
+        case MTY_EVENT_REOPEN:
+            retval.reopenArg = JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, obj, "reopen"));
+            break;
+        case MTY_EVENT_HOTKEY:
+            retval.hotkey = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "hotkey"));
+            break;
+        case MTY_EVENT_TRAY:
+            retval.trayID = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "trayID"));
+            break;
+        case MTY_EVENT_TEXT:
+            int i;
+            for (i=0; i<8; i++) {
+                retval.text[i] = (char)JSToInt32(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, obj, "text"), i));
+            }
+            break;
+        case MTY_EVENT_FOCUS:
+            retval.focus = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, obj, "focus"));
+            break;
+        default:
+            break;
+    }
+
+    return retval;
+}
+
+static JSValue convJSMTY_Event(JSContext *jsctx, MTY_Event obj) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "type", JS_NewInt32(jsctx, obj.type));
+    JS_SetPropertyStr(jsctx, retval, "window", JS_NewInt32(jsctx, obj.window));
+
+    // Union
+    switch (obj.type) {
+        case MTY_EVENT_CONTROLLER:
+        case MTY_EVENT_CONNECT:
+        case MTY_EVENT_DISCONNECT:
+            JS_SetPropertyStr(jsctx, retval, "controller", convJSMTY_ControllerEvent(jsctx, obj.controller));
+            break;
+        case MTY_EVENT_SCROLL:
+            JS_SetPropertyStr(jsctx, retval, "scroll", convJSMTY_ScrollEvent(jsctx, obj.scroll));
+            break;
+        case MTY_EVENT_BUTTON:
+            JS_SetPropertyStr(jsctx, retval, "button", convJSMTY_ButtonEvent(jsctx, obj.button));
+            break;
+        case MTY_EVENT_MOTION:
+            JS_SetPropertyStr(jsctx, retval, "motion", convJSMTY_MotionEvent(jsctx, obj.motion));
+            break;
+        case MTY_EVENT_DROP:
+            JS_SetPropertyStr(jsctx, retval, "drop", convJSMTY_DropEvent(jsctx, obj.drop));
+            break;
+        case MTY_EVENT_PEN:
+            JS_SetPropertyStr(jsctx, retval, "pen", convJSMTY_PenEvent(jsctx, obj.pen));
+            break;
+        case MTY_EVENT_KEY:
+            JS_SetPropertyStr(jsctx, retval, "key", convJSMTY_KeyEvent(jsctx, obj.key));
+            break;
+        case MTY_EVENT_REOPEN:
+            JS_SetPropertyStr(jsctx, retval, "reopenArg", JS_NewString(jsctx, obj.reopenArg));
+            break;
+        case MTY_EVENT_HOTKEY:
+            JS_SetPropertyStr(jsctx, retval, "hotkey", JS_NewInt32(jsctx, obj.hotkey));
+            break;
+        case MTY_EVENT_TRAY:
+            JS_SetPropertyStr(jsctx, retval, "trayID", JS_NewInt32(jsctx, obj.trayID));
+            break;
+        case MTY_EVENT_TEXT:
+            int i;
+            JSValue text = JS_NewObject(jsctx);
+            for (i=0; i<8; i++) {
+                JS_SetPropertyUint32(jsctx, text, i, JS_NewInt32(jsctx, obj.text[i]));
+            }
+            JS_SetPropertyStr(jsctx, retval, "text", text);
+            break;
+        case MTY_EVENT_FOCUS:
+            JS_SetPropertyStr(jsctx, retval, "focus", JS_NewBool(jsctx, obj.focus));
+            break;
+        default:
+            break;
+    }
+
+    return retval;
+}
+
+// TODO; MTY_MenuItem
 
 static MTY_WindowDesc convCMTY_WindowDesc(JSContext *jsctx, JSValue object) {
     MTY_WindowDesc winDesc = { 0 };
@@ -517,6 +835,8 @@ static JSValue convJSMTY_WindowDesc(JSContext *jsctx, MTY_WindowDesc winDesc) {
     return retval;
 }
 
+// End App module
+
 // Callbacks
 
 static bool appFunc(void* opaque) {
@@ -530,65 +850,12 @@ static bool appFunc(void* opaque) {
 static void eventFunc(const MTY_Event *evt, void *opaque) {
 	struct Context* ctx = (struct Context*)opaque;
 
-    JSValue *args = MTY_Alloc(3, sizeof(JSValue));
+    JSValue *args = MTY_Alloc(1, sizeof(JSValue));
 
-    JSValue eventType = JS_NewInt32(ctx->jsctx, evt->type);
-    args[0] = eventType;
+    JSValue event = convJSMTY_Event(ctx->jsctx, *evt);
+    args[0] = event;
 
-    JSValue window = JS_NewInt32(ctx->jsctx, evt->window);
-    args[1] = window;
-    
-    JSValue retval = JS_NewObject(ctx->jsctx);
-
-    switch (evt->type) {
-        case MTY_EVENT_CONTROLLER:
-        case MTY_EVENT_CONNECT:
-        case MTY_EVENT_DISCONNECT:
-            break;
-        case MTY_EVENT_SCROLL:
-            JS_SetPropertyStr(ctx->jsctx, retval, "x", JS_NewInt32(ctx->jsctx, evt->scroll.x));
-            JS_SetPropertyStr(ctx->jsctx, retval, "y", JS_NewInt32(ctx->jsctx, evt->scroll.y));
-            JS_SetPropertyStr(ctx->jsctx, retval, "pixels", JS_NewInt32(ctx->jsctx, evt->scroll.pixels));
-            break;
-        case MTY_EVENT_BUTTON:
-            JS_SetPropertyStr(ctx->jsctx, retval, "button", JS_NewInt32(ctx->jsctx, evt->button.button));
-            JS_SetPropertyStr(ctx->jsctx, retval, "x", JS_NewInt32(ctx->jsctx, evt->button.x));
-            JS_SetPropertyStr(ctx->jsctx, retval, "y", JS_NewInt32(ctx->jsctx, evt->button.y));
-            JS_SetPropertyStr(ctx->jsctx, retval, "pressed", JS_NewInt32(ctx->jsctx, evt->button.pressed));
-            break;
-        case MTY_EVENT_MOTION:
-            JS_SetPropertyStr(ctx->jsctx, retval, "x", JS_NewInt32(ctx->jsctx, evt->motion.x));
-            JS_SetPropertyStr(ctx->jsctx, retval, "y", JS_NewInt32(ctx->jsctx, evt->motion.y));
-            JS_SetPropertyStr(ctx->jsctx, retval, "relative", JS_NewInt32(ctx->jsctx, evt->motion.relative));
-            JS_SetPropertyStr(ctx->jsctx, retval, "synth", JS_NewInt32(ctx->jsctx, evt->motion.synth));
-            break;
-        case MTY_EVENT_DROP:
-            break;
-        case MTY_EVENT_PEN:
-            break;
-        case MTY_EVENT_KEY:
-            JS_SetPropertyStr(ctx->jsctx, retval, "key", JS_NewInt32(ctx->jsctx, evt->key.key));
-            JS_SetPropertyStr(ctx->jsctx, retval, "mod", JS_NewInt32(ctx->jsctx, evt->key.mod));
-            JS_SetPropertyStr(ctx->jsctx, retval, "pressed", JS_NewInt32(ctx->jsctx, evt->key.pressed));
-            break;
-        case MTY_EVENT_REOPEN:
-            break;
-        case MTY_EVENT_HOTKEY:
-            break;
-        case MTY_EVENT_TRAY:
-            break;
-        case MTY_EVENT_TEXT:
-            break;
-        case MTY_EVENT_FOCUS:
-            break;
-        case MTY_EVENT_CLOSE:
-            break;
-        default:
-            break;
-    }
-
-    args[2] = retval;
-    JSValue ret = JS_Call(ctx->jsctx, ctx->eventFunc, JS_UNDEFINED, 3, args);
+    JSValue ret = JS_Call(ctx->jsctx, ctx->eventFunc, JS_UNDEFINED, 1, args);
     ctx->running = JS_ToBool(ctx->jsctx, ret);
 
     MTY_Free(args);

@@ -23,20 +23,20 @@ function appFunc() {
     MTY_WindowPresent(0, 0)
 }
 
-function eventFunc(eventType, window, event) {
+function eventFunc(event) {
 
     // Close Window
-    if (eventType == MTY_EVENT_CLOSE) {
+    if (event.type == MTY_EVENT_CLOSE) {
         ParsecClientDisconnect()
         return 0
     
     // Mouse Buttons
-    } else if (eventType == MTY_EVENT_BUTTON) {
-        ParsecClientSendMessage(MESSAGE_MOUSE_BUTTON, event)
+    } else if (event.type == MTY_EVENT_BUTTON) {
+        ParsecClientSendMessage(MESSAGE_MOUSE_BUTTON, event.button)
     
     // Mouse Motion
-    } else if (eventType == MTY_EVENT_MOTION) {
-        ParsecClientSendMessage(MESSAGE_MOUSE_MOTION, event)
+    } else if (event.type == MTY_EVENT_MOTION) {
+        ParsecClientSendMessage(MESSAGE_MOUSE_MOTION, event.motion)
     }
     return 1
 }
