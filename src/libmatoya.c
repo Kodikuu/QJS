@@ -3,6 +3,22 @@
 
 // Objects
 
+static const JSCFunctionListEntry js_mty_render_desc[] = {
+    JS_PROP_INT32_DEF("format", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("rotation", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("filter", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("effect", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("imageWidth", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("imageHeight", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("cropWidth", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("cropHeight", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("viewWidth", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("viewHeight", 0, JS_PROP_C_W_E),
+
+    JS_PROP_DOUBLE_DEF("aspectRatio", 0.0f, JS_PROP_C_W_E),
+    JS_PROP_DOUBLE_DEF("scale", 0.0f, JS_PROP_C_W_E),
+};
+
 static const JSCFunctionListEntry js_mty_window_desc[] = {
     JS_PROP_STRING_DEF("title", "", JS_PROP_C_W_E),
 
