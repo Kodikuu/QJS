@@ -49,6 +49,19 @@ static const JSCFunctionListEntry js_mty_cmd[] = {
     JS_PROP_INT32_DEF("vtxOffset", 0, JS_PROP_C_W_E),
 };
 
+static const JSCFunctionListEntry js_mty_cmd_list[] = {
+
+    JS_PROP_INT64_DEF("cmd", 0, JS_PROP_C_W_E), // Pointer to MTY_Cmd array
+    JS_PROP_INT64_DEF("vtx", 0, JS_PROP_C_W_E), // Pointer to MTY_Vtx array
+    JS_PROP_INT64_DEF("idx", 0, JS_PROP_C_W_E), // Pointer to uint16_t array
+    JS_PROP_INT32_DEF("cmdLength", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("cmdMax", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("vtxLength", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("vtxMax", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("idxLength", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("idxMax", 0, JS_PROP_C_W_E),
+};
+
 static const JSCFunctionListEntry js_mty_window_desc[] = {
     JS_PROP_STRING_DEF("title", "", JS_PROP_C_W_E),
 
@@ -189,6 +202,38 @@ static JSValue convJSMTY_Cmd(JSContext *jsctx, MTY_Cmd cmd) {
     JS_SetPropertyStr(jsctx, retval, "elemCount", JS_NewInt32(jsctx, cmd.elemCount));
     JS_SetPropertyStr(jsctx, retval, "idxOffset", JS_NewInt32(jsctx, cmd.idxOffset));
     JS_SetPropertyStr(jsctx, retval, "vtxOffset", JS_NewInt32(jsctx, cmd.vtxOffset));
+
+    return retval;
+}
+
+static const MTY_CmdList convCMTY_CmdList(JSContext *jsctx, JSValue object) {
+    MTY_CmdList cmdlist = { 0 };
+
+    cmdlist.cmd = (MTY_Cmd *)JSToInt64(jsctx, JS_GetPropertyStr(jsctx, object, "cmd")); // Pointer
+    cmdlist.vtx = (MTY_Vtx *)JSToInt64(jsctx, JS_GetPropertyStr(jsctx, object, "vtx")); // Pointer
+    cmdlist.idx = (uint16_t *)JSToInt64(jsctx, JS_GetPropertyStr(jsctx, object, "idx")); // Pointer
+    cmdlist.cmdLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "cmdLength"));
+    cmdlist.cmdMax = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "cmdMax"));
+    cmdlist.vtxLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "vtxLength"));
+    cmdlist.vtxMax = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "vtxMax"));
+    cmdlist.idxLength = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "idxLength"));
+    cmdlist.idxMax = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "idxMax"));
+
+    return cmdlist;
+}
+
+static JSValue convJSMTY_CmdList(JSContext *jsctx, MTY_CmdList cmdlist) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "cmd", JS_NewBigInt64(jsctx, (size_t)cmdlist.cmd)); // Pointer
+    JS_SetPropertyStr(jsctx, retval, "vtx", JS_NewBigInt64(jsctx, (size_t)cmdlist.vtx)); // Pointer
+    JS_SetPropertyStr(jsctx, retval, "idx", JS_NewBigInt64(jsctx, (size_t)cmdlist.idx)); // Pointer
+    JS_SetPropertyStr(jsctx, retval, "cmdLength", JS_NewInt32(jsctx, cmdlist.cmdLength));
+    JS_SetPropertyStr(jsctx, retval, "cmdMax", JS_NewInt32(jsctx, cmdlist.cmdMax));
+    JS_SetPropertyStr(jsctx, retval, "vtxLength", JS_NewInt32(jsctx, cmdlist.vtxLength));
+    JS_SetPropertyStr(jsctx, retval, "vtxMax", JS_NewInt32(jsctx, cmdlist.vtxMax));
+    JS_SetPropertyStr(jsctx, retval, "idxLength", JS_NewInt32(jsctx, cmdlist.idxLength));
+    JS_SetPropertyStr(jsctx, retval, "idxMax", JS_NewInt32(jsctx, cmdlist.idxMax));
 
     return retval;
 }
@@ -876,6 +921,7 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_OBJECT_DEF("MTY_Rect", js_mty_rect, 4, JS_PROP_C_W_E),
     JS_OBJECT_DEF("MTY_Vtx", js_mty_vtx, 3, JS_PROP_C_W_E),
     JS_OBJECT_DEF("MTY_Cmd", js_mty_cmd, 5, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_CmdList", js_mty_cmd_list, 9, JS_PROP_C_W_E),
 
     JS_OBJECT_DEF("MTY_WindowDesc", js_mty_window_desc, 13, JS_PROP_C_W_E),
 // END Structs
