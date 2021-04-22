@@ -781,6 +781,9 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
 // END Enums
 
 // Structs
+    JS_OBJECT_DEF("MTY_RenderDesc", js_mty_render_desc, 12, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_Point", js_mty_point, 2, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("MTY_WindowDesc", js_mty_window_desc, 13, JS_PROP_C_W_E),
 // END Structs
 
 // Functions
@@ -795,7 +798,6 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_AudioQueue", 1, js_mty_audio_queue),
     JS_CFUNC_DEF("MTY_AppSetRelativeMouse", 1, js_mty_app_set_relative),
     JS_CFUNC_DEF("MTY_WindowWarpCursor", 1, js_mty_window_warp_cursor),
-    JS_OBJECT_DEF("MTY_WindowDesc", js_mty_window_desc, 13, JS_PROP_C_W_E),
 // END Functions
 };
 
