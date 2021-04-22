@@ -50,7 +50,7 @@ function makeWindow(w, h) {
     winDesc.width = w
     winDesc.height = h
     winDesc.title = "QJS"
-    winDesc.api = 1
+    winDesc.api = MTY_GFX_GL
     
     WINDOWS = MTY_WindowCreate(winDesc)
 }
