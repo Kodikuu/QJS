@@ -2047,6 +2047,279 @@ static JSValue js_mty_audio_queue(JSContext* jsctx, JSValueConst this_val, int a
 
 // End Audio module
 
+static JSValue js_mty_crc32(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    uint32_t size;
+
+    uint32_t crc = JSToInt32(jsctx, argv[0]);
+    const void *buf = (const void *)JS_GetArrayBuffer(jsctx, &size, argv[1]);
+
+    uint32_t hash = MTY_CRC32(crc, buf, size);
+    return JS_NewInt32(jsctx, hash);
+}
+
+static JSValue js_mty_djb2(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+    
+    const char *str = JS_ToCString(jsctx, argv[0]);
+
+    uint32_t hash = MTY_DJB2(str);
+    return JS_NewInt32(jsctx, hash);
+}
+
+static JSValue js_mty_bytes_to_hex(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+    
+    size_t size;
+    const void *bytes = (const void *)JS_GetArrayBuffer(jsctx, &size, argv[0]);
+
+    char *hex = MTY_Alloc(size, sizeof(char));
+    MTY_BytesToHex(bytes, size, hex, size);
+
+    JSValue str = JS_NewString(jsctx, hex);
+    MTY_Free(hex);
+    return str;
+}
+
+static JSValue js_mty_hex_to_bytes(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+    
+    const char *hex = JS_ToCString(jsctx, argv[0]);
+
+    size_t size = sizeof(hex);
+    void *bytes = MTY_Alloc(strlen(hex), sizeof(char));
+    MTY_HexToBytes(hex, bytes, size);
+
+    JSValue buffer = JS_NewArrayBuffer(jsctx, bytes, size, FreeArray, NULL, false);
+    MTY_Free(bytes);
+    return buffer;
+}
+
+static JSValue js_mty_bytes_to_base64(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+    
+    size_t size;
+    const void *bytes = (const void *)JS_GetArrayBuffer(jsctx, &size, argv[0]);
+
+    char *b64 = MTY_Alloc(size, sizeof(char));
+    MTY_BytesToBase64(bytes, size, b64, size);
+
+    JSValue str = JS_NewString(jsctx, b64);
+    MTY_Free(b64);
+    return str;
+}
+
+static JSValue js_mty_crypto_hash(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc < 2 || argc > 3) {
+        return JS_EXCEPTION;
+    }
+    
+    MTY_Algorithm algo = JSToInt32(jsctx, argv[0]);
+
+    size_t inputsize;
+    const void *input = (const void *)JS_GetArrayBuffer(jsctx, &inputsize, argv[1]);
+
+    void *output = MTY_Alloc(inputsize, sizeof(char));
+
+    if (argc == 3){
+        MTY_CryptoHash(algo, input, inputsize, NULL, 0, output, inputsize);
+    } else {
+        size_t keysize;
+        const void *key = (const void *)JS_GetArrayBuffer(jsctx, &keysize, argv[2]);
+        MTY_CryptoHash(algo, input, inputsize, key, keysize, output, inputsize);
+    }
+
+    JSValue buffer = JS_NewArrayBuffer(jsctx, output, inputsize, FreeArray, NULL, false);
+    MTY_Free(output);
+    return buffer;
+}
+
+static JSValue js_mty_crypto_hash_file(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc < 2 || argc > 3) {
+        return JS_EXCEPTION;
+    }
+    
+    MTY_Algorithm algo = JSToInt32(jsctx, argv[0]);
+
+    const char *path = JS_ToCString(jsctx, argv[1]);
+    size_t inputsize = sizeof(path);
+
+    void *output = MTY_Alloc(inputsize, sizeof(char));
+
+    if (argc == 3){
+        MTY_CryptoHashFile(algo, path, NULL, 0, output, inputsize);
+    } else {
+        size_t keysize;
+        const void *key = (const void *)JS_GetArrayBuffer(jsctx, &keysize, argv[2]);
+        MTY_CryptoHashFile(algo, path, key, keysize, output, inputsize);
+    }
+
+    JSValue buffer = JS_NewArrayBuffer(jsctx, output, inputsize, FreeArray, NULL, false);
+    MTY_Free(output);
+    return buffer;
+}
+
+static JSValue js_mty_get_random_bytes(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+    
+    uint32_t size = JSToInt32(jsctx, argv[0]);
+
+    void *output = MTY_Alloc(size, sizeof(char));
+    MTY_GetRandomBytes(output, size);
+
+    JSValue buffer = JS_NewArrayBuffer(jsctx, output, size, FreeArray, NULL, false);
+    MTY_Free(output);
+    return buffer;
+}
+
+static JSValue js_mty_get_random_uint(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+    
+    uint32_t min = JSToInt32(jsctx, argv[0]);
+    uint32_t max = JSToInt32(jsctx, argv[1]);
+
+    uint32_t ret = MTY_GetRandomUInt(min, max);
+
+    return JS_NewUint32(jsctx, ret);
+}
+
+static JSValue js_mty_aesgcm_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+    
+    size_t keysize;
+    const void *key = (const void *)JS_GetArrayBuffer(jsctx, &keysize, argv[0]);
+
+    if (keysize != 16) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_AESGCM *aesgcm = MTY_AESGCMCreate(key);
+
+    return JS_NewBigInt64(jsctx, (int64_t)aesgcm);
+}
+
+static JSValue js_mty_aesgcm_destroy(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+    
+    MTY_AESGCM *aesgcm = (MTY_AESGCM *)JSToInt64(jsctx, argv[0]);
+
+    MTY_AESGCMDestroy(&aesgcm);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_aesgcm_encrypt(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 3) {
+        return JS_EXCEPTION;
+    }
+    
+    MTY_AESGCM *aesgcm = (MTY_AESGCM *)JSToInt64(jsctx, argv[0]);
+
+    size_t noncesize;
+    const void *nonce = (const void *)JS_GetArrayBuffer(jsctx, &noncesize, argv[1]);
+
+    if (noncesize != 12) {
+        return JS_EXCEPTION;
+    }
+
+    size_t plainTextsize;
+    const void *plainText = (const void *)JS_GetArrayBuffer(jsctx, &plainTextsize, argv[2]);
+
+    void *tag = MTY_Alloc(16, sizeof(char));
+    void *cipherText = MTY_Alloc(plainTextsize, sizeof(char));
+
+    bool success = MTY_AESGCMEncrypt(aesgcm, nonce, plainText, plainTextsize, tag, cipherText);
+
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "success", JS_NewBool(jsctx, success));
+
+    JSValue tagbuffer = JS_NewArrayBuffer(jsctx, tag, 16, FreeArray, NULL, false);
+    JS_SetPropertyStr(jsctx, retval, "tag", tagbuffer);
+
+    JSValue cipherTextbuffer = JS_NewArrayBuffer(jsctx, cipherText, plainTextsize, FreeArray, NULL, false);
+    JS_SetPropertyStr(jsctx, retval, "cipherText", cipherTextbuffer);
+
+    MTY_Free(tag);
+    MTY_Free(cipherText);
+    return retval;
+}
+
+static JSValue js_mty_aesgcm_decrypt(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    if (argc != 4) {
+        return JS_EXCEPTION;
+    }
+    
+    MTY_AESGCM *aesgcm = (MTY_AESGCM *)JSToInt64(jsctx, argv[0]);
+
+    size_t noncesize;
+    const void *nonce = (const void *)JS_GetArrayBuffer(jsctx, &noncesize, argv[1]);
+
+    if (noncesize != 12) {
+        return JS_EXCEPTION;
+    }
+
+    size_t cipherTextsize;
+    const void *cipherText = (const void *)JS_GetArrayBuffer(jsctx, &cipherTextsize, argv[2]);
+
+    size_t tagsize;
+    const void *tag = (const void *)JS_GetArrayBuffer(jsctx, &tagsize, argv[3]);
+
+    if (tagsize != 16) {
+        return JS_EXCEPTION;
+    }
+
+    void *plainText = MTY_Alloc(cipherTextsize, sizeof(char));
+
+    bool success = MTY_AESGCMDecrypt(aesgcm, nonce, cipherText, cipherTextsize, tag, plainText);
+
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "success", JS_NewBool(jsctx, success));
+
+    JSValue plainTextbuffer = JS_NewArrayBuffer(jsctx, plainText, cipherTextsize, FreeArray, NULL, false);
+    JS_SetPropertyStr(jsctx, retval, "plainText", plainTextbuffer);
+
+    MTY_Free(plainText);
+    return retval;
+}
+
+// Crypto module
+
+
+
+// End of Crypto module
+
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
     Args (1); String (C const char*)
@@ -2553,6 +2826,22 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_AudioGetQueued", 1, js_mty_audio_get_queued),
     JS_CFUNC_DEF("MTY_AudioQueue", 1, js_mty_audio_queue),
     // End audio module
+
+    // Crypto module
+    JS_CFUNC_DEF("MTY_CRC32", 2, js_mty_crc32),
+    JS_CFUNC_DEF("MTY_DJB2", 1, js_mty_djb2),
+    JS_CFUNC_DEF("MTY_BytesToHex", 1, js_mty_bytes_to_hex),
+    JS_CFUNC_DEF("MTY_HexToBytes", 1, js_mty_hex_to_bytes),
+    JS_CFUNC_DEF("MTY_BytesToBase64", 1, js_mty_bytes_to_base64),
+    JS_CFUNC_DEF("MTY_CryptoHashFile", 3, js_mty_crypto_hash_file),
+    JS_CFUNC_DEF("MTY_CryptoHash", 3, js_mty_crypto_hash),
+    JS_CFUNC_DEF("MTY_GetRandomBytes", 1, js_mty_get_random_bytes),
+    JS_CFUNC_DEF("MTY_GetRandomUInt", 2, js_mty_get_random_uint),
+    JS_CFUNC_DEF("MTY_AESGCMCreate", 1, js_mty_aesgcm_create),
+    JS_CFUNC_DEF("MTY_AESGCMDestroy", 1, js_mty_aesgcm_destroy),
+    JS_CFUNC_DEF("MTY_AESGCMEncrypt", 3, js_mty_aesgcm_encrypt),
+    JS_CFUNC_DEF("MTY_AESGCMDecrypt", 4, js_mty_aesgcm_decrypt),
+    // End audio Crypto
 
     JS_CFUNC_DEF("print", 1, js_print),
 // END Functions
