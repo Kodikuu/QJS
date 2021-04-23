@@ -3340,6 +3340,83 @@ static JSValue js_mty_is_tls_application_data(JSContext* jsctx, JSValueConst thi
 
 // End TLS module
 
+// Time module
+
+static JSValue js_mty_get_time(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    uint64_t time = MTY_GetTime();
+
+    return JS_NewBigInt64(jsctx, time);
+}
+
+static JSValue js_mty_time_diff(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    uint64_t begin = JSToInt64(jsctx, argv[0]);
+    uint64_t end = JSToInt64(jsctx, argv[1]);
+
+    float diff = MTY_TimeDiff(begin, end);
+
+    return JS_NewFloat64(jsctx, diff);
+}
+
+static JSValue js_mty_sleep(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    uint32_t timeout = JSToInt32(jsctx, argv[0]);
+
+    MTY_Sleep(timeout);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_set_timer_resolution(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    uint32_t res = JSToInt32(jsctx, argv[0]);
+
+    MTY_SetTimerResolution(res);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_revert_timer_resolution(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    uint32_t res = JSToInt32(jsctx, argv[0]);
+
+    MTY_RevertTimerResolution(res);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+// End Time module
+
+static JSValue js_mty_get_version(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    uint32_t time = MTY_GetVersion();
+
+    return JS_NewInt32(jsctx, time);
+}
+
+// Version module
+
+// End Version module
+
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
     Args (1); String (C const char*)
@@ -3961,11 +4038,15 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     // End TLS module
 
     // Time module
-    
+    JS_CFUNC_DEF("MTY_GetTime", 0, js_mty_get_time),
+    JS_CFUNC_DEF("MTY_TimeDiff", 2, js_mty_time_diff),
+    JS_CFUNC_DEF("MTY_Sleep", 1, js_mty_sleep),
+    JS_CFUNC_DEF("MTY_SetTimerResolution", 1, js_mty_set_timer_resolution),
+    JS_CFUNC_DEF("MTY_RevertTimerResolution", 1, js_mty_revert_timer_resolution),
     // End Time module
 
     // Version module
-
+    JS_CFUNC_DEF("MTY_GetVersion", 0, js_mty_get_version),
     // End Version module
 
     // Skipped modules: JSON, Memory, Thread, Struct
