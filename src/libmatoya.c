@@ -906,6 +906,18 @@ static void crashFunc(bool forced, void* opaque) {
     MTY_Free(args);
 }
 
+static void writeFunc(const void *buf, size_t size, void *opaque) {
+	struct Context* ctx = (struct Context*)opaque;
+
+    JSValue *args = MTY_Alloc(1, sizeof(JSValue));
+
+    JSValue val = JS_NewArrayBuffer(ctx->jsctx, buf, size, FreeArray, NULL, false);
+    args[0] = val;
+
+    JS_Call(ctx->jsctx, ctx->writeFunc, JS_UNDEFINED, 1, args);
+    MTY_Free(args);
+}
+
 // Functions
 // Render module
 static JSValue js_mty_renderer_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -3232,6 +3244,99 @@ static JSValue js_mty_tls_destroy(JSContext* jsctx, JSValueConst this_val, int a
     return JS_NewBool(jsctx, 1);
 }
 
+static JSValue js_mty_tls_handshake(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc <= 1 || argc > 3) {
+        return JS_EXCEPTION;
+    }
+
+    Context *ctx = JS_GetContextOpaque(jsctx);
+
+    MTY_TLS *tls = (MTY_TLS *)JSToInt64(jsctx, argv[0]); // Context Pointer
+
+    MTY_Async ret;
+    if (argc == 2) {
+        ctx->writeFunc = argv[1];
+        ret = MTY_TLSHandshake(&tls, NULL, 0, writeFunc, ctx);
+
+    } else {
+        size_t size;
+        const void *buf = JS_GetArrayBuffer(jsctx, &size, argv[1]);
+        
+        ctx->writeFunc = argv[2];
+        ret = MTY_TLSHandshake(&tls, buf, size, writeFunc, ctx);
+    }
+
+    return JS_NewInt32(jsctx, ret);
+}
+
+static JSValue js_mty_tls_encrypt(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_TLS *tls = (MTY_TLS *)JSToInt64(jsctx, argv[0]); // Context Pointer
+    size_t size;
+    const void *buf = JS_GetArrayBuffer(jsctx, &size, argv[1]);
+
+    size_t written;
+    void *out = MTY_Alloc(size, 1);
+
+    bool success = MTY_TLSEncrypt(tls, buf, size, out, size, &written);
+    
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "success", JS_NewBool(jsctx, success));
+    JS_SetPropertyStr(jsctx, retval, "buffer", JS_NewArrayBuffer(jsctx, out, written, FreeArray, NULL, false));
+    MTY_Free(out);
+    return retval;
+}
+
+static JSValue js_mty_tls_decrypt(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_TLS *tls = (MTY_TLS *)JSToInt64(jsctx, argv[0]); // Context Pointer
+    size_t size;
+    const void *buf = JS_GetArrayBuffer(jsctx, &size, argv[1]);
+
+    size_t read;
+    void *out = MTY_Alloc(size, 1);
+
+    bool success = MTY_TLSDecrypt(tls, buf, size, out, size, &read);
+    
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "success", JS_NewBool(jsctx, success));
+    JS_SetPropertyStr(jsctx, retval, "buffer", JS_NewArrayBuffer(jsctx, out, read, FreeArray, NULL, false));
+    MTY_Free(out);
+    return retval;
+}
+
+static JSValue js_mty_is_tls_handshake(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    size_t size;
+    const void *buf = JS_GetArrayBuffer(jsctx, &size, argv[0]);
+
+    bool success = MTY_IsTLSHandshake(buf, size);
+
+    return JS_NewBool(jsctx, success);
+}
+
+static JSValue js_mty_is_tls_application_data(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    size_t size;
+    const void *buf = JS_GetArrayBuffer(jsctx, &size, argv[0]);
+
+    bool success = MTY_IsTLSApplicationData(buf, size);
+
+    return JS_NewBool(jsctx, success);
+}
+
 // End TLS module
 
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -3839,11 +3944,19 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_GetRunOnStartup", 1, js_mty_get_run_on_startup),
     JS_CFUNC_DEF("MTY_SetRunOnStartup", 3, js_mty_set_run_on_startup),
     JS_CFUNC_DEF("MTY_GetJNIEnv", 0, js_get_jni_env),
-
     // End System module
 
     // TLS module
-
+    JS_CFUNC_DEF("MTY_CertCreate", 0, js_mty_cert_create),
+    JS_CFUNC_DEF("MTY_CertDestroy", 1, js_mty_cert_destroy),
+    JS_CFUNC_DEF("MTY_CertGetFingerprint", 1, js_mty_cert_get_fingerprint),
+    JS_CFUNC_DEF("MTY_TLSCreate", 5, js_mty_tls_create),
+    JS_CFUNC_DEF("MTY_TLSDestroy", 1, js_mty_tls_destroy),
+    JS_CFUNC_DEF("MTY_TLSHandshake", 2, js_mty_tls_handshake),
+    JS_CFUNC_DEF("MTY_TLSEncrypt", 2, js_mty_tls_encrypt),
+    JS_CFUNC_DEF("MTY_TLSDecrypt", 2, js_mty_tls_decrypt),
+    JS_CFUNC_DEF("MTY_IsTLSHandshake", 1, js_mty_is_tls_handshake),
+    JS_CFUNC_DEF("MTY_IsTLSApplicationData", 1, js_mty_is_tls_application_data),
     // End TLS module
 
     // Time module

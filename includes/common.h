@@ -18,6 +18,7 @@ typedef struct Context {
 	JSValueConst audioFunc;
 	JSValueConst logFunc;
 	JSValueConst crashFunc;
+	JSValueConst writeFunc;
 
 	// Parsec
 	ParsecDSO *ps;
