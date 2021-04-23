@@ -2318,6 +2318,30 @@ static JSValue js_mty_aesgcm_decrypt(JSContext* jsctx, JSValueConst this_val, in
 
 // End of Crypto module
 
+// Dialog module
+
+static JSValue js_mty_has_dialogs(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    bool ret = MTY_HasDialogs();
+    return JS_NewBool(ctx, ret); //
+}
+
+static JSValue js_mty_show_messagebox(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char* title = JS_ToCString(ctx, argv[0]);
+    const char* string = JS_ToCString(ctx, argv[1]);
+    MTY_ShowMessageBox(title, string);
+    return JS_NewBool(ctx, 1);
+}
+
+// End of Dialog module
+
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
     Args (1); String (C const char*)
@@ -2839,7 +2863,12 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_AESGCMDestroy", 1, js_mty_aesgcm_destroy),
     JS_CFUNC_DEF("MTY_AESGCMEncrypt", 3, js_mty_aesgcm_encrypt),
     JS_CFUNC_DEF("MTY_AESGCMDecrypt", 4, js_mty_aesgcm_decrypt),
-    // End audio Crypto
+    // End Crypto module
+
+    // Dialog module
+    JS_CFUNC_DEF("MTY_HasDialogs", 0, js_mty_has_dialogs),
+    JS_CFUNC_DEF("MTY_ShowMessageBox", 2, js_mty_show_messagebox),
+    // End Dialog module
 
     JS_CFUNC_DEF("print", 1, js_print),
 // END Functions
