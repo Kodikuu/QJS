@@ -894,6 +894,18 @@ static void logFunc(const char *msg, void* opaque) {
     MTY_Free(args);
 }
 
+static void crashFunc(bool forced, void* opaque) {
+	struct Context* ctx = (struct Context*)opaque;
+
+    JSValue *args = MTY_Alloc(1, sizeof(JSValue));
+
+    JSValue val = JS_NewBool(ctx->jsctx, forced);
+    args[0] = val;
+
+    JS_Call(ctx->jsctx, ctx->crashFunc, JS_UNDEFINED, 1, args);
+    MTY_Free(args);
+}
+
 // Functions
 // Render module
 static JSValue js_mty_renderer_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -3006,6 +3018,157 @@ static JSValue js_mty_websocket_get_close_code(JSContext* jsctx, JSValueConst th
 
 // End of Net module
 
+// System Module
+
+static JSValue js_mty_get_hostname(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    const char *name = MTY_GetHostname();
+
+    return JS_NewString(jsctx, name);
+}
+
+static JSValue js_mty_is_supported(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    bool supported = MTY_IsSupported();
+
+    return JS_NewBool(jsctx, supported);
+}
+
+static JSValue js_mty_get_platform(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    uint32_t platform = MTY_GetPlatform();
+
+    return JS_NewInt32(jsctx, platform);
+}
+
+static JSValue js_mty_get_platform_noweb(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    uint32_t platform = MTY_GetPlatformNoWeb();
+
+    return JS_NewInt32(jsctx, platform);
+}
+
+static JSValue js_mty_get_platform_string(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *name = MTY_GetPlatformString(JSToInt32(jsctx, argv[0]));
+
+    return JS_NewString(jsctx, name);
+}
+
+static JSValue js_mty_handle_protocol(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc == 0 || argc > 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char *uri = JS_ToCString(jsctx, argv[0]);
+    void *token = NULL;
+    if (argc == 2) {
+        size_t size;
+        token = JS_GetArrayBuffer(jsctx, &size, argv[1]);
+    }
+
+    MTY_HandleProtocol(uri, token);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_get_process_path(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path = MTY_GetProcessPath();
+
+    return JS_NewString(jsctx, path);
+}
+
+static JSValue js_mty_set_crash_func(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    Context *ctx = JS_GetContextOpaque(jsctx);
+    ctx->crashFunc = argv[0];
+
+    MTY_SetCrashFunc(crashFunc, ctx);
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_open_console(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *title = JS_ToCString(jsctx, argv[0]);
+
+    MTY_OpenConsole(title);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_close_console(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_CloseConsole();
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_get_run_on_startup(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *name = JS_ToCString(jsctx, argv[0]);
+
+    bool startup = MTY_GetRunOnStartup(name);
+
+    return JS_NewBool(jsctx, startup);
+}
+
+static JSValue js_mty_set_run_on_startup(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 3) {
+        return JS_EXCEPTION;
+    }
+
+    const char *name = JS_ToCString(jsctx, argv[0]);
+    const char *path = JS_ToCString(jsctx, argv[1]);
+    const char *args = JS_ToCString(jsctx, argv[2]);
+
+    MTY_SetRunOnStartup(name, path, args);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_get_jni_env(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    uint64_t jni = (uint64_t)MTY_GetJNIEnv(); // Context pointer
+
+    return JS_NewBigInt64(jsctx, jni);
+}
+
+// End System module
+
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
     Args (1); String (C const char*)
@@ -3591,10 +3754,26 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_WebSocketRead", 3, js_mty_websocket_read),
     JS_CFUNC_DEF("MTY_WebSocketWrite", 2, js_mty_websocket_write),
     JS_CFUNC_DEF("MTY_WebSocketGetCloseCode", 1, js_mty_websocket_get_close_code),
-
     // End Net module
 
     // System module
+    // TODO: MTY_SOLoad
+    // TODO: MTY_SOGetSymbol
+    // TODO: MTY_SOUnload
+    JS_CFUNC_DEF("MTY_GetHostname", 0, js_mty_get_hostname),
+    JS_CFUNC_DEF("MTY_IsSupported", 0, js_mty_is_supported),
+    JS_CFUNC_DEF("MTY_GetPlatform", 0, js_mty_get_platform),
+    JS_CFUNC_DEF("MTY_GetPlatformNoWeb", 0, js_mty_get_platform_noweb),
+    JS_CFUNC_DEF("MTY_GetPlatformString", 1, js_mty_get_platform_string),
+    JS_CFUNC_DEF("MTY_HandleProtocol", 2, js_mty_handle_protocol),
+    JS_CFUNC_DEF("MTY_GetProcessPath", 0, js_mty_get_process_path),
+    // TODO: MTY_RestartProcess
+    JS_CFUNC_DEF("MTY_SetCrashFunc", 1, js_mty_set_crash_func),
+    JS_CFUNC_DEF("MTY_OpenConsole", 1, js_mty_open_console),
+    JS_CFUNC_DEF("MTY_CloseConsole", 0, js_mty_close_console),
+    JS_CFUNC_DEF("MTY_GetRunOnStartup", 1, js_mty_get_run_on_startup),
+    JS_CFUNC_DEF("MTY_SetRunOnStartup", 3, js_mty_set_run_on_startup),
+    JS_CFUNC_DEF("MTY_GetJNIEnv", 0, js_get_jni_env),
 
     // End System module
 
