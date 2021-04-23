@@ -906,16 +906,17 @@ static void crashFunc(bool forced, void* opaque) {
     MTY_Free(args);
 }
 
-static void writeFunc(const void *buf, size_t size, void *opaque) {
+static bool writeFunc(const void *buf, size_t size, void *opaque) {
 	struct Context* ctx = (struct Context*)opaque;
 
     JSValue *args = MTY_Alloc(1, sizeof(JSValue));
 
-    JSValue val = JS_NewArrayBuffer(ctx->jsctx, buf, size, FreeArray, NULL, false);
+    JSValue val = JS_NewArrayBuffer(ctx->jsctx, (uint8_t *)buf, size, FreeArray, NULL, false);
     args[0] = val;
 
-    JS_Call(ctx->jsctx, ctx->writeFunc, JS_UNDEFINED, 1, args);
+    JSValue ret = JS_Call(ctx->jsctx, ctx->writeFunc, JS_UNDEFINED, 1, args);
     MTY_Free(args);
+    return JS_ToBool(ctx->jsctx, ret);
 }
 
 // Functions
@@ -3256,14 +3257,14 @@ static JSValue js_mty_tls_handshake(JSContext* jsctx, JSValueConst this_val, int
     MTY_Async ret;
     if (argc == 2) {
         ctx->writeFunc = argv[1];
-        ret = MTY_TLSHandshake(&tls, NULL, 0, writeFunc, ctx);
+        ret = MTY_TLSHandshake(tls, NULL, 0, writeFunc, ctx);
 
     } else {
         size_t size;
         const void *buf = JS_GetArrayBuffer(jsctx, &size, argv[1]);
         
         ctx->writeFunc = argv[2];
-        ret = MTY_TLSHandshake(&tls, buf, size, writeFunc, ctx);
+        ret = MTY_TLSHandshake(tls, buf, size, writeFunc, ctx);
     }
 
     return JS_NewInt32(jsctx, ret);
