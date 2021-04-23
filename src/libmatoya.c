@@ -3341,7 +3341,6 @@ static int js_mty_exportlist(JSContext *ctx, JSModuleDef *m)
     return JS_SetModuleExportList(ctx, m, js_mty_funcs, func_count);
 }
 
-
 // this is what we use later as the module itself.
 JSModuleDef *js_init_module_matoya(JSContext *ctx, const char *module_name)
 {
