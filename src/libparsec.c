@@ -6,7 +6,7 @@
 static void audioFunc(const int16_t *pcm, uint32_t frames, void *opaque) {
 	struct Context* ctx = (struct Context*)opaque;
 
-    JSValue audio = JS_NewArrayBuffer(ctx->jsctx, pcm, frames, FreeArray, NULL, false);
+    JSValue audio = JS_NewArrayBuffer(ctx->jsctx, (uint8_t *)pcm, frames, FreeArray, NULL, false);
     JSValue args[1] = {audio};
     
     JS_Call(ctx->jsctx, ctx->audioFunc, JS_UNDEFINED, 1, args);
