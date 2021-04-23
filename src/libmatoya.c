@@ -2739,6 +2739,273 @@ static JSValue js_mty_log_fatal_params(JSContext* jsctx, JSValueConst this_val, 
 
 // End of Log module
 
+// Net module
+
+static JSValue js_mty_http_parse_url(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *url = JS_ToCString(jsctx, argv[0]);
+
+    size_t hostSize;
+    char *host = MTY_Alloc(MTY_URL_MAX, 1);
+    size_t pathSize;
+    char *path = MTY_Alloc(MTY_URL_MAX, 1);
+
+    MTY_HttpParseUrl(url, host, hostSize, path, pathSize);
+
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "host", JS_NewString(jsctx, host));
+    JS_SetPropertyStr(jsctx, retval, "path", JS_NewString(jsctx, path));
+    MTY_Free(host);
+    MTY_Free(path);
+    return retval;
+}
+
+static JSValue js_mty_http_encode_url(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *url = JS_ToCString(jsctx, argv[0]);
+
+    size_t dstSize;
+    char *dst = MTY_Alloc(MTY_URL_MAX, 1);
+
+    MTY_HttpEncodeUrl(url, dst, dstSize);
+
+    JSValue retval = JS_NewString(jsctx, dst);
+    MTY_Free(dst);
+    return retval;
+}
+
+static JSValue js_mty_http_set_proxy(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *proxy = JS_ToCString(jsctx, argv[0]);
+
+    MTY_HttpSetProxy(proxy);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_http_request(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 8) {
+        return JS_EXCEPTION;
+    }
+
+    const char *host = JS_ToCString(jsctx, argv[0]);
+    uint16_t port = JSToInt32(jsctx, argv[1]);
+    bool secure = JS_ToBool(jsctx, argv[2]);
+    const char *method = JS_ToCString(jsctx, argv[3]);
+    const char *path = JS_ToCString(jsctx, argv[4]);
+    const char *headers = JS_ToCString(jsctx, argv[5]);
+    const char *body = JS_ToCString(jsctx, argv[6]);
+    uint32_t timeout = JSToInt32(jsctx, argv[7]);
+
+    void *response = NULL;
+    size_t responseSize = 0;
+    uint16_t status = 0;
+
+    bool success = MTY_HttpRequest(host, port, secure, method, path, headers, body, strlen(body), timeout, &response, &responseSize, &status);
+
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "success", JS_NewInt32(jsctx, success));
+    if (success) {
+        JS_SetPropertyStr(jsctx, retval, "status", JS_NewInt32(jsctx, status));
+        if (responseSize) {
+            JS_SetPropertyStr(jsctx, retval, "response", JS_NewArrayBuffer(jsctx, response, responseSize, FreeArray, NULL, false));
+        } else {
+            JS_SetPropertyStr(jsctx, retval, "response", JS_NewBool(jsctx, 0));
+        }
+        MTY_Free(response);
+    }
+
+    return retval;
+}
+
+static JSValue js_mty_http_async_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    uint32_t maxThreads = JSToInt32(jsctx, argv[0]);
+
+    MTY_HttpAsyncCreate(maxThreads);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_http_async_destroy(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_HttpAsyncDestroy();
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_http_async_request(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 9) {
+        return JS_EXCEPTION;
+    }
+
+    uint32_t index = JSToInt32(jsctx, argv[0]);
+    const char *host = JS_ToCString(jsctx, argv[1]);
+    uint16_t port = JSToInt32(jsctx, argv[2]);
+    bool secure = JS_ToBool(jsctx, argv[3]);
+    const char *method = JS_ToCString(jsctx, argv[4]);
+    const char *path = JS_ToCString(jsctx, argv[5]);
+    const char *headers = JS_ToCString(jsctx, argv[6]);
+    const char *body = JS_ToCString(jsctx, argv[7]);
+    uint32_t timeout = JSToInt32(jsctx, argv[8]);
+
+    MTY_HttpAsyncRequest(&index, host, port, secure, method, path, headers, body, strlen(body), timeout, NULL);
+
+    return JS_NewInt32(jsctx, index);
+}
+
+static JSValue js_mty_http_async_poll(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    uint32_t index = JSToInt32(jsctx, argv[0]);
+
+    void *response = NULL;
+    size_t responseSize = 0;
+    uint16_t status = 0;
+
+    bool success = MTY_HttpAsyncPoll(index, &response, &responseSize, &status);
+
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "success", JS_NewInt32(jsctx, success));
+    if (success) {
+        JS_SetPropertyStr(jsctx, retval, "status", JS_NewInt32(jsctx, status));
+        if (responseSize) {
+            JS_SetPropertyStr(jsctx, retval, "response", JS_NewArrayBuffer(jsctx, response, responseSize, FreeArray, NULL, false));
+        } else {
+            JS_SetPropertyStr(jsctx, retval, "response", JS_NewBool(jsctx, 0));
+        }
+        MTY_Free(response);
+    }
+
+    return retval;
+}
+
+static JSValue js_mty_http_async_clear(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    uint32_t index = JSToInt32(jsctx, argv[0]);
+
+    MTY_HttpAsyncClear(&index);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_websocket_listen(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char *host = JS_ToCString(jsctx, argv[0]);
+    uint16_t port = JSToInt32(jsctx, argv[1]);
+
+    uint64_t ws = (uint64_t)MTY_WebSocketListen(host, port); // Context pointer
+
+    return JS_NewBigInt64(jsctx, ws);
+}
+
+// TODO: MTY_WebSocketAccept
+
+static JSValue js_mty_websocket_connect(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char *host = JS_ToCString(jsctx, argv[0]);
+    uint16_t port = JSToInt32(jsctx, argv[1]);
+    bool secure = JS_ToBool(jsctx, argv[2]);
+    const char *path = JS_ToCString(jsctx, argv[3]);
+    const char *headers = JS_ToCString(jsctx, argv[4]);
+    uint32_t timeout = JSToInt32(jsctx, argv[5]);
+    
+    uint16_t upgradeStatus = 0;
+
+    uint64_t ws = (uint64_t)MTY_WebSocketConnect(host, port, secure, path, headers, timeout, &upgradeStatus); // Context pointer
+
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "context", JS_NewBigInt64(jsctx, ws));
+    JS_SetPropertyStr(jsctx, retval, "upgradeStatus", JS_NewInt32(jsctx, upgradeStatus));
+
+    return retval;
+}
+
+static JSValue js_mty_websocket_destroy(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_WebSocket *ws = (MTY_WebSocket *)JSToInt64(jsctx, argv[0]);
+
+    MTY_WebSocketDestroy(&ws);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_websocket_read(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 3) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_WebSocket *ws = (MTY_WebSocket *)JSToInt64(jsctx, argv[0]);
+    uint32_t timeout = JSToInt32(jsctx, argv[1]);
+    uint32_t size = JSToInt32(jsctx, argv[2]); // Size of output string
+
+    char *msg = MTY_Alloc(size, 1);
+
+    MTY_Async ret = MTY_WebSocketRead(ws, timeout, msg, size);
+
+    JSValue retval = JS_NewObject(jsctx);
+    JS_SetPropertyStr(jsctx, retval, "result", JS_NewInt32(jsctx, ret));
+    JS_SetPropertyStr(jsctx, retval, "msg", JS_NewString(jsctx, msg));
+    MTY_Free(msg);
+    return retval;
+}
+
+static JSValue js_mty_websocket_write(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_WebSocket *ws = (MTY_WebSocket *)JSToInt64(jsctx, argv[0]);
+    const char *msg = JS_ToCString(jsctx, argv[1]);
+
+    bool success = MTY_WebSocketWrite(ws, msg);
+
+    return JS_NewBool(jsctx, success);
+}
+
+static JSValue js_mty_websocket_get_close_code(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_WebSocket *ws = (MTY_WebSocket *)JSToInt64(jsctx, argv[0]);
+
+    uint16_t ret = MTY_WebSocketGetCloseCode(ws);
+
+    return JS_NewInt32(jsctx, ret);
+}
+
+// End of Net module
+
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
     Args (1); String (C const char*)
@@ -3308,6 +3575,22 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     // End Log module
 
     // Net module
+    JS_CFUNC_DEF("MTY_HttpParseUrl", 1, js_mty_http_parse_url),
+    JS_CFUNC_DEF("MTY_HttpEncodeUrl", 1, js_mty_http_encode_url),
+    JS_CFUNC_DEF("MTY_HttpSetProxy", 1, js_mty_http_set_proxy),
+    JS_CFUNC_DEF("MTY_HttpRequest", 8, js_mty_http_request),
+    JS_CFUNC_DEF("MTY_HttpAsyncCreate", 1, js_mty_http_async_create),
+    JS_CFUNC_DEF("MTY_HttpAsyncDestroy", 0, js_mty_http_async_destroy),
+    JS_CFUNC_DEF("MTY_HttpAsyncRequest", 9, js_mty_http_async_request),
+    JS_CFUNC_DEF("MTY_HttpAsyncPoll", 1, js_mty_http_async_poll),
+    JS_CFUNC_DEF("MTY_HttpAsyncClear", 1, js_mty_http_async_clear),
+    JS_CFUNC_DEF("MTY_WebSocketListen", 2, js_mty_websocket_listen),
+    // TODO: MTY_WebSocketAccept
+    JS_CFUNC_DEF("MTY_WebSocketConnect", 2, js_mty_websocket_connect),
+    JS_CFUNC_DEF("MTY_WebSocketDestroy", 1, js_mty_websocket_destroy),
+    JS_CFUNC_DEF("MTY_WebSocketRead", 3, js_mty_websocket_read),
+    JS_CFUNC_DEF("MTY_WebSocketWrite", 2, js_mty_websocket_write),
+    JS_CFUNC_DEF("MTY_WebSocketGetCloseCode", 1, js_mty_websocket_get_close_code),
 
     // End Net module
 

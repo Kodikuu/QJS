@@ -23,7 +23,10 @@ LIBS = \
 	imm32.lib \
 	winmm.lib \
 	Advapi32.lib \
-	Userenv.lib
+	Userenv.lib \
+	Winhttp.lib \
+	Crypt32.lib \
+	Secur32.lib
 
 CFILES =  \
 	src/main.c \
