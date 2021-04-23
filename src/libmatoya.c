@@ -3297,6 +3297,26 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_LogFatalParams", 2, js_mty_log_fatal_params),
     // End Log module
 
+    // Net module
+
+    // End Net module
+
+    // System module
+
+    // End System module
+
+    // TLS module
+
+    // End TLS module
+
+    // Time module
+    
+    // End Time module
+
+    // Version module
+
+    // End Version module
+
     JS_CFUNC_DEF("print", 1, js_print),
 // END Functions
 };
