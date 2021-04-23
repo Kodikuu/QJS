@@ -856,7 +856,9 @@ static void eventFunc(const MTY_Event *evt, void *opaque) {
     args[0] = event;
 
     JSValue ret = JS_Call(ctx->jsctx, ctx->eventFunc, JS_UNDEFINED, 1, args);
-    ctx->running = JS_ToBool(ctx->jsctx, ret);
+
+    if (!JS_ToBool(ctx->jsctx, ret))
+        ctx->running = false;
 
     MTY_Free(args);
 }
