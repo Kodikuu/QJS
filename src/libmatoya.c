@@ -52,6 +52,7 @@ static const JSCFunctionListEntry js_mty_cmd[] = {
     JS_PROP_INT32_DEF("vtxOffset", 0, JS_PROP_C_W_E),
 };
 
+// Incomplete, uses pointers
 static const JSCFunctionListEntry js_mty_cmd_list[] = {
 
     JS_PROP_INT64_DEF("cmd", 0, JS_PROP_C_W_E), // Pointer to MTY_Cmd array
@@ -66,6 +67,7 @@ static const JSCFunctionListEntry js_mty_cmd_list[] = {
     JS_PROP_INT32_DEF("idxMax", 0, JS_PROP_C_W_E),
 };
 
+// Incomplete, uses pointers
 static const JSCFunctionListEntry js_mty_draw_data[] = {
 
     JS_OBJECT_DEF("displaySize", js_mty_point, 2, JS_PROP_C_W_E),
@@ -415,6 +417,7 @@ static JSValue convJSMTY_Cmd(JSContext *jsctx, MTY_Cmd cmd) {
     return retval;
 }
 
+// Incomplete, uses pointers
 static const MTY_CmdList convCMTY_CmdList(JSContext *jsctx, JSValue object) {
     MTY_CmdList cmdlist = { 0 };
 
@@ -431,6 +434,7 @@ static const MTY_CmdList convCMTY_CmdList(JSContext *jsctx, JSValue object) {
     return cmdlist;
 }
 
+// Incomplete, uses pointers
 static JSValue convJSMTY_CmdList(JSContext *jsctx, MTY_CmdList cmdlist) {
     JSValue retval = JS_NewObject(jsctx);
 
@@ -447,6 +451,7 @@ static JSValue convJSMTY_CmdList(JSContext *jsctx, MTY_CmdList cmdlist) {
     return retval;
 }
 
+// Incomplete, uses pointers
 static const MTY_DrawData convCMTY_DrawData(JSContext *jsctx, JSValue object) {
     MTY_DrawData drawdata = { 0 };
 
@@ -464,6 +469,7 @@ static const MTY_DrawData convCMTY_DrawData(JSContext *jsctx, JSValue object) {
     return drawdata;
 }
 
+// Incomplete, uses pointers
 static JSValue convJSMTY_DrawData(JSContext *jsctx, MTY_DrawData drawdata) {
     JSValue retval = JS_NewObject(jsctx);
 
@@ -906,7 +912,7 @@ static JSValue js_mty_renderer_destroy(JSContext* jsctx, JSValueConst this_val, 
         return JS_EXCEPTION;
     }
 
-    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Pointer
+    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Context Pointer
     MTY_RendererDestroy(&renderer);
     return JS_NewBool(jsctx, 1);
 }
@@ -917,11 +923,12 @@ static JSValue js_mty_renderer_draw_quad(JSContext* jsctx, JSValueConst this_val
         return JS_EXCEPTION;
     }
 
-    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Pointer
-    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[2]); // Pointer
-    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[3]); // Pointer
-    const void *image = (const void *)JSToInt64(jsctx, argv[4]); // Pointer
-    MTY_Surface *dst = (MTY_Surface *)JSToInt64(jsctx, argv[6]); // Pointer
+    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Context Pointer
+    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[2]); // Context Pointer
+    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[3]); // Context Pointer
+    size_t imagesize;
+    const void *image = (const void *)JS_GetArrayBuffer(jsctx, &imagesize, argv[4]);
+    MTY_Surface *dst = (MTY_Surface *)JSToInt64(jsctx, argv[6]); // Context Pointer
 
     MTY_GFX api = JSToInt32(jsctx, argv[1]);
 
@@ -937,10 +944,10 @@ static JSValue js_mty_renderer_draw_ui(JSContext* jsctx, JSValueConst this_val, 
         return JS_EXCEPTION;
     }
 
-    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Pointer
-    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[2]); // Pointer
-    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[3]); // Pointer
-    MTY_Surface *dst = (MTY_Surface *)JSToInt64(jsctx, argv[5]); // Pointer
+    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Context Pointer
+    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[2]); // Context Pointer
+    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[3]); // Context Pointer
+    MTY_Surface *dst = (MTY_Surface *)JSToInt64(jsctx, argv[5]); // Context Pointer
 
     MTY_GFX api = JSToInt32(jsctx, argv[1]);
 
@@ -956,10 +963,11 @@ static JSValue js_mty_renderer_set_texture(JSContext* jsctx, JSValueConst this_v
         return JS_EXCEPTION;
     }
 
-    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Pointer
-    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[2]); // Pointer
-    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[3]); // Pointer
-    const void *rgba = (const void *)JSToInt64(jsctx, argv[5]); // Pointer
+    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Context Pointer
+    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[2]); // Context Pointer
+    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[3]); // Context Pointer
+    size_t rgbasize;
+    const void *rgba = (const void *)JS_GetArrayBuffer(jsctx, &rgbasize, argv[5]);
 
     MTY_GFX api = JSToInt32(jsctx, argv[1]);
     uint32_t id = JSToInt32(jsctx, argv[4]);
@@ -976,7 +984,7 @@ static JSValue js_mty_renderer_has_texture(JSContext* jsctx, JSValueConst this_v
         return JS_EXCEPTION;
     }
 
-    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Pointer
+    MTY_Renderer *renderer = (MTY_Renderer *)JSToInt64(jsctx, argv[0]); // Context Pointer
     uint32_t id = JSToInt32(jsctx, argv[1]);
 
     bool ret = MTY_RendererHasUITexture(renderer, id);
@@ -1002,12 +1010,12 @@ static JSValue js_mty_get_render_state(JSContext* jsctx, JSValueConst this_val, 
         return JS_EXCEPTION;
     }
 
-    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[1]); // Pointer
-    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[2]); // Pointer
+    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[1]); // Context Pointer
+    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[2]); // Context Pointer
 
     MTY_GFX api = JSToInt32(jsctx, argv[0]);
 
-    size_t state = (size_t)MTY_GetRenderState(api, device, context); // Pointer
+    size_t state = (size_t)MTY_GetRenderState(api, device, context); // Context Pointer
     return JS_NewBigInt64(jsctx, state);
 }
 
@@ -1017,9 +1025,9 @@ static JSValue js_mty_set_render_state(JSContext* jsctx, JSValueConst this_val, 
         return JS_EXCEPTION;
     }
 
-    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[1]); // Pointer
-    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[2]); // Pointer
-    MTY_RenderState *state = (MTY_RenderState *)JSToInt64(jsctx, argv[3]); // Pointer
+    MTY_Device *device = (MTY_Device *)JSToInt64(jsctx, argv[1]); // Context Pointer
+    MTY_Context *context = (MTY_Context *)JSToInt64(jsctx, argv[2]); // Context Pointer
+    MTY_RenderState *state = (MTY_RenderState *)JSToInt64(jsctx, argv[3]); // Context Pointer
 
     MTY_GFX api = JSToInt32(jsctx, argv[0]);
 
@@ -1033,7 +1041,7 @@ static JSValue js_mty_free_render_state(JSContext* jsctx, JSValueConst this_val,
         return JS_EXCEPTION;
     }
 
-    MTY_RenderState *state = (MTY_RenderState *)JSToInt64(jsctx, argv[3]); // Pointer
+    MTY_RenderState *state = (MTY_RenderState *)JSToInt64(jsctx, argv[3]); // Context Pointer
 
     MTY_FreeRenderState(&state);
     return JS_NewBool(jsctx, 1);
@@ -1845,7 +1853,9 @@ static JSValue js_mty_window_set_ui_texture(JSContext* jsctx, JSValueConst this_
     MTY_App *app = (MTY_App *)JSToInt64(jsctx, argv[0]);
     uint32_t window = JSToInt32(jsctx, argv[1]);
     uint32_t id = JSToInt32(jsctx, argv[2]);
-    const void *rgba = (const void *)JSToInt64(jsctx, argv[3]); // Pointer
+
+    size_t rgbasize;
+    const void *rgba = (const void *)JS_GetArrayBuffer(jsctx, &rgbasize, argv[3]);
     uint32_t width = JSToInt32(jsctx, argv[4]);
     uint32_t height = JSToInt32(jsctx, argv[5]);
 
@@ -3170,9 +3180,9 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_AppSetTimeout", 2, js_mty_app_set_timeout),
     JS_CFUNC_DEF("MTY_AppIsActive", 1, js_mty_app_is_active),
     JS_CFUNC_DEF("MTY_AppActivate", 2, js_mty_app_activate),
-    // TODO; MTY_AppSetTray
+    // TODO; MTY_AppSetTray - How to do MTY_MenuItem array properly?
     JS_CFUNC_DEF("MTY_AppRemoveTray", 1, js_mty_app_remove_tray),
-    // TODO; MTY_AppSendNotification, requires MTY_AppSetTray
+    // TODO; MTY_AppSendNotification, requires an icon via MTY_AppSetTray
     JS_CFUNC_DEF("MTY_AppGetClipboard", 1, js_mty_app_get_clipboard),
     JS_CFUNC_DEF("MTY_AppSetClipboard", 2, js_mty_app_set_clipboard),
     JS_CFUNC_DEF("MTY_AppStayAwake", 2, js_mty_app_stay_awake),
@@ -3238,7 +3248,7 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_AudioDestroy", 1, js_mty_audio_destroy),
     JS_CFUNC_DEF("MTY_AudioReset", 1, js_mty_audio_reset),
     JS_CFUNC_DEF("MTY_AudioGetQueued", 1, js_mty_audio_get_queued),
-    JS_CFUNC_DEF("MTY_AudioQueue", 1, js_mty_audio_queue),
+    JS_CFUNC_DEF("MTY_AudioQueue", 1, js_mty_audio_queue), // Incomplete until libparsec is init'd via JS
     // End audio module
 
     // Crypto module
@@ -3247,14 +3257,14 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_BytesToHex", 1, js_mty_bytes_to_hex),
     JS_CFUNC_DEF("MTY_HexToBytes", 1, js_mty_hex_to_bytes),
     JS_CFUNC_DEF("MTY_BytesToBase64", 1, js_mty_bytes_to_base64),
-    JS_CFUNC_DEF("MTY_CryptoHashFile", 3, js_mty_crypto_hash_file),
-    JS_CFUNC_DEF("MTY_CryptoHash", 3, js_mty_crypto_hash),
+    JS_CFUNC_DEF("MTY_CryptoHash", 3, js_mty_crypto_hash), // Possibly flawed
+    JS_CFUNC_DEF("MTY_CryptoHashFile", 3, js_mty_crypto_hash_file), // Possibly flawed
     JS_CFUNC_DEF("MTY_GetRandomBytes", 1, js_mty_get_random_bytes),
     JS_CFUNC_DEF("MTY_GetRandomUInt", 2, js_mty_get_random_uint),
     JS_CFUNC_DEF("MTY_AESGCMCreate", 1, js_mty_aesgcm_create),
     JS_CFUNC_DEF("MTY_AESGCMDestroy", 1, js_mty_aesgcm_destroy),
-    JS_CFUNC_DEF("MTY_AESGCMEncrypt", 3, js_mty_aesgcm_encrypt),
-    JS_CFUNC_DEF("MTY_AESGCMDecrypt", 4, js_mty_aesgcm_decrypt),
+    JS_CFUNC_DEF("MTY_AESGCMEncrypt", 3, js_mty_aesgcm_encrypt), // Possibly flawed
+    JS_CFUNC_DEF("MTY_AESGCMDecrypt", 4, js_mty_aesgcm_decrypt), // Possibly flawed
     // End Crypto module
 
     // Dialog module
@@ -3278,8 +3288,8 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_GetPathPrefix", 1, js_mty_get_path_prefix),
     JS_CFUNC_DEF("MTY_LockFileCreate", 2, js_mty_lockfile_create),
     JS_CFUNC_DEF("MTY_LockFileDestroy", 1, js_mty_lockfile_destroy),
-    JS_CFUNC_DEF("MTY_GetFileList", 2, js_mty_get_file_list),
-    JS_CFUNC_DEF("MTY_FreeFileList", 1, js_mty_free_file_list),
+    JS_CFUNC_DEF("MTY_GetFileList", 2, js_mty_get_file_list), // incomplete
+    JS_CFUNC_DEF("MTY_FreeFileList", 1, js_mty_free_file_list), // incomplete
     // End File module
 
     // Image module
@@ -3316,6 +3326,8 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     // Version module
 
     // End Version module
+
+    // Skipped modules: JSON, Memory, Thread, Struct
 
     JS_CFUNC_DEF("print", 1, js_print),
 // END Functions
