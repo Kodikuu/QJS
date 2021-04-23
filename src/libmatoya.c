@@ -876,6 +876,18 @@ static void eventFunc(const MTY_Event *evt, void *opaque) {
     MTY_Free(args);
 }
 
+static void logFunc(const char *msg, void* opaque) {
+	struct Context* ctx = (struct Context*)opaque;
+
+    JSValue *args = MTY_Alloc(1, sizeof(JSValue));
+
+    JSValue message = JS_NewString(ctx->jsctx, msg);
+    args[0] = message;
+
+    JS_Call(ctx->jsctx, ctx->logFunc, JS_UNDEFINED, 1, args);
+    MTY_Free(args);
+}
+
 // Functions
 // Render module
 static JSValue js_mty_renderer_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -2339,7 +2351,7 @@ static JSValue js_mty_has_dialogs(JSContext* jsctx, JSValueConst this_val, int a
     }
 
     bool ret = MTY_HasDialogs();
-    return JS_NewBool(jsctx, ret); //
+    return JS_NewBool(jsctx, ret);
 }
 
 static JSValue js_mty_show_messagebox(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -2653,6 +2665,69 @@ static JSValue js_mty_get_program_icon(JSContext* jsctx, JSValueConst this_val, 
 }
 
 // End of image module
+
+// Log module
+
+static JSValue js_mty_get_log(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    const char *log = MTY_GetLog();
+    return JS_NewString(jsctx, log);
+}
+
+static JSValue js_mty_set_log_func(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    Context *ctx = JS_GetContextOpaque(jsctx);
+    ctx->logFunc = argv[0];
+
+    MTY_SetLogFunc(logFunc, ctx);
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_disable_log(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    bool disabled = JS_ToBool(jsctx, argv[0]);
+
+    MTY_DisableLog(disabled);
+    
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_log_params(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char *func = JS_ToCString(jsctx, argv[0]);
+    const char *string = JS_ToCString(jsctx, argv[1]);
+
+    MTY_LogParams(func, string);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_log_fatal_params(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char *func = JS_ToCString(jsctx, argv[0]);
+    const char *string = JS_ToCString(jsctx, argv[1]);
+
+    MTY_LogFatalParams(func, string);
+
+    return JS_NewBool(jsctx, 1);
+}
+
+// End of Log module
 
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
@@ -3213,6 +3288,14 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_CropImage", 5, js_mty_crop_image),
     JS_CFUNC_DEF("MTY_GetProgramIcon", 1, js_mty_get_program_icon),
     // End Image module
+
+    // Log module
+    JS_CFUNC_DEF("MTY_GetLog", 0, js_mty_get_log),
+    JS_CFUNC_DEF("MTY_SetLogFunc", 1, js_mty_set_log_func),
+    JS_CFUNC_DEF("MTY_DisableLog", 1, js_mty_disable_log),
+    JS_CFUNC_DEF("MTY_LogParams", 2, js_mty_log_params),
+    JS_CFUNC_DEF("MTY_LogFatalParams", 2, js_mty_log_fatal_params),
+    // End Log module
 
     JS_CFUNC_DEF("print", 1, js_print),
 // END Functions
