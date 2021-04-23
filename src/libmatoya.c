@@ -2047,6 +2047,8 @@ static JSValue js_mty_audio_queue(JSContext* jsctx, JSValueConst this_val, int a
 
 // End Audio module
 
+// Crypto module
+
 static JSValue js_mty_crc32(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
     if (argc != 2) {
@@ -2313,10 +2315,6 @@ static JSValue js_mty_aesgcm_decrypt(JSContext* jsctx, JSValueConst this_val, in
     MTY_Free(plainText);
     return retval;
 }
-
-// Crypto module
-
-
 
 // End of Crypto module
 
