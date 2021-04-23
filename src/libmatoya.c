@@ -276,6 +276,19 @@ static const JSCFunctionListEntry js_mty_window_desc[] = {
 
 // End App module
 
+// File module
+
+static const JSCFunctionListEntry js_mty_file_desc[] = {
+    JS_PROP_STRING_DEF("path", "", JS_PROP_C_W_E),
+    JS_PROP_STRING_DEF("name", "", JS_PROP_C_W_E),
+
+    JS_PROP_INT32_DEF("dir", 0, JS_PROP_C_W_E),
+};
+
+// TODO: MTY_FileList __PROPERLY__
+
+// End File module
+
 // Converters
 
 // Render module
@@ -2320,27 +2333,326 @@ static JSValue js_mty_aesgcm_decrypt(JSContext* jsctx, JSValueConst this_val, in
 
 // Dialog module
 
-static JSValue js_mty_has_dialogs(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+static JSValue js_mty_has_dialogs(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     if (argc != 0) {
         return JS_EXCEPTION;
     }
 
     bool ret = MTY_HasDialogs();
-    return JS_NewBool(ctx, ret); //
+    return JS_NewBool(jsctx, ret); //
 }
 
-static JSValue js_mty_show_messagebox(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+static JSValue js_mty_show_messagebox(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     if (argc != 2) {
         return JS_EXCEPTION;
     }
 
-    const char* title = JS_ToCString(ctx, argv[0]);
-    const char* string = JS_ToCString(ctx, argv[1]);
+    const char *title = JS_ToCString(jsctx, argv[0]);
+    const char *string = JS_ToCString(jsctx, argv[1]);
     MTY_ShowMessageBox(title, string);
-    return JS_NewBool(ctx, 1);
+    return JS_NewBool(jsctx, 1);
 }
 
 // End of Dialog module
+
+// File module
+
+static JSValue js_mty_read_file(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path = JS_ToCString(jsctx, argv[0]);
+    size_t size;
+    void *file = MTY_ReadFile(path, &size);
+
+    JSValue buffer = JS_NewArrayBuffer(jsctx, file, size, FreeArray, NULL, false);
+    return buffer;
+}
+
+static JSValue js_mty_write_file(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+    
+    size_t bufsize;
+
+    const char *path = JS_ToCString(jsctx, argv[0]);
+    void *buf = JS_GetArrayBuffer(jsctx, &bufsize, argv[1]);
+
+    bool success = MTY_WriteFile(path, buf, bufsize);
+
+    return JS_NewBool(jsctx, success);
+}
+
+static JSValue js_mty_write_text_file(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path = JS_ToCString(jsctx, argv[0]);
+    const char *text = JS_ToCString(jsctx, argv[1]);
+
+    bool success = MTY_WriteTextFile(path, text);
+
+    return JS_NewBool(jsctx, success);
+}
+
+static JSValue js_mty_append_text_to_file(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path = JS_ToCString(jsctx, argv[0]);
+    const char *text = JS_ToCString(jsctx, argv[1]);
+
+    bool success = MTY_AppendTextToFile(path, text);
+
+    return JS_NewBool(jsctx, success);
+}
+
+static JSValue js_mty_delete_file(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path = JS_ToCString(jsctx, argv[0]);
+
+    bool success = MTY_DeleteFile(path);
+
+    return JS_NewBool(jsctx, success);
+}
+
+static JSValue js_mty_file_exists(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path = JS_ToCString(jsctx, argv[0]);
+
+    bool success = MTY_FileExists(path);
+
+    return JS_NewBool(jsctx, success);
+}
+
+static JSValue js_mty_mkdir(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path = JS_ToCString(jsctx, argv[0]);
+
+    bool success = MTY_Mkdir(path);
+
+    return JS_NewBool(jsctx, success);
+}
+
+static JSValue js_mty_join_path(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path1 = JS_ToCString(jsctx, argv[0]);
+    const char *path2 = JS_ToCString(jsctx, argv[1]);
+
+    const char *path = MTY_JoinPath(path1, path2);
+
+    return JS_NewString(jsctx, path);
+}
+
+static JSValue js_mty_copy_file(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path1 = JS_ToCString(jsctx, argv[0]);
+    const char *path2 = JS_ToCString(jsctx, argv[1]);
+
+    bool success = MTY_CopyFile(path1, path2);
+
+    return JS_NewBool(jsctx, success);
+}
+
+static JSValue js_mty_move_file(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path1 = JS_ToCString(jsctx, argv[0]);
+    const char *path2 = JS_ToCString(jsctx, argv[1]);
+
+    bool success = MTY_MoveFile(path1, path2);
+
+    return JS_NewBool(jsctx, success);
+}
+
+static JSValue js_mty_get_dir(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Dir dir = (MTY_Dir)JSToInt32(jsctx, argv[0]);
+
+    const char *path = MTY_GetDir(dir);
+
+    return JS_NewString(jsctx, path);
+}
+
+static JSValue js_mty_get_filename(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path = JS_ToCString(jsctx, argv[0]);
+    bool ext = JS_ToBool(jsctx, argv[1]);
+
+    const char *name = MTY_GetFileName(path, ext);
+
+    return JS_NewString(jsctx, name);
+}
+
+static JSValue js_mty_get_path_prefix(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path = JS_ToCString(jsctx, argv[0]);
+
+    const char *name = MTY_GetPathPrefix(path);
+
+    return JS_NewString(jsctx, name);
+}
+
+static JSValue js_mty_lockfile_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path = JS_ToCString(jsctx, argv[0]);
+    MTY_FileMode mode = (MTY_FileMode)JSToInt32(jsctx, argv[1]);
+
+    MTY_LockFile *lock = MTY_LockFileCreate(path, mode);
+    
+    return JS_NewBigInt64(jsctx, (int64_t)lock);
+}
+
+static JSValue js_mty_lockfile_destroy(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_LockFile *lock = (MTY_LockFile *)JSToInt64(jsctx, argv[0]);
+
+    MTY_LockFileDestroy(&lock);
+    
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_get_file_list(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 2) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path = JS_ToCString(jsctx, argv[0]);
+    const char *filter = JS_ToCString(jsctx, argv[1]);
+
+    MTY_FileList *list = MTY_GetFileList(path, filter);
+    
+    return JS_NewBigInt64(jsctx, (int64_t)list);
+}
+
+static JSValue js_mty_free_file_list(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_FileList *list = (MTY_FileList *)JSToInt64(jsctx, argv[0]);
+
+    MTY_FreeFileList(&list);
+    
+    return JS_NewBool(jsctx, 1);
+}
+
+// End of file module
+
+// Image module
+
+static JSValue js_mty_compress_image(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 4) {
+        return JS_EXCEPTION;
+    }
+
+    size_t bufsize;
+
+    MTY_ImageCompression method = (MTY_ImageCompression)JSToInt32(jsctx, argv[0]);
+    void *input = JS_GetArrayBuffer(jsctx, &bufsize, argv[1]);
+    uint32_t width = JSToInt32(jsctx, argv[2]);
+    uint32_t height = JSToInt32(jsctx, argv[3]);
+
+    size_t outputsize;
+    void *buffer = MTY_CompressImage(method, input, width, height, &outputsize);
+
+    JSValue retval = JS_NewArrayBuffer(jsctx, buffer, outputsize, FreeArray, NULL, false);
+    MTY_Free(buffer);
+    return retval;
+}
+
+static JSValue js_mty_decompress_image(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    size_t bufsize;
+
+    void *input = JS_GetArrayBuffer(jsctx, &bufsize, argv[0]);
+
+    uint32_t width;
+    uint32_t height;
+    void *buffer = MTY_DecompressImage(input, bufsize,&width, &height);
+
+    JSValue retval = JS_NewArrayBuffer(jsctx, buffer, width*height*4, FreeArray, NULL, false);
+    MTY_Free(buffer);
+    return retval;
+}
+
+static JSValue js_mty_crop_image(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 5) {
+        return JS_EXCEPTION;
+    }
+
+    size_t bufsize;
+
+    void *input = JS_GetArrayBuffer(jsctx, &bufsize, argv[0]);
+    uint32_t cropwidth = JSToInt32(jsctx, argv[1]);
+    uint32_t cropheight = JSToInt32(jsctx, argv[2]);
+    uint32_t width = JSToInt32(jsctx, argv[3]);
+    uint32_t height = JSToInt32(jsctx, argv[4]);
+
+    size_t outputsize;
+    void *buffer = MTY_CropImage(input, cropwidth, cropheight, &width, &height);
+
+    JSValue retval = JS_NewArrayBuffer(jsctx, buffer, width*height*4, FreeArray, NULL, false);
+    MTY_Free(buffer);
+    return retval;
+}
+
+static JSValue js_mty_get_program_icon(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    const char *path = JS_ToCString(jsctx, argv[0]);
+
+    uint32_t width;
+    uint32_t height;
+    void *buffer = MTY_GetProgramIcon(path, &width, &height);
+
+    JSValue retval = JS_NewArrayBuffer(jsctx, buffer, width*height*4, FreeArray, NULL, false);
+    MTY_Free(buffer);
+    return retval;
+}
+
+// End of image module
 
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
@@ -2755,6 +3067,11 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_OBJECT_DEF("MTY_WindowDesc", js_mty_window_desc, 13, JS_PROP_C_W_E),
     // End App module
 
+    // File module
+    JS_OBJECT_DEF("MTY_FileDesc", js_mty_file_desc, 3, JS_PROP_C_W_E),
+    // TODO: MTY_FileList
+    // End file module
+
 // END Structs
 
 // Functions
@@ -2869,6 +3186,33 @@ static const JSCFunctionListEntry js_mty_funcs[] = {
     JS_CFUNC_DEF("MTY_HasDialogs", 0, js_mty_has_dialogs),
     JS_CFUNC_DEF("MTY_ShowMessageBox", 2, js_mty_show_messagebox),
     // End Dialog module
+
+    // File module
+    JS_CFUNC_DEF("MTY_ReadFile", 1, js_mty_read_file),
+    JS_CFUNC_DEF("MTY_WriteFile", 2, js_mty_write_file),
+    JS_CFUNC_DEF("MTY_WriteTextFile", 2, js_mty_write_text_file),
+    JS_CFUNC_DEF("MTY_AppendTextToFile", 2, js_mty_append_text_to_file),
+    JS_CFUNC_DEF("MTY_DeleteFile", 1, js_mty_delete_file),
+    JS_CFUNC_DEF("MTY_FileExists", 1, js_mty_file_exists),
+    JS_CFUNC_DEF("MTY_Mkdir", 1, js_mty_mkdir),
+    JS_CFUNC_DEF("MTY_JoinPath", 2, js_mty_join_path),
+    JS_CFUNC_DEF("MTY_CopyFile", 2, js_mty_copy_file),
+    JS_CFUNC_DEF("MTY_MoveFile", 2, js_mty_move_file),
+    JS_CFUNC_DEF("MTY_GetDir", 1, js_mty_get_dir),
+    JS_CFUNC_DEF("MTY_GetFileName", 2, js_mty_get_filename),
+    JS_CFUNC_DEF("MTY_GetPathPrefix", 1, js_mty_get_path_prefix),
+    JS_CFUNC_DEF("MTY_LockFileCreate", 2, js_mty_lockfile_create),
+    JS_CFUNC_DEF("MTY_LockFileDestroy", 1, js_mty_lockfile_destroy),
+    JS_CFUNC_DEF("MTY_GetFileList", 2, js_mty_get_file_list),
+    JS_CFUNC_DEF("MTY_FreeFileList", 1, js_mty_free_file_list),
+    // End File module
+
+    // Image module
+    JS_CFUNC_DEF("MTY_CompressImage", 4, js_mty_compress_image),
+    JS_CFUNC_DEF("MTY_DecompressImage", 1, js_mty_decompress_image),
+    JS_CFUNC_DEF("MTY_CropImage", 5, js_mty_crop_image),
+    JS_CFUNC_DEF("MTY_GetProgramIcon", 1, js_mty_get_program_icon),
+    // End Image module
 
     JS_CFUNC_DEF("print", 1, js_print),
 // END Functions
