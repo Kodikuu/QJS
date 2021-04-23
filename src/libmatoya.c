@@ -3169,6 +3169,71 @@ static JSValue js_get_jni_env(JSContext* jsctx, JSValueConst this_val, int argc,
 
 // End System module
 
+// TLS module
+
+static JSValue js_mty_cert_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 0) {
+        return JS_EXCEPTION;
+    }
+
+    size_t cert = (size_t)MTY_CertCreate(); // MTY_Cert * pointer
+    return JS_NewBigInt64(jsctx, cert);
+}
+
+static JSValue js_mty_cert_destroy(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Cert *cert = (MTY_Cert *)JSToInt64(jsctx, argv[0]); // Context Pointer
+    MTY_CertDestroy(&cert);
+    return JS_NewBool(jsctx, 1);
+}
+
+static JSValue js_mty_cert_get_fingerprint(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_Cert *cert = (MTY_Cert *)JSToInt64(jsctx, argv[0]); // Context Pointer
+
+    char *fingerprint = MTY_Alloc(MTY_FINGERPRINT_MAX, 1);
+    size_t size = MTY_FINGERPRINT_MAX;
+
+    MTY_CertGetFingerprint(cert, fingerprint, size);
+
+    JSValue string = JS_NewString(jsctx, fingerprint);
+    MTY_Free(fingerprint);
+    return string;
+}
+
+static JSValue js_mty_tls_create(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 5) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_TLSProtocol proto = JSToInt32(jsctx, argv[0]);
+    MTY_Cert *cert = (MTY_Cert *)JSToInt64(jsctx, argv[1]); // Context Pointer
+    const char *host = JS_ToCString(jsctx, argv[2]);
+    const char *peerFingerprint = JS_ToCString(jsctx, argv[3]);
+    uint32_t mtu = JSToInt32(jsctx, argv[4]);
+
+    size_t tls = (size_t)MTY_TLSCreate(proto, cert, host, peerFingerprint, mtu); // MTY_Cert * pointer
+    return JS_NewBigInt64(jsctx, tls);
+}
+
+static JSValue js_mty_tls_destroy(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    MTY_TLS *tls = (MTY_TLS *)JSToInt64(jsctx, argv[0]); // Context Pointer
+    MTY_TLSDestroy(&tls);
+    return JS_NewBool(jsctx, 1);
+}
+
+// End TLS module
+
 static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     /*
     Args (1); String (C const char*)
