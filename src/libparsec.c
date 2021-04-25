@@ -1,6 +1,306 @@
 #include "libparsec.h"
 #include "utils.h"
 
+// Objects
+
+static const JSCFunctionListEntry js_parsecconfig[] = {
+    JS_PROP_INT32_DEF("upnp", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("clientPort", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("hostPort", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecframe[] = {
+    JS_PROP_INT32_DEF("format", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("size", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("width", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("height", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("fullWidth", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("fullHeight", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecrect[] = {
+    JS_PROP_INT32_DEF("left", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("top", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("right", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("bottom", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecoutput[] = {
+	JS_OBJECT_DEF("coords", js_parsecrect, 4, JS_PROP_C_W_E),
+
+    JS_PROP_INT32_DEF("adapterIndex", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("outputIndex", 0, JS_PROP_C_W_E),
+
+    JS_PROP_STRING_DEF("name", "", JS_PROP_C_W_E), // OUTPUT_NAME_LEN
+    JS_PROP_STRING_DEF("adapterName", "", JS_PROP_C_W_E), // ADAPTER_NAME_LEN
+    JS_PROP_STRING_DEF("device", "", JS_PROP_C_W_E), // OUTPUT_ID_LEN
+    JS_PROP_STRING_DEF("id", "", JS_PROP_C_W_E), // OUTPUT_ID_LEN
+};
+
+static const JSCFunctionListEntry js_parseccursor[] = {
+    JS_PROP_INT32_DEF("size", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("positionX", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("positionY", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("width", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("height", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("hotX", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("hotY", 0, JS_PROP_C_W_E),
+
+    JS_PROP_INT32_DEF("modeUpdate", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("imageUpdate", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("relative", 0, JS_PROP_C_W_E),
+
+    JS_PROP_INT32_DEF("stream", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecpermissions[] = {
+    JS_PROP_INT32_DEF("gamepad", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("keyboard", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("mouse", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecmetrics[] = {
+    JS_PROP_INT32_DEF("packetsSent", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("fastRTs", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("slowRTs", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("queuedFrames", 0, JS_PROP_C_W_E),
+
+    JS_PROP_DOUBLE_DEF("encodeLatency", 0.0f, JS_PROP_C_W_E),
+    JS_PROP_DOUBLE_DEF("decodeLatency", 0.0f, JS_PROP_C_W_E),
+    JS_PROP_DOUBLE_DEF("networkLatency", 0.0f, JS_PROP_C_W_E),
+    JS_PROP_DOUBLE_DEF("bitrate", 0.0f, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecmetricsarray[] = {
+	// NUM_VSTREAMS
+	JS_OBJECT_DEF("0", js_parsecmetrics, 8, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("1", js_parsecmetrics, 8, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecguest[] = {
+	JS_OBJECT_DEF("perms", js_parsecpermissions, 4, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("metrics", js_parsecmetricsarray, 2, JS_PROP_C_W_E),
+
+    JS_PROP_INT32_DEF("state", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("id", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("userID", 0, JS_PROP_C_W_E),
+
+    JS_PROP_STRING_DEF("name", "", JS_PROP_C_W_E), // GUEST_NAME_LEN
+    JS_PROP_STRING_DEF("externalID", "", JS_PROP_C_W_E), // EXTERNAL_ID_LEN
+
+    JS_PROP_INT32_DEF("owner", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parseckeyboardmessage[] = {
+    JS_PROP_INT32_DEF("code", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("mod", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("pressed", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecmousebuttonmessage[] = {
+    JS_PROP_INT32_DEF("button", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("pressed", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecmousewheelmessage[] = {
+    JS_PROP_INT32_DEF("x", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("y", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecmousemotionmessage[] = {
+    JS_PROP_INT32_DEF("x", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("y", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("relative", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("scaleRelative", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("stream", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecgamepadbuttonmessage[] = {
+    JS_PROP_INT32_DEF("button", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("id", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("pressed", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecgamepadaxismessage[] = {
+    JS_PROP_INT32_DEF("axis", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("id", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("value", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecgamepadunplugmessage[] = {
+    JS_PROP_INT32_DEF("id", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecgamepadstatemessage[] = {
+    JS_PROP_INT32_DEF("id", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("buttons", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("thumbLX", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("thumbLY", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("thumbRX", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("thumbRY", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("leftTrigger", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("rightTrigger", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecmessage[] = {
+    JS_PROP_INT32_DEF("type", 0, JS_PROP_C_W_E),
+
+	// Union Start
+	JS_OBJECT_DEF("keyboard", js_parseckeyboardmessage, 3, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("mouseButton", js_parsecmousebuttonmessage, 2, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("mouseWheel", js_parsecmousewheelmessage, 2, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("mouseMotion", js_parsecmousemotionmessage, 5, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("gamepadButton", js_parsecgamepadbuttonmessage, 3, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("gamepadAxis", js_parsecgamepadaxismessage, 3, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("gamepadUnplug", js_parsecgamepadunplugmessage, 1, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("gamepadState", js_parsecgamepadstatemessage, 8, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecclientvideoconfig[] = {
+    JS_PROP_INT32_DEF("decoderIndex", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("resolutionX", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("resolutionY", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("decoderCompatibility", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("decoderH265", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("decoder444", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecclientvideoconfigarray[] = {
+	// NUM_VSTREAMS
+	JS_OBJECT_DEF("0", js_parsecclientvideoconfig, 6, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("1", js_parsecclientvideoconfig, 6, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecclientconfig[] = {
+	JS_OBJECT_DEF("video", js_parsecclientvideoconfigarray, 2, JS_PROP_C_W_E),
+
+    JS_PROP_INT32_DEF("mediaContainer", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("protocol", 0, JS_PROP_C_W_E),
+
+    JS_PROP_STRING_DEF("secret", "", JS_PROP_C_W_E), // HOST_SECRET_LEN
+
+    JS_PROP_INT32_DEF("pngCursor", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecdecoder[] = {
+    JS_PROP_INT32_DEF("index", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("width", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("height", 0, JS_PROP_C_W_E),
+
+    JS_PROP_STRING_DEF("name", "", JS_PROP_C_W_E), // DECODER_NAME_LEN
+
+    JS_PROP_INT32_DEF("h265", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("color444", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecdecoderarray[] = {
+	// NUM_VSTREAMS
+	JS_OBJECT_DEF("0", js_parsecdecoder, 6, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("1", js_parsecdecoder, 6, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecclientstatus[] = {
+	JS_OBJECT_DEF("self", js_parsecguest, 8, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("decoder", js_parsecdecoderarray, 2, JS_PROP_C_W_E),
+
+    JS_PROP_INT32_DEF("hostMode", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("networkFailure", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecclientcursorevent[] = {
+	JS_OBJECT_DEF("cursor", js_parseccursor, 11, JS_PROP_C_W_E),
+
+    JS_PROP_INT32_DEF("key", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecclientrumbleevent[] = {
+    JS_PROP_INT32_DEF("gamepadID", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("motorBig", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("motorSmall", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecclientstreamevent[] = {
+    JS_PROP_INT32_DEF("status", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("stream", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecclientuserdataevent[] = {
+    JS_PROP_INT32_DEF("id", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("key", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecclientevent[] = {
+    JS_PROP_INT32_DEF("type", 0, JS_PROP_C_W_E),
+
+	// Union Start
+	JS_OBJECT_DEF("cursor", js_parsecclientcursorevent, 2, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("rumble", js_parsecclientrumbleevent, 3, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("stream", js_parsecclientstreamevent, 2, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("userData", js_parsecclientuserdataevent, 2, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsechostvideoconfig[] = {
+    JS_PROP_INT32_DEF("resolutionX", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("resolutionY", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("encoderFPS", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("encoderMaxBitrate", 0, JS_PROP_C_W_E),
+
+    JS_PROP_STRING_DEF("output", "", JS_PROP_C_W_E), // OUTPUT_ID_LEN
+
+    JS_PROP_INT32_DEF("fullFPS", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsechostvideoconfigarray[] = {
+	// NUM_VSTREAMS
+	JS_OBJECT_DEF("0", js_parsechostvideoconfig, 6, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("1", js_parsechostvideoconfig, 6, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsechostconfig[] = {
+	JS_OBJECT_DEF("video", js_parsechostvideoconfigarray, 2, JS_PROP_C_W_E),
+
+    JS_PROP_INT32_DEF("gamepadType", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("adminMute", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("exclusiveInput", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("maxGuests", 0, JS_PROP_C_W_E),
+    
+    JS_PROP_STRING_DEF("name", "", JS_PROP_C_W_E), // HOST_NAME_LEN
+    JS_PROP_STRING_DEF("desc", "", JS_PROP_C_W_E), // HOST_DESC_LEN
+    JS_PROP_STRING_DEF("gameID", "", JS_PROP_C_W_E), // GAME_ID_LEN
+    JS_PROP_STRING_DEF("secret", "", JS_PROP_C_W_E), // HOST_SECRET_LEN
+
+    JS_PROP_INT32_DEF("publicGame", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsechoststatus[] = {
+	JS_OBJECT_DEF("cfg", js_parsechostconfig, 10, JS_PROP_C_W_E),
+
+    JS_PROP_INT32_DEF("numGuests", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("running", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("invalidSessionID", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecgueststatechangeevent[] = {
+	JS_OBJECT_DEF("guest", js_parsecguest, 8, JS_PROP_C_W_E),
+
+    JS_PROP_INT32_DEF("status", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsecuserdataevent[] = {
+	JS_OBJECT_DEF("guest", js_parsecguest, 8, JS_PROP_C_W_E),
+
+    JS_PROP_INT32_DEF("id", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("key", 0, JS_PROP_C_W_E),
+};
+
+static const JSCFunctionListEntry js_parsechostevent[] = {
+    JS_PROP_INT32_DEF("type", 0, JS_PROP_C_W_E),
+
+	// Union Start
+	JS_OBJECT_DEF("guestStateChange", js_parsecgueststatechangeevent, 2, JS_PROP_C_W_E),
+	JS_OBJECT_DEF("userData", js_parsecuserdataevent, 3, JS_PROP_C_W_E),
+};
+
 // Callbacks
 
 static void audioFunc(const int16_t *pcm, uint32_t frames, void *opaque) {
@@ -685,6 +985,43 @@ static const JSCFunctionListEntry js_parsec_funcs[] = {
 // END Enums
 
 // Structs
+    JS_OBJECT_DEF("ParsecConfig", js_parsecconfig, 3, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecFrame", js_parsecframe, 6, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecRect", js_parsecrect, 4, JS_PROP_C_W_E),
+
+    JS_OBJECT_DEF("ParsecOutput", js_parsecoutput, 7, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecCursor", js_parseccursor, 11, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecPermissions", js_parsecpermissions, 3, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecMetrics", js_parsecmetrics, 8, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecGuest", js_parsecguest, 8, JS_PROP_C_W_E),
+
+    JS_OBJECT_DEF("ParsecKeyboardMessage", js_parseckeyboardmessage, 3, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecMouseButtonMessage", js_parsecmousebuttonmessage, 2, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecMouseWheelMessage", js_parsecmousewheelmessage, 2, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecMouseMotionMessage", js_parsecmousemotionmessage, 5, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecGamepadButtonMessage", js_parsecgamepadbuttonmessage, 3, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecGamepadAxisMessage", js_parsecgamepadaxismessage, 3, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecGamepadUnplugMessage", js_parsecgamepadunplugmessage, 1, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecGamepadStateMessage", js_parsecgamepadstatemessage, 8, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecMessage", js_parsecmessage, 9, JS_PROP_C_W_E),
+
+    JS_OBJECT_DEF("ParsecClientVideoConfig", js_parsecclientvideoconfig, 6, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecClientConfig", js_parsecclientconfig, 5, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecDecoder", js_parsecdecoder, 6, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecClientStatus", js_parsecclientstatus, 4, JS_PROP_C_W_E),
+
+    JS_OBJECT_DEF("ParsecClientCursorEvent", js_parsecclientcursorevent, 2, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecClientRumbleEvent", js_parsecclientrumbleevent, 3, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecClientStreamEvent", js_parsecclientstreamevent, 2, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecClientUserDataEvent", js_parsecclientuserdataevent, 2, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecClientEvent", js_parsecclientstatus, 5, JS_PROP_C_W_E),
+
+    JS_OBJECT_DEF("ParsecHostVideoConfig", js_parsechostvideoconfig, 6, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecHostConfig", js_parsechostconfig, 10, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecHostStatus", js_parsechoststatus, 4, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecGuestStateChangeEvent", js_parsecgueststatechangeevent, 2, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecUserDataEvent", js_parsecuserdataevent, 3, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecHostEvent", js_parsechostevent, 3, JS_PROP_C_W_E),
 // END Structs
 
 // Functions
