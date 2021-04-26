@@ -9,10 +9,10 @@ function appFunc() {
     let event = ParsecClientPollEvents(ps, 1)
 
     if (event.new) {
-        if (event.type = CLIENT_EVENT_CURSOR && event.modeUpdate) {
-            MTY_AppSetRelativeMouse(app, event.relative)
-            if (!event.relative) {
-                MTY_WindowWarpCursor(app, 0, event.positionX, event.positionY)
+        if (event.type = CLIENT_EVENT_CURSOR && event.cursor.cursor.modeUpdate) {
+            MTY_AppSetRelativeMouse(app, event.cursor.cursor.relative)
+            if (!event.cursor.cursor.relative) {
+                MTY_WindowWarpCursor(app, 0, event.cursor.cursor.positionX, event.cursor.cursor.positionY)
             }
         }
     }
@@ -28,16 +28,27 @@ function appFunc() {
 
 function eventFunc(event) {
 
-    // Close Window
-    if (event.type == MTY_EVENT_CLOSE) {
-        ParsecClientDisconnect(ps)
-        return 0
+    switch (event.type) {
+        case MTY_EVENT_CLOSE:
+            ParsecClientDisconnect(ps)
+            return 0
+        case MTY_EVENT_MOTION:
+        case MTY_EVENT_BUTTON:
+        case MTY_EVENT_KEY:
+        case MTY_EVENT_SCROLL:
+        case MTY_EVENT_CONTROLLER:
+        case MTY_EVENT_DISCONNECT:
+            let pevent = MTY_EVENT_TO_PARSEC(event)
+            ParsecClientSendMessage(ps, pevent)
+            break;
+        default:
+            break;
     }
     return 1
 }
 
 function audioFunc(pcm) {
-    MTY_AudioQueue(pcm)
+    MTY_AudioQueue(audio, pcm)
 }
 
 function makeWindow(app, w, h) {
@@ -52,7 +63,7 @@ function makeWindow(app, w, h) {
 
 print("Prepare Matoya")
 app = MTY_AppCreate(appFunc, eventFunc)
-audio = MTY_AudioCreate(48000, 25, 100)
+audio = MTY_AudioCreate(48000, 0, 25)
 
 print("Prepare Parsec")
 let ver = ParsecVersion()

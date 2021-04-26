@@ -694,7 +694,7 @@ static JSValue convJSMTY_PenEvent(JSContext *jsctx, MTY_PenEvent obj) {
     return retval;
 }
 
-static const MTY_Event convCMTY_Event(JSContext *jsctx, JSValue obj) {
+const MTY_Event convCMTY_Event(JSContext *jsctx, JSValue obj) {
     MTY_Event retval = { 0 };
 
     retval.type = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, obj, "type"));
@@ -861,7 +861,11 @@ static JSValue convJSMTY_WindowDesc(JSContext *jsctx, MTY_WindowDesc winDesc) {
 static bool appFunc(void* opaque) {
 	struct Context* ctx = (struct Context*)opaque;
 
-    JS_Call(ctx->jsctx, ctx->appFunc, JS_UNDEFINED, 0, NULL);
+    JSValue ret = JS_Call(ctx->jsctx, ctx->appFunc, JS_UNDEFINED, 0, NULL);
+	
+	if (JS_IsException(ret)) {
+        printf("- JS err : %s\n", JS_ToCString(ctx->jsctx, JS_GetException(ctx->jsctx)));
+	}
 
 	return ctx->running;
 }
@@ -875,7 +879,10 @@ static void eventFunc(const MTY_Event *evt, void *opaque) {
     args[0] = event;
 
     JSValue ret = JS_Call(ctx->jsctx, ctx->eventFunc, JS_UNDEFINED, 1, args);
-
+	
+	if (JS_IsException(ret)) {
+        printf("- JS err : %s\n", JS_ToCString(ctx->jsctx, JS_GetException(ctx->jsctx)));
+	}
     if (!JS_ToBool(ctx->jsctx, ret))
         ctx->running = false;
 
@@ -2097,7 +2104,7 @@ static JSValue js_mty_audio_queue(JSContext* jsctx, JSValueConst this_val, int a
     uint32_t frames;
     
     MTY_Audio *audio = (MTY_Audio *)JSToInt64(jsctx, argv[0]);
-    const int16_t *pcm = (int16_t *)JS_GetArrayBuffer(jsctx, &frames, argv[0]);
+    const int16_t *pcm = (int16_t *)JS_GetArrayBuffer(jsctx, &frames, argv[1]);
 
     MTY_AudioQueue(audio, pcm, frames);
 

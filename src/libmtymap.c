@@ -2,6 +2,9 @@
 #include "mtymap.h"
 #include "utils.h"
 
+const MTY_Event convCMTY_Event(JSContext *, JSValue);
+JSValue convJSParsecMessage(JSContext *, ParsecMessage);
+
 static JSValue js_mty_key_to_parsec(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
     if (argc != 1) {
@@ -35,11 +38,30 @@ static JSValue js_mty_button_to_parsec(JSContext* jsctx, JSValueConst this_val, 
     return JS_NewInt32(jsctx, MTY_BUTTON_TO_PARSEC[button]);
 }
 
+
+
+static JSValue js_mtyeventtoparsec(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+    if (argc != 1) {
+        return JS_EXCEPTION;
+    }
+
+    ParsecMessage p;
+    const MTY_Event mty = convCMTY_Event(jsctx, argv[0]);
+    MTY_EVENT_TO_PARSEC(&mty, &p);
+
+    JSValue retval = convJSParsecMessage(jsctx, p);
+
+    return retval;
+}
+
 // list of exported functions, the string is how they'll appear in the module
 static const JSCFunctionListEntry js_map_funcs[] = {
     JS_CFUNC_DEF("MTY_KEY_TO_PARSEC", 1, js_mty_key_to_parsec),
     JS_CFUNC_DEF("MTY_MOD_TO_PARSEC", 1, js_mty_mod_to_parsec),
     JS_CFUNC_DEF("MTY_BUTTON_TO_PARSEC", 1, js_mty_button_to_parsec),
+
+    JS_CFUNC_DEF("MTY_EVENT_TO_PARSEC", 1, js_mtyeventtoparsec),
 
 };
 

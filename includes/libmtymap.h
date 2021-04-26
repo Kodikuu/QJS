@@ -5,4 +5,4 @@
 
 JSModuleDef *js_init_module_map(JSContext*, const char*);
 
-void JS_AddIntrinsicMap(JSContext *ctx);
+void JS_AddIntrinsicMap(JSContext *);

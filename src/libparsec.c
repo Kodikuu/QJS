@@ -755,7 +755,7 @@ static const ParsecMessage convCParsecMessage(JSContext *jsctx, JSValue object) 
     return retval;
 }
 
-static JSValue convJSParsecMessage(JSContext *jsctx, ParsecMessage object) {
+JSValue convJSParsecMessage(JSContext *jsctx, ParsecMessage object) {
     JSValue retval = JS_NewObject(jsctx);
 
     JS_SetPropertyStr(jsctx, retval, "type", JS_NewInt32(jsctx, object.type));
@@ -1250,7 +1250,10 @@ static void audioFunc(const int16_t *pcm, uint32_t frames, void *opaque) {
     JSValue audio = JS_NewArrayBuffer(ctx->jsctx, (uint8_t *)pcm, frames, FreeArray, NULL, false);
     JSValue args[1] = {audio};
     
-    JS_Call(ctx->jsctx, ctx->audioFunc, JS_UNDEFINED, 1, args);
+    JSValue ret = JS_Call(ctx->jsctx, ctx->audioFunc, JS_UNDEFINED, 1, args);	
+	if (JS_IsException(ret)) {
+        printf("- JS err : %s\n", JS_ToCString(ctx->jsctx, JS_GetException(ctx->jsctx)));
+	}
 }
 
 static void logFunc(enum ParsecLogLevel level, const char *msg, void *opaque) {
