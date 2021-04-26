@@ -859,6 +859,389 @@ static JSValue convJSParsecClientConfig(JSContext *jsctx, ParsecClientConfig obj
     return retval;
 }
 
+static const ParsecDecoder convCParsecDecoder(JSContext *jsctx, JSValue object) {
+    ParsecDecoder retval = { 0 };
+
+    retval.index = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "index"));
+    retval.width = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "width"));
+    retval.height = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "height"));
+
+    snprintf(retval.name, DECODER_NAME_LEN, "%s", JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, object, "name")));
+
+    retval.h265 = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, object, "h265"));
+    retval.color444 = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, object, "color444"));
+
+    return retval;
+}
+
+static JSValue convJSParsecDecoder(JSContext *jsctx, ParsecDecoder object) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "index", JS_NewInt32(jsctx, object.index));
+    JS_SetPropertyStr(jsctx, retval, "width", JS_NewInt32(jsctx, object.width));
+    JS_SetPropertyStr(jsctx, retval, "height", JS_NewInt32(jsctx, object.height));
+
+    JS_SetPropertyStr(jsctx, retval, "name", JS_NewString(jsctx, object.name));
+
+    JS_SetPropertyStr(jsctx, retval, "h265", JS_NewBool(jsctx, object.h265));
+    JS_SetPropertyStr(jsctx, retval, "color444", JS_NewBool(jsctx, object.color444));
+
+    return retval;
+}
+
+static const ParsecClientStatus convCParsecClientStatus(JSContext *jsctx, JSValue object) {
+    ParsecClientStatus retval = { 0 };
+
+    retval.self = convCParsecGuest(jsctx, JS_GetPropertyStr(jsctx, object, "self"));
+
+    int i;
+    for (i=0; i<NUM_VSTREAMS; i++) {
+        retval.decoder[i] = convCParsecDecoder(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, object, "decoder"), i));
+    }
+
+    retval.hostMode = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "hostMode"));
+
+    retval.networkFailure = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, object, "networkFailure"));
+
+    return retval;
+}
+
+static JSValue convJSParsecClientStatus(JSContext *jsctx, ParsecClientStatus object) {
+    JSValue retval = JS_NewObject(jsctx);
+    
+    JS_SetPropertyStr(jsctx, retval, "self", convJSParsecGuest(jsctx, object.self));
+
+    int i;
+    JSValue decoder = JS_NewObject(jsctx);
+    for (i=0; i<NUM_VSTREAMS; i++) {
+        JS_SetPropertyUint32(jsctx, decoder, i, convJSParsecDecoder(jsctx, object.decoder[i]));
+    }
+    JS_SetPropertyStr(jsctx, retval, "decoder", decoder);
+
+    JS_SetPropertyStr(jsctx, retval, "hostMode", JS_NewInt32(jsctx, object.hostMode));
+
+    JS_SetPropertyStr(jsctx, retval, "networkFailure", JS_NewBool(jsctx, object.networkFailure));
+
+    return retval;
+}
+
+static const ParsecClientCursorEvent convCParsecClientCursorEvent(JSContext *jsctx, JSValue object) {
+    ParsecClientCursorEvent retval = { 0 };
+
+    retval.cursor = convCParsecCursor(jsctx, JS_GetPropertyStr(jsctx, object, "cursor"));
+
+    retval.key = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "key"));
+
+    return retval;
+}
+
+static JSValue convJSParsecClientCursorEvent(JSContext *jsctx, ParsecClientCursorEvent object) {
+    JSValue retval = JS_NewObject(jsctx);
+    
+    JS_SetPropertyStr(jsctx, retval, "cursor", convJSParsecCursor(jsctx, object.cursor));
+
+    JS_SetPropertyStr(jsctx, retval, "key", JS_NewInt32(jsctx, object.key));
+
+    return retval;
+}
+
+static const ParsecClientRumbleEvent convCParsecClientRumbleEvent(JSContext *jsctx, JSValue object) {
+    ParsecClientRumbleEvent retval = { 0 };
+
+    retval.gamepadID = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "gamepadID"));
+    retval.motorBig = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "motorBig"));
+    retval.motorSmall = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "motorSmall"));
+
+    return retval;
+}
+
+static JSValue convJSParsecClientRumbleEvent(JSContext *jsctx, ParsecClientRumbleEvent object) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "gamepadID", JS_NewInt32(jsctx, object.gamepadID));
+    JS_SetPropertyStr(jsctx, retval, "motorBig", JS_NewInt32(jsctx, object.motorBig));
+    JS_SetPropertyStr(jsctx, retval, "motorSmall", JS_NewInt32(jsctx, object.motorSmall));
+
+    return retval;
+}
+
+static const ParsecClientStreamEvent convCParsecClientStreamEvent(JSContext *jsctx, JSValue object) {
+    ParsecClientStreamEvent retval = { 0 };
+
+    retval.status = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "status"));
+    retval.stream = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "stream"));
+
+    return retval;
+}
+
+static JSValue convJSParsecClientStreamEvent(JSContext *jsctx, ParsecClientStreamEvent object) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "status", JS_NewInt32(jsctx, object.status));
+    JS_SetPropertyStr(jsctx, retval, "stream", JS_NewInt32(jsctx, object.stream));
+
+    return retval;
+}
+
+static const ParsecClientUserDataEvent convCParsecClientUserDataEvent(JSContext *jsctx, JSValue object) {
+    ParsecClientUserDataEvent retval = { 0 };
+
+    retval.id = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "id"));
+    retval.key = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "key"));
+
+    return retval;
+}
+
+static JSValue convJSParsecClientUserDataEvent(JSContext *jsctx, ParsecClientUserDataEvent object) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "id", JS_NewInt32(jsctx, object.id));
+    JS_SetPropertyStr(jsctx, retval, "key", JS_NewInt32(jsctx, object.key));
+
+    return retval;
+}
+
+static const ParsecClientEvent convCParsecClientEvent(JSContext *jsctx, JSValue object) {
+    ParsecClientEvent retval = { 0 };
+
+    retval.type = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "type"));
+
+    switch (retval.type) {
+        case CLIENT_EVENT_CURSOR:
+            retval.cursor = convCParsecClientCursorEvent(jsctx, JS_GetPropertyStr(jsctx, object, "cursor"));
+            break;
+        case CLIENT_EVENT_RUMBLE:
+            retval.rumble = convCParsecClientRumbleEvent(jsctx, JS_GetPropertyStr(jsctx, object, "rumble"));
+            break;
+        case CLIENT_EVENT_USER_DATA:
+            retval.userData = convCParsecClientUserDataEvent(jsctx, JS_GetPropertyStr(jsctx, object, "userData"));
+            break;
+        case CLIENT_EVENT_STREAM:
+            retval.stream = convCParsecClientStreamEvent(jsctx, JS_GetPropertyStr(jsctx, object, "stream"));
+            break;
+        case CLIENT_EVENT_BLOCKED:
+        case CLIENT_EVENT_UNBLOCKED:
+        default:
+            break;
+    }
+
+    return retval;
+}
+
+static JSValue convJSParsecClientEvent(JSContext *jsctx, ParsecClientEvent object) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "type", JS_NewInt32(jsctx, object.type));
+
+    switch (object.type) {
+        case CLIENT_EVENT_CURSOR:
+            JS_SetPropertyStr(jsctx, retval, "cursor", convJSParsecClientCursorEvent(jsctx, object.cursor));
+            break;
+        case CLIENT_EVENT_RUMBLE:
+            JS_SetPropertyStr(jsctx, retval, "rumble", convJSParsecClientRumbleEvent(jsctx, object.rumble));
+            break;
+        case CLIENT_EVENT_USER_DATA:
+            JS_SetPropertyStr(jsctx, retval, "userData", convJSParsecClientUserDataEvent(jsctx, object.userData));
+            break;
+        case CLIENT_EVENT_STREAM:
+            JS_SetPropertyStr(jsctx, retval, "stream", convJSParsecClientStreamEvent(jsctx, object.stream));
+            break;
+        case CLIENT_EVENT_BLOCKED:
+        case CLIENT_EVENT_UNBLOCKED:
+        default:
+            break;
+    }
+
+    return retval;
+}
+
+static const ParsecHostVideoConfig convCParsecHostVideoConfig(JSContext *jsctx, JSValue object) {
+    ParsecHostVideoConfig retval = { 0 };
+
+    retval.resolutionX = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "resolutionX"));
+    retval.resolutionY = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "resolutionY"));
+    retval.encoderFPS = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "encoderFPS"));
+    retval.encoderMaxBitrate = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "encoderMaxBitrate"));
+
+    snprintf(retval.output, OUTPUT_ID_LEN, "%s", JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, object, "output")));
+
+    retval.fullFPS = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, object, "fullFPS"));
+
+    return retval;
+}
+
+static JSValue convJSParsecHostVideoConfig(JSContext *jsctx, ParsecHostVideoConfig object) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "resolutionX", JS_NewInt32(jsctx, object.resolutionX));
+    JS_SetPropertyStr(jsctx, retval, "resolutionY", JS_NewInt32(jsctx, object.resolutionY));
+    JS_SetPropertyStr(jsctx, retval, "encoderFPS", JS_NewInt32(jsctx, object.encoderFPS));
+    JS_SetPropertyStr(jsctx, retval, "encoderMaxBitrate", JS_NewInt32(jsctx, object.encoderMaxBitrate));
+
+    JS_SetPropertyStr(jsctx, retval, "output", JS_NewString(jsctx, object.output));
+
+    JS_SetPropertyStr(jsctx, retval, "fullFPS", JS_NewBool(jsctx, object.fullFPS));
+
+    return retval;
+}
+
+static const ParsecHostConfig convCParsecHostConfig(JSContext *jsctx, JSValue object) {
+    ParsecHostConfig retval = { 0 };
+
+    int i;
+    for (i=0; i<NUM_VSTREAMS; i++) {
+        retval.video[i] = convCParsecHostVideoConfig(jsctx, JS_GetPropertyUint32(jsctx, JS_GetPropertyStr(jsctx, object, "video"), i));
+    }
+
+    retval.gamepadType = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "gamepadType"));
+    retval.adminMute = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "adminMute"));
+    retval.exclusiveInput = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "exclusiveInput"));
+    retval.maxGuests = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "maxGuests"));
+
+    snprintf(retval.name, HOST_NAME_LEN, "%s", JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, object, "name")));
+    snprintf(retval.desc, HOST_DESC_LEN, "%s", JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, object, "desc")));
+    snprintf(retval.gameID, GAME_ID_LEN, "%s", JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, object, "gameID")));
+    snprintf(retval.secret, HOST_SECRET_LEN, "%s", JS_ToCString(jsctx, JS_GetPropertyStr(jsctx, object, "secret")));
+
+    retval.publicGame = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, object, "pngCpublicGameursor"));
+
+    return retval;
+}
+
+static JSValue convJSParsecHostConfig(JSContext *jsctx, ParsecHostConfig object) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    int i;
+    JSValue video = JS_NewObject(jsctx);
+    for (i=0; i<NUM_VSTREAMS; i++) {
+        JS_SetPropertyUint32(jsctx, video, i, convJSParsecHostVideoConfig(jsctx, object.video[i]));
+    }
+    JS_SetPropertyStr(jsctx, retval, "video", video);
+
+    JS_SetPropertyStr(jsctx, retval, "gamepadType", JS_NewInt32(jsctx, object.gamepadType));
+    JS_SetPropertyStr(jsctx, retval, "adminMute", JS_NewInt32(jsctx, object.adminMute));
+    JS_SetPropertyStr(jsctx, retval, "exclusiveInput", JS_NewInt32(jsctx, object.exclusiveInput));
+    JS_SetPropertyStr(jsctx, retval, "maxGuests", JS_NewInt32(jsctx, object.maxGuests));
+
+    JS_SetPropertyStr(jsctx, retval, "name", JS_NewString(jsctx, object.name));
+    JS_SetPropertyStr(jsctx, retval, "desc", JS_NewString(jsctx, object.desc));
+    JS_SetPropertyStr(jsctx, retval, "gameID", JS_NewString(jsctx, object.gameID));
+    JS_SetPropertyStr(jsctx, retval, "secret", JS_NewString(jsctx, object.secret));
+
+    JS_SetPropertyStr(jsctx, retval, "publicGame", JS_NewBool(jsctx, object.publicGame));
+
+    return retval;
+}
+
+static const ParsecHostStatus convCParsecHostStatus(JSContext *jsctx, JSValue object) {
+    ParsecHostStatus retval = { 0 };
+
+    retval.cfg = convCParsecHostConfig(jsctx, JS_GetPropertyStr(jsctx, object, "cfg"));
+
+    retval.numGuests = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "numGuests"));
+
+    retval.running = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, object, "running"));
+    retval.invalidSessionID = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, object, "invalidSessionID"));
+
+    return retval;
+}
+
+static JSValue convJSParsecHostStatus(JSContext *jsctx, ParsecHostStatus object) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "cfg", convJSParsecHostConfig(jsctx, object.cfg));
+
+    JS_SetPropertyStr(jsctx, retval, "numGuests", JS_NewInt32(jsctx, object.numGuests));
+
+    JS_SetPropertyStr(jsctx, retval, "running", JS_NewBool(jsctx, object.running));
+    JS_SetPropertyStr(jsctx, retval, "invalidSessionID", JS_NewBool(jsctx, object.invalidSessionID));
+
+    return retval;
+}
+
+static const ParsecGuestStateChangeEvent convCParsecGuestStateChangeEvent(JSContext *jsctx, JSValue object) {
+    ParsecGuestStateChangeEvent retval = { 0 };
+
+    retval.guest = convCParsecGuest(jsctx, JS_GetPropertyStr(jsctx, object, "guest"));
+
+    retval.status = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "status"));
+
+    return retval;
+}
+
+static JSValue convJSParsecGuestStateChangeEvent(JSContext *jsctx, ParsecGuestStateChangeEvent object) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "guest", convJSParsecGuest(jsctx, object.guest));
+
+    JS_SetPropertyStr(jsctx, retval, "status", JS_NewInt32(jsctx, object.status));
+
+    return retval;
+}
+
+static const ParsecUserDataEvent convCParsecUserDataEvent(JSContext *jsctx, JSValue object) {
+    ParsecUserDataEvent retval = { 0 };
+
+    retval.guest = convCParsecGuest(jsctx, JS_GetPropertyStr(jsctx, object, "guest"));
+
+    retval.id = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "id"));
+    retval.key = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "key"));
+
+    return retval;
+}
+
+static JSValue convJSParsecUserDataEvent(JSContext *jsctx, ParsecUserDataEvent object) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "guest", convJSParsecGuest(jsctx, object.guest));
+
+    JS_SetPropertyStr(jsctx, retval, "id", JS_NewInt32(jsctx, object.id));
+    JS_SetPropertyStr(jsctx, retval, "key", JS_NewInt32(jsctx, object.key));
+
+    return retval;
+}
+
+static const ParsecHostEvent convCParsecHostEvent(JSContext *jsctx, JSValue object) {
+    ParsecHostEvent retval = { 0 };
+
+    retval.type = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "type"));
+
+    switch (retval.type) {
+        case HOST_EVENT_GUEST_STATE_CHANGE:
+            retval.guestStateChange = convCParsecGuestStateChangeEvent(jsctx, JS_GetPropertyStr(jsctx, object, "guestStateChange"));
+            break;
+        case HOST_EVENT_USER_DATA:
+            retval.userData = convCParsecUserDataEvent(jsctx, JS_GetPropertyStr(jsctx, object, "userData"));
+            break;
+        case HOST_EVENT_INVALID_SESSION_ID:
+        default:
+            break;
+    }
+
+    return retval;
+}
+
+static JSValue convJSParsecHostEvent(JSContext *jsctx, ParsecHostEvent object) {
+    JSValue retval = JS_NewObject(jsctx);
+
+    JS_SetPropertyStr(jsctx, retval, "type", JS_NewInt32(jsctx, object.type));
+
+    switch (object.type) {
+        case HOST_EVENT_GUEST_STATE_CHANGE:
+            JS_SetPropertyStr(jsctx, retval, "guestStateChange", convJSParsecGuestStateChangeEvent(jsctx, object.guestStateChange));
+            break;
+        case HOST_EVENT_USER_DATA:
+            JS_SetPropertyStr(jsctx, retval, "userData", convJSParsecUserDataEvent(jsctx, object.userData));
+            break;
+        case HOST_EVENT_INVALID_SESSION_ID:
+
+        default:
+            break;
+    }
+
+    return retval;
+}
+
 // Callbacks
 
 static void audioFunc(const int16_t *pcm, uint32_t frames, void *opaque) {
