@@ -2090,17 +2090,16 @@ static JSValue js_mty_audio_get_queued(JSContext* jsctx, JSValueConst this_val, 
 
 static JSValue js_mty_audio_queue(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
-    if (argc != 1) {
+    if (argc != 2) {
         return JS_EXCEPTION;
     }
 
     uint32_t frames;
     
-    Context *ctx = JS_GetContextOpaque(jsctx);
-    //MTY_Audio *audio = (MTY_Audio *)JSToInt64(jsctx, argv[0]);
+    MTY_Audio *audio = (MTY_Audio *)JSToInt64(jsctx, argv[0]);
     const int16_t *pcm = (int16_t *)JS_GetArrayBuffer(jsctx, &frames, argv[0]);
 
-    MTY_AudioQueue(ctx->audio, pcm, frames);
+    MTY_AudioQueue(audio, pcm, frames);
 
     return JS_NewBool(jsctx, 1);
 }

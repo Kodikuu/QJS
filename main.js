@@ -3,9 +3,10 @@ let WINDOWS = 0
 // Pointers
 let app = 0
 let audio = 0
+let ps = 0
 
 function appFunc() {
-    let event = ParsecClientPollEvents(1)
+    let event = ParsecClientPollEvents(ps, 1)
 
     if (event.new) {
         if (event.type = CLIENT_EVENT_CURSOR && event.modeUpdate) {
@@ -16,12 +17,12 @@ function appFunc() {
         }
     }
 
-    ParsecClientPollAudio(1)
+    ParsecClientPollAudio(ps, audioFunc, 1)
 
     let size = MTY_WindowGetSize(app, 0);
     let scale = MTY_WindowGetScreenScale(app, 0)
-    ParsecClientSetDimensions(0, size.width, size.height, scale)
-    ParsecClientGLRenderFrame(0, 1)
+    ParsecClientSetDimensions(ps, 0, size.width, size.height, scale)
+    ParsecClientGLRenderFrame(ps, 0, 1)
     MTY_WindowPresent(app, 0, 0)
 }
 
@@ -29,16 +30,8 @@ function eventFunc(event) {
 
     // Close Window
     if (event.type == MTY_EVENT_CLOSE) {
-        ParsecClientDisconnect()
+        ParsecClientDisconnect(ps)
         return 0
-    
-    // Mouse Buttons
-    } else if (event.type == MTY_EVENT_BUTTON) {
-        ParsecClientSendMessage(MESSAGE_MOUSE_BUTTON, event.button)
-    
-    // Mouse Motion
-    } else if (event.type == MTY_EVENT_MOTION) {
-        ParsecClientSendMessage(MESSAGE_MOUSE_MOTION, event.motion)
     }
     return 1
 }
@@ -57,20 +50,21 @@ function makeWindow(app, w, h) {
     WINDOWS = MTY_WindowCreate(app, winDesc)
 }
 
-print("Create app")
+print("Prepare Matoya")
 app = MTY_AppCreate(appFunc, eventFunc)
+audio = MTY_AudioCreate(48000, 25, 100)
+
+print("Prepare Parsec")
+let ver = ParsecVersion()
+ps = ParsecInit(ver, null)
 
 print("Make window")
 makeWindow(app, 1920, 1080)
 print("Focus window")
 MTY_WindowMakeCurrent(app, 0, true);
 
-print("Init audio")
-//audio = MTY_AudioCreate(48000, 25, 100)
-ParsecSetAudioCallback(audioFunc)
-
 print("Connect")
-ParsecClientConnect(SESSION, PEER)
+ParsecClientConnect(ps, null, SESSION, PEER)
 
 print("Run")
 MTY_AppRun(app)

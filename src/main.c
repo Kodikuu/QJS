@@ -10,23 +10,6 @@ static void logFunc(const char *msg, void *opaque) {
 	printf("%s\n", msg);
 }
 
-static void pLogFunc(enum ParsecLogLevel level, const char *msg, void *ctx) {
-	MTY_Log(msg);
-}
-
-int prepareParsec(Context *ctx, char *path) {
-	ParsecDSO *ps = {0};
-	ParsecStatus e = ParsecInit(NULL, NULL, path, &ps);
-
-	if (e == PARSEC_OK) {
-		ctx->ps = ps;
-	}
-
-	ParsecSetLogCallback(ps, pLogFunc, ctx);
-
-	return e;
-}
-
 int prepareQuickJS(Context *ctx, const char *session, const char *peer) {
 	ctx->jsrt = JS_NewRuntime();
 	//JS_SetModuleLoaderFunc(ctx->jsrt, NULL, loadmodule, NULL);
@@ -47,11 +30,6 @@ int prepareQuickJS(Context *ctx, const char *session, const char *peer) {
 	return 0;
 }
 
-int prepareMatoya(Context *ctx) {
-	ctx->audio = MTY_AudioCreate(48000, 25, 100);
-	return 0;
-}
-
 int main(int argc, const char *argv[]) {
 
 	if (argc != 3) {
@@ -67,22 +45,6 @@ int main(int argc, const char *argv[]) {
 	MTY_SetLogFunc(logFunc, &ctx);
 
 	bool ret;
-
-	printf("Matoya: ");
-	ret = prepareMatoya(&ctx);
-	if (!ret) {
-		printf("Success\n");
-	} else {
-		printf("Fail\n");
-	}
-	
-	printf("Parsec: ");
-	ret = prepareParsec(&ctx, "deps/parsec32.dll");
-	if (!ret) {
-		printf("Success\n");
-	} else {
-		printf("Fail\n");
-	}
 
 	printf("QuickJS: ");
 	ret = prepareQuickJS(&ctx, session, peer);
