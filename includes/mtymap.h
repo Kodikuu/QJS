@@ -1,7 +1,6 @@
 #pragma once
 
-#include "matoya.h"
-#include "parsec-dso.h"
+#include "common.h"
 
 static const ParsecKeycode MTY_KEY_TO_PARSEC[] = {
 	[0x001] = 41,

@@ -2,7 +2,7 @@
 
 #include "matoya.h"
 #include "quickjs.h"
-#include "parsec-dso.h"
+#include "parsec.h"
 
 typedef struct Context {
 	// Matoya
@@ -19,9 +19,6 @@ typedef struct Context {
 	JSValueConst logFunc;
 	JSValueConst crashFunc;
 	JSValueConst writeFunc;
-
-	// Parsec
-	ParsecDSO *ps;
 } Context;
 
 

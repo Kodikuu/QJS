@@ -5,6 +5,7 @@ INCLUDES = \
 LIBS = \
 	deps/matoya.lib \
 	deps/quickjs.lib \
+	deps/parsec32.lib \
 	bcrypt.lib \
 	d3d11.lib \
 	d3d9.lib \
