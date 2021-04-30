@@ -11,6 +11,7 @@ static const JSCFunctionListEntry js_parsecconfig[] = {
 
 static const JSCFunctionListEntry js_parsecframe[] = {
     JS_PROP_INT32_DEF("format", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("rotation", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("size", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("width", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("height", 0, JS_PROP_C_W_E),
@@ -46,7 +47,7 @@ static const JSCFunctionListEntry js_parseccursor[] = {
     JS_PROP_INT32_DEF("hotX", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("hotY", 0, JS_PROP_C_W_E),
 
-    JS_PROP_INT32_DEF("modeUpdate", 0, JS_PROP_C_W_E),
+    JS_PROP_INT32_DEF("hidden", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("imageUpdate", 0, JS_PROP_C_W_E),
     JS_PROP_INT32_DEF("relative", 0, JS_PROP_C_W_E),
 
@@ -327,6 +328,7 @@ static const ParsecFrame convCParsecFrame(JSContext *jsctx, JSValue object) {
     ParsecFrame retval = { 0 };
 
     retval.format = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "format"));
+    retval.rotation = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "rotation"));
     retval.size = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "size"));
     retval.width = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "width"));
     retval.height = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "height"));
@@ -340,6 +342,7 @@ static JSValue convJSParsecFrame(JSContext *jsctx, ParsecFrame object) {
     JSValue retval = JS_NewObject(jsctx);
     
     JS_SetPropertyStr(jsctx, retval, "format", JS_NewInt32(jsctx, object.format));
+    JS_SetPropertyStr(jsctx, retval, "rotation", JS_NewInt32(jsctx, object.rotation));
     JS_SetPropertyStr(jsctx, retval, "size", JS_NewInt32(jsctx, object.size));
     JS_SetPropertyStr(jsctx, retval, "width", JS_NewInt32(jsctx, object.width));
     JS_SetPropertyStr(jsctx, retval, "height", JS_NewInt32(jsctx, object.height));
@@ -414,7 +417,7 @@ static const ParsecCursor convCParsecCursor(JSContext *jsctx, JSValue object) {
     retval.hotX = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "hotX"));
     retval.hotY = JSToInt32(jsctx, JS_GetPropertyStr(jsctx, object, "hotY"));
 
-    retval.modeUpdate = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, object, "modeUpdate"));
+    retval.hidden = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, object, "hidden"));
     retval.imageUpdate = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, object, "imageUpdate"));
     retval.relative = JS_ToBool(jsctx, JS_GetPropertyStr(jsctx, object, "relative"));
 
@@ -434,7 +437,7 @@ static JSValue convJSParsecCursor(JSContext *jsctx, ParsecCursor object) {
     JS_SetPropertyStr(jsctx, retval, "hotX", JS_NewInt32(jsctx, object.hotX));
     JS_SetPropertyStr(jsctx, retval, "hotY", JS_NewInt32(jsctx, object.hotY));
 
-    JS_SetPropertyStr(jsctx, retval, "modeUpdate", JS_NewBool(jsctx, object.modeUpdate));
+    JS_SetPropertyStr(jsctx, retval, "hidden", JS_NewBool(jsctx, object.hidden));
     JS_SetPropertyStr(jsctx, retval, "imageUpdate", JS_NewBool(jsctx, object.imageUpdate));
     JS_SetPropertyStr(jsctx, retval, "relative", JS_NewBool(jsctx, object.relative));
 
@@ -527,7 +530,7 @@ static JSValue convJSParsecGuest(JSContext *jsctx, ParsecGuest object) {
     for (i=0; i<NUM_VSTREAMS; i++) {
         JS_SetPropertyUint32(jsctx, Metrics, i, convJSParsecMetrics(jsctx, object.metrics[i]));
     }
-    JS_SetPropertyStr(jsctx, retval, "buttons", Metrics);
+    JS_SetPropertyStr(jsctx, retval, "metrics", Metrics);
 
     JS_SetPropertyStr(jsctx, retval, "state", JS_NewInt32(jsctx, object.state));
     JS_SetPropertyStr(jsctx, retval, "id", JS_NewInt32(jsctx, object.id));
@@ -1609,8 +1612,8 @@ static const JSCFunctionListEntry js_parsec_funcs[] = {
     JS_PROP_INT32_DEF("NUM_VSTREAMS", 2, 0),
     JS_PROP_INT32_DEF("DEFAULT_STREAM", 0, 0),
     JS_PROP_INT32_DEF("DECODER_NAME_LEN", 16, 0),
-    JS_PROP_INT32_DEF("PARSEC_VER_MAJOR", 5, 0),
-    JS_PROP_INT32_DEF("PARSEC_VER_MINOR", 1, 0),
+    JS_PROP_INT32_DEF("PARSEC_VER_MAJOR", 6, 0),
+    JS_PROP_INT32_DEF("PARSEC_VER_MINOR", 0, 0),
 // END Definitions
 
 // Enums
@@ -1630,6 +1633,7 @@ static const JSCFunctionListEntry js_parsec_funcs[] = {
 
     JS_PROP_INT32_DEF("WRN_CONTINUE", 10, 0),
     JS_PROP_INT32_DEF("PARSEC_CONNECTING", 20, 0),
+    JS_PROP_INT32_DEF("PARSEC_WRN_BROWSER", 30, 0),
 
     JS_PROP_INT32_DEF("ALINK_WRN_INVALID", 200, 0),
     JS_PROP_INT32_DEF("ALINK_WRN_INACTIVE", 201, 0),
@@ -1666,17 +1670,14 @@ static const JSCFunctionListEntry js_parsec_funcs[] = {
     JS_PROP_INT32_DEF("DECODE_ERR_DEPENDENCY", -22, 0),
     JS_PROP_INT32_DEF("DECODE_ERR_SYMBOL", -23, 0),
 
-    JS_PROP_INT32_DEF("WS_ERR_CONNECT", -6101, 0),
-    JS_PROP_INT32_DEF("WS_ERR_POLL", -3001, 0),
     JS_PROP_INT32_DEF("WS_ERR_READ", -3002, 0),
     JS_PROP_INT32_DEF("WS_ERR_WRITE", -3003, 0),
-    JS_PROP_INT32_DEF("WS_ERR_CLOSE", -6105, 0),
-    JS_PROP_INT32_DEF("WS_ERR_INVALID_MSG", -6106, 0),
-    JS_PROP_INT32_DEF("WS_ERR_PING", -3005, 0),
-    JS_PROP_INT32_DEF("WS_ERR_PONG_TIMEOUT", -3006, 0),
-    JS_PROP_INT32_DEF("WS_ERR_PONG", -3007, 0),
     JS_PROP_INT32_DEF("WS_ERR_AUTH", -3008, 0),
     JS_PROP_INT32_DEF("WS_ERR_GOING_AWAY", -3009, 0),
+    JS_PROP_INT32_DEF("WS_ERR_CONNECT", -3010, 0),
+    JS_PROP_INT32_DEF("WS_ERR_CONNECT", -6101, 0),
+    JS_PROP_INT32_DEF("WS_ERR_CLOSE", -6105, 0),
+    JS_PROP_INT32_DEF("WS_ERR_INVALID_MSG", -6106, 0),
 
     JS_PROP_INT32_DEF("NAT_ERR_PEER_PHASE", -6023, 0),
     JS_PROP_INT32_DEF("NAT_ERR_STUN_PHASE", -6024, 0),
@@ -1768,13 +1769,6 @@ static const JSCFunctionListEntry js_parsec_funcs[] = {
 	JS_PROP_INT32_DEF("SCTP_ERR_SOCKET", -32002, 0),
 	JS_PROP_INT32_DEF("SCTP_ERR_BIND", -32003, 0),
 	JS_PROP_INT32_DEF("SCTP_ERR_CONNECT", -32004, 0),
-
-	JS_PROP_INT32_DEF("DTLS_ERR_BIO_WRITE", -33000, 0),
-	JS_PROP_INT32_DEF("DTLS_ERR_BIO_READ", -33001, 0),
-	JS_PROP_INT32_DEF("DTLS_ERR_SSL", -33002, 0),
-	JS_PROP_INT32_DEF("DTLS_ERR_BUFFER", -33003, 0),
-	JS_PROP_INT32_DEF("DTLS_ERR_NO_DATA", -33004, 0),
-	JS_PROP_INT32_DEF("DTLS_ERR_CERT", -33005, 0),
 
 	JS_PROP_INT32_DEF("STUN_ERR_PACKET", -34000, 0),
 	JS_PROP_INT32_DEF("STUN_ERR_PARSE_HEADER", -34001, 0),
@@ -2026,6 +2020,14 @@ static const JSCFunctionListEntry js_parsec_funcs[] = {
 	JS_PROP_INT32_DEF("FORMAT_I444", 7, 0),
     // END ParsecColorFormat
 
+    // ParsecRotation
+	JS_PROP_INT32_DEF("ROTATION_UNKNOWN", 0, 0),
+	JS_PROP_INT32_DEF("ROTATION_NONE", 1, 0),
+	JS_PROP_INT32_DEF("ROTATION_90", 2, 0),
+	JS_PROP_INT32_DEF("ROTATION_180", 3, 0),
+	JS_PROP_INT32_DEF("ROTATION_270", 4, 0),
+    // END ParsecRotation
+
     // ParsecProtocol
 	JS_PROP_INT32_DEF("PROTO_MODE_BUD", 1, 0),
 	JS_PROP_INT32_DEF("PROTO_MODE_SCTP", 2, 0),
@@ -2078,7 +2080,7 @@ static const JSCFunctionListEntry js_parsec_funcs[] = {
 
 // Structs
     JS_OBJECT_DEF("ParsecConfig", js_parsecconfig, 3, JS_PROP_C_W_E),
-    JS_OBJECT_DEF("ParsecFrame", js_parsecframe, 6, JS_PROP_C_W_E),
+    JS_OBJECT_DEF("ParsecFrame", js_parsecframe, 7, JS_PROP_C_W_E),
     JS_OBJECT_DEF("ParsecRect", js_parsecrect, 4, JS_PROP_C_W_E),
 
     JS_OBJECT_DEF("ParsecOutput", js_parsecoutput, 7, JS_PROP_C_W_E),

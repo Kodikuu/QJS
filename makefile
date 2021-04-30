@@ -48,11 +48,12 @@ INCLUDES = \
 	-Isrc
 
 FLAGS = \
-	-Os
+	-Os \
+	-march=native
 
 
 CFLAGS = $(INCLUDES) $(FLAGS)
 
 all:
-   clang $(CFILES) $(INCLUDES) -c
+   clang $(CFILES) $(CFLAGS) -c
    link $(OBJS) $(LIBS)
