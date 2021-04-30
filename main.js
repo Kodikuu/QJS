@@ -1,29 +1,56 @@
 let WINDOWS = 0
+let frames = 0
 
 // Pointers
 let app = 0
 let audio = 0
 let ps = 0
 
+function cursorEventHandler(event) {
+    MTY_AppShowCursor(app, !event.cursor.hidden);
+    MTY_AppSetRelativeMouse(app, event.cursor.relative)
+    if (!event.cursor.relative) {
+        MTY_WindowWarpCursor(app, 0, event.cursor.positionX, event.cursor.positionY)
+    }
+}
+
 function appFunc() {
+    // Matoya
+    let size = MTY_WindowGetSize(app, 0);
+    let scale = MTY_WindowGetScreenScale(app, 0)
+
+    // Parsec
     let event = ParsecClientPollEvents(ps, 1)
 
     if (event.new) {
-        if (event.type = CLIENT_EVENT_CURSOR && event.cursor.cursor.modeUpdate) {
-            MTY_AppSetRelativeMouse(app, event.cursor.cursor.relative)
-            if (!event.cursor.cursor.relative) {
-                MTY_WindowWarpCursor(app, 0, event.cursor.cursor.positionX, event.cursor.cursor.positionY)
-            }
+        switch (event.type) {
+            case CLIENT_EVENT_CURSOR:
+                cursorEventHandler(event.cursor)
+                break;
+            default:
+                break;
         }
     }
 
     ParsecClientPollAudio(ps, audioFunc, 1)
-
-    let size = MTY_WindowGetSize(app, 0);
-    let scale = MTY_WindowGetScreenScale(app, 0)
     ParsecClientSetDimensions(ps, 0, size.width, size.height, scale)
-    ParsecClientGLRenderFrame(ps, 0, 1)
-    MTY_WindowPresent(app, 0, 0)
+    
+    let newFrame = ParsecClientGLRenderFrame(ps, 0, 1000)
+
+    if (newFrame == PARSEC_OK) {
+        MTY_WindowPresent(app, 0, 0)
+        frames = (frames + 1) % 100
+
+        if (!frames) {
+            let ret = ParsecClientGetStatus(ps)
+
+            for (const val in ret.self.metrics[0]) {
+                print(`${val}: ${ret.self.metrics[0][val]}`)
+            }
+            print("")
+        }
+    }
+
 }
 
 function eventFunc(event) {
@@ -31,7 +58,7 @@ function eventFunc(event) {
     switch (event.type) {
         case MTY_EVENT_CLOSE:
             ParsecClientDisconnect(ps)
-            return 0
+            return 0 // Stop
         case MTY_EVENT_MOTION:
         case MTY_EVENT_BUTTON:
         case MTY_EVENT_KEY:
@@ -44,7 +71,7 @@ function eventFunc(event) {
         default:
             break;
     }
-    return 1
+    return 1 // Continue
 }
 
 function audioFunc(pcm) {
