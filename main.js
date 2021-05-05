@@ -126,10 +126,12 @@ function appFunc() {
         MTY_WindowSetUITexture(ctx.app, ctx.mainWindow, IM_FONT_ID, fontbuf.rgba, fontbuf.width, fontbuf.height)
     }
     
-    let drawlist = im_draw(size.width, size.height, scale, true, ui_main)
-    MTY_WindowDrawUI(ctx.app, ctx.mainWindow, drawlist)
+    if (MTY_WindowIsVisible(ctx.app, ctx.mainWindow)) {
+        let drawlist = im_draw(size.width, size.height, scale, true, ui_main)
+        MTY_WindowDrawUI(ctx.app, ctx.mainWindow, drawlist)
 
-    MTY_WindowPresent(ctx.app, ctx.mainWindow, 0)
+        MTY_WindowPresent(ctx.app, ctx.mainWindow, 0)
+    }
 
 }
 
