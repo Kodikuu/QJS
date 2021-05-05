@@ -119,12 +119,9 @@ function appFunc() {
     let scale = MTY_WindowGetScreenScale(ctx.app, ctx.mainWindow)
 
     if (!MTY_WindowHasUITexture(ctx.app, ctx.mainWindow, IM_FONT_ID)) {
-        print("No Texture\n")
         let fonttex = font_get()
         let fontbuf = im_get_font(fonttex, 18.0, scale)
-        print("SetTex\n")
-        let ret = MTY_WindowSetUITexture(ctx.app, ctx.mainWindow, IM_FONT_ID, fontbuf.rgba, fontbuf.width, fontbuf.height)
-        print(`Done: ${ret}\n`)
+        MTY_WindowSetUITexture(ctx.app, ctx.mainWindow, IM_FONT_ID, fontbuf.rgba, fontbuf.width, fontbuf.height)
     }
     
     let drawlist = im_draw(size.width, size.height, scale, true, ui_main)
