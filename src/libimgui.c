@@ -314,13 +314,15 @@ static JSValue js_im_text_wrapped(JSContext* jsctx, JSValueConst this_val, int a
 
 static JSValue js_im_button(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
-    if (argc != 1) {
+    if (argc != 3) {
         return JS_EXCEPTION;
     }
 
     const char *label = JS_ToCString(jsctx, argv[0]);
+    float w = JSToFloat64(jsctx, argv[1]);
+    float h = JSToFloat64(jsctx, argv[2]);
 
-    bool success = im_button(label);
+    bool success = im_button(label, w, h);
     
     return JS_NewBool(jsctx, success);
 }
@@ -582,7 +584,7 @@ static const JSCFunctionListEntry js_imgui_funcs[] = {
     JS_CFUNC_DEF("im_end_main_menu", 0, js_im_end_main_menu),
     JS_CFUNC_DEF("im_text", 1, js_im_text),
     JS_CFUNC_DEF("im_text_wrapped", 1, js_im_text_wrapped),
-    JS_CFUNC_DEF("im_button", 1, js_im_button),
+    JS_CFUNC_DEF("im_button", 3, js_im_button),
     JS_CFUNC_DEF("im_selectable", 1, js_im_selectable),
     JS_CFUNC_DEF("im_pop_style", 1, js_im_pop_style),
     JS_CFUNC_DEF("im_pop_color", 1, js_im_pop_color),

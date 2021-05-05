@@ -44,7 +44,7 @@ bool im_begin_main_menu(void);
 void im_end_main_menu(void);
 void im_text(const char *text);
 void im_text_wrapped(const char *text);
-bool im_button(const char *label);
+bool im_button(const char *label, float w, float h);
 bool im_selectable(const char *label);
 
 void im_pop_style(uint32_t n);
@@ -135,7 +135,7 @@ static void im_poll_input(ImGuiIO &io)
 	while (MTY_QueueGetOutputBuffer(IM.input_q, 0, (void **) &wmsg, NULL)) {
 		switch (wmsg->type) {
 			case MTY_EVENT_SCROLL:
-				io.MouseWheel += wmsg->scroll.y / 120.0f;
+				io.MouseWheel += wmsg->scroll.y;
 				break;
 
 			case MTY_EVENT_BUTTON:
@@ -422,9 +422,9 @@ void im_text_wrapped(const char *text)
 	TextWrapped("%s", text);
 }
 
-bool im_button(const char *label)
+bool im_button(const char *label, float w, float h)
 {
-	return Button(label);
+	return Button(label, ImVec2(w, h));
 }
 
 bool im_selectable(const char *label)

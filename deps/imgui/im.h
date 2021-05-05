@@ -123,7 +123,7 @@ bool im_begin_main_menu(void);
 void im_end_main_menu(void);
 void im_text(const char *text);
 void im_text_wrapped(const char *text);
-bool im_button(const char *label);
+bool im_button(const char *label, float w, float h);
 bool im_selectable(const char *label);
 
 void im_pop_style(uint32_t n);
