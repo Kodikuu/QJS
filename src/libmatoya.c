@@ -452,7 +452,7 @@ static JSValue convJSMTY_CmdList(JSContext *jsctx, MTY_CmdList cmdlist) {
 }
 
 // Incomplete, uses pointers
-static const MTY_DrawData convCMTY_DrawData(JSContext *jsctx, JSValue object) {
+const MTY_DrawData convCMTY_DrawData(JSContext *jsctx, JSValue object) {
     MTY_DrawData drawdata = { 0 };
 
     drawdata.displaySize = convCMTY_Point(jsctx, JS_GetPropertyStr(jsctx, object, "displaySize"));
@@ -470,7 +470,7 @@ static const MTY_DrawData convCMTY_DrawData(JSContext *jsctx, JSValue object) {
 }
 
 // Incomplete, uses pointers
-static JSValue convJSMTY_DrawData(JSContext *jsctx, MTY_DrawData drawdata) {
+JSValue convJSMTY_DrawData(JSContext *jsctx, MTY_DrawData drawdata) {
     JSValue retval = JS_NewObject(jsctx);
 
     JS_SetPropertyStr(jsctx, retval, "displaySize", convJSMTY_Point(jsctx, drawdata.displaySize));
@@ -1660,8 +1660,8 @@ static JSValue js_mty_window_get_screen_size(JSContext* jsctx, JSValueConst this
     bool success = MTY_WindowGetScreenSize(app, window, &x, &y);
 
     JSValue retval = JS_NewObject(jsctx);
-    JS_SetPropertyStr(jsctx, retval, "x", JS_NewUint32(jsctx, x));
-    JS_SetPropertyStr(jsctx, retval, "y", JS_NewUint32(jsctx, y));
+    JS_SetPropertyStr(jsctx, retval, "width", JS_NewUint32(jsctx, x));
+    JS_SetPropertyStr(jsctx, retval, "height", JS_NewUint32(jsctx, y));
     JS_SetPropertyStr(jsctx, retval, "success", JS_NewBool(jsctx, success));
     return retval;
 }
