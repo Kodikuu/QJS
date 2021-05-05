@@ -16,6 +16,32 @@ let COLOR_MSG_BG = 0xD1333333
 let COLOR_HOVER = 0xF7777777
 let COLOR_SEPERATOR = 0xFF3A3838
 
+function cursor_top() {
+    im_set_window_pos(0, 0)
+}
+
+function cursor_contents() {
+    im_set_window_pos(0, 64)
+}
+
+function cursor_bottom(height) {
+    im_set_window_pos(0, height-63)
+}
+
+function nav_bar(id, height) {
+    cursor_top(height)
+    if(im_begin_frame(id, 64, height, 0)) {
+        im_end_frame()
+    }
+}
+
+function bottom_bar(id, height, width) {
+    cursor_bottom(height)
+    if(im_begin_frame(id, width, 64, 0)) {
+        im_end_frame()
+    }
+}
+
 function ui_main() {
     im_push_color(ImGuiCol_Separator,        COLOR_SEPERATOR)
 	im_push_color(ImGuiCol_SeparatorActive,  COLOR_SEPERATOR)
