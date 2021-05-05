@@ -4,28 +4,44 @@ ctx.width = 1287
 ctx.height = 780
 ctx.title = "Parsec"
 ctx.api = MTY_GFX_D3D11
+ctx.page = 1
 
 // ABGR
 let COLOR_TEXT = 0xFEEEEEEE
 let COLOR_LABEL = 0xFFAAAAAA
 let COLOR_BUTTON = 0xFF555555
+let COLOR_BUTTON_HOVER = 0xFF3B383A
+let COLOR_BUTTON_PRESS = 0xFF2E2C2C
 let COLOR_BORDER = 0xF84F4F4F
 let COLOR_DARK_BG = 0xFF2A2929
 let COLOR_DARK_FRAME = 0xFF242221
 let COLOR_MSG_BG = 0xD1333333
 let COLOR_HOVER = 0xF7777777
 let COLOR_SEPERATOR = 0xFF3A3838
+let COLOR_SCROLL = 0xFF3A3838
+
+function clamp(val, min, max) {
+    return Math.max(min, Math.min(max, val))
+}
 
 function cursor_top() {
     im_set_window_pos(0, 0)
 }
 
 function cursor_contents() {
-    im_set_window_pos(0, 64)
+    im_set_window_pos(64, 65)
 }
 
 function cursor_bottom(height, offset) {
     im_set_window_pos(0, height-offset)
+}
+
+function button(text, w, h) {
+    if (im_button(text, w, h)) {
+        return true
+    } else {
+        return false
+    }
 }
 
 function user_panel(width) {
@@ -38,12 +54,32 @@ function user_panel(width) {
     im_pop_color(1)
 }
 
-function contents_panel(width, height) {
+function contents_panel(width, height, smallMode) {
     im_push_color(ImGuiCol_FrameBg, 0x000000) // Transparent Frame
     cursor_contents()
-    if(im_begin_frame(1, width, height-128, 0)) {
+    let framewidth = width-64
+    let sections = clamp(Math.floor((framewidth-108)/240),0, 5)
+    let contentwidth = (sections)*240
+    let marginwidth = framewidth - (contentwidth + 65)
+    
+    im_push_style_f(ImGuiStyleVar_ChildRounding,  10)
+    im_push_style_f2(ImGuiStyleVar_FramePadding,  marginwidth/2, 0)
+    if(im_begin_frame(1, framewidth, height-129, 0)) {
+        im_pop_style(1)
+        
+        //Example Content
+        im_push_color(ImGuiCol_FrameBg, 0xFF121212) // InnerFrame
+        if(im_begin_frame(4, contentwidth+65, 200, 0)) {
+            button(`width for ${sections} computers`, 200, 32)
+            im_end_frame()
+        }
+        im_pop_color(1)
+
         im_end_frame()
+    } else {
+        im_pop_style(1)
     }
+    im_pop_style(1)
     im_pop_color(1)
 }
 
@@ -51,18 +87,40 @@ function nav_bar(height, width, smallMode) {
     if (smallMode) {
         cursor_bottom(height, 64)
         if(im_begin_frame(3, width, 64, 0)) {
+            
             im_end_frame()
         }
     } else {
         cursor_top(height)
+        im_push_style_f2(ImGuiStyleVar_ButtonTextAlign,  0.5, 0.5)
+        im_push_style_f2(ImGuiStyleVar_ItemSpacing,  16, 28)
+        im_push_style_f2(ImGuiStyleVar_FramePadding,  16, (height/2 - 32*3 - 28*2.5))
         if(im_begin_frame(3, 64, height, 0)) {
+            im_pop_style(1)
+            if (button("C", 32, 32)) {
+                ctx.page = 1
+            } else if (button("A", 32, 32)) {
+                ctx.page = 2
+            } else if (button("S", 32, 32)) {
+                ctx.page = 3
+            } else if (button("F", 32, 32)) {
+
+            } else if (button("?", 32, 32)) {
+
+            } else if (button("X", 32, 32)) {
+
+            }
             im_end_frame()
+        } else {
+            im_pop_style(1)
         }
+        im_pop_style(2)
     }
 }
 
 function bottom_bar(height, width, smallMode) {
     if (!smallMode) {
+        im_separator()
         cursor_bottom(height, 63)
         if(im_begin_frame(2, width, 64, 0)) {
             im_end_frame()
@@ -86,10 +144,14 @@ function ui_main() {
 	im_push_color(ImGuiCol_Header,           COLOR_DARK_BG)
 	im_push_color(ImGuiCol_HeaderHovered,    COLOR_HOVER)
 	im_push_color(ImGuiCol_HeaderActive,     COLOR_DARK_BG)
-	im_push_color(ImGuiCol_Button,           COLOR_BUTTON)
-	im_push_color(ImGuiCol_ButtonHovered,    COLOR_HOVER)
-	im_push_color(ImGuiCol_ButtonActive,     COLOR_BUTTON)
+	im_push_color(ImGuiCol_Button,           COLOR_DARK_FRAME)
+	im_push_color(ImGuiCol_ButtonHovered,    COLOR_BUTTON_HOVER)
+	im_push_color(ImGuiCol_ButtonActive,     COLOR_BUTTON_PRESS)
 	im_push_color(ImGuiCol_NavHighlight,     COLOR_BORDER)
+	im_push_color(ImGuiCol_ScrollbarBg,      COLOR_DARK_BG)
+	im_push_color(ImGuiCol_ScrollbarGrab,    COLOR_SCROLL)
+	im_push_color(ImGuiCol_ScrollbarGrabHovered, COLOR_SCROLL)
+	im_push_color(ImGuiCol_ScrollbarGrabActive,  COLOR_SCROLL)
     
     im_push_style_f(ImGuiStyleVar_ScrollbarSize,    im_scale()*12)
 	im_push_style_f(ImGuiStyleVar_WindowBorderSize, 0)
@@ -112,7 +174,7 @@ function ui_main() {
         user_panel(size.width)
 
         // Main Contents
-        contents_panel(size.width, size.height)
+        contents_panel(size.width, size.height, smallMode)
         
         bottom_bar(size.height, size.width, smallMode)
         nav_bar(size.height, size.width, smallMode)
@@ -120,7 +182,7 @@ function ui_main() {
         im_end_window()
     }
 
-    im_pop_color(19)
+    im_pop_color(23)
     im_pop_style(7)
 }
 
