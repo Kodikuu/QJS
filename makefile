@@ -1,6 +1,7 @@
 INCLUDES = \
 	-Iincludes \
-	-Isrc
+	-Isrc \
+	-Ideps/imgui
 
 LIBS = \
 	deps/matoya.lib \
@@ -34,14 +35,21 @@ CFILES =  \
 	src/utils.c \
 	src/libmatoya.c \
 	src/libparsec.c \
-	src/libmtymap.c
+	src/libmtymap.c \
+	src/libimgui.c \
+
+CPPFiles = \
+	deps/imgui/im.cpp
+
 
 OBJS = \
 	main.o \
 	utils.o \
 	libmatoya.o \
 	libparsec.o \
-	libmtymap.o
+	libmtymap.o \
+	libimgui.o \
+	im.o
 
 INCLUDES = \
 	-Iincludes \
@@ -51,9 +59,13 @@ FLAGS = \
 	-Os \
 	-march=native
 
-
 CFLAGS = $(INCLUDES) $(FLAGS)
 
 all:
-   clang $(CFILES) $(CFLAGS) -c
-   link $(OBJS) $(LIBS)
+	del $(OBJS)
+	del main.exe
+	clang $(CFILES) $(CPPFiles) $(CFLAGS) -c
+	link $(OBJS) $(LIBS) /NOLOGO
+
+run:
+	main.exe

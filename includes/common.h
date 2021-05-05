@@ -3,6 +3,7 @@
 #include "matoya.h"
 #include "quickjs.h"
 #include "parsec.h"
+#include "../deps/imgui/im.h"
 
 typedef struct Context {
 	// Matoya
@@ -19,6 +20,7 @@ typedef struct Context {
 	JSValueConst logFunc;
 	JSValueConst crashFunc;
 	JSValueConst writeFunc;
+	JSValueConst im_root;
 } Context;
 
 

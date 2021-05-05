@@ -1872,7 +1872,7 @@ static JSValue js_mty_window_has_ui_texture(JSContext* jsctx, JSValueConst this_
     uint32_t window = JSToInt32(jsctx, argv[1]);
     uint32_t id = JSToInt32(jsctx, argv[2]);
     
-    bool has = MTY_WindowHasUITexture(app, window, id);
+    bool has = MTY_WindowHasUITexture(app, window, IM_FONT_ID);
     return JS_NewBool(jsctx, has);
 }
 
@@ -1891,7 +1891,7 @@ static JSValue js_mty_window_set_ui_texture(JSContext* jsctx, JSValueConst this_
     uint32_t width = JSToInt32(jsctx, argv[4]);
     uint32_t height = JSToInt32(jsctx, argv[5]);
 
-    bool ret = MTY_WindowSetUITexture(app, window, id, rgba, width, height);
+    bool ret = MTY_WindowSetUITexture(app, window, IM_FONT_ID, rgba, width, height);
     return JS_NewBool(jsctx, ret);
 }
 
@@ -3439,7 +3439,7 @@ static JSValue js_print(JSContext* ctx, JSValueConst this_val, int argc, JSValue
     JS_RunGC(rt);
 
     const char* string = JS_ToCString(ctx, argv[0]);
-    printf("- [lib] \"%s\"\n", string);
+    printf("%s", string);
     return JS_NewInt32(ctx, strlen(string)); // length of string
 }
 
