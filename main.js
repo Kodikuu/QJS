@@ -73,13 +73,15 @@ function ui_main() {
 
     let size = MTY_WindowGetSize(ctx.app, ctx.mainWindow)
 
+    let smallMode = size.width <= 768
+
     im_set_window_size(size.width+8, size.height)
     im_set_window_pos(-4, 0)
     // Background
     if (im_begin_window("Main", ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize)) {
         
         // Top Panel
-        im_set_window_pos(0, 0)
+        cursor_top()
         im_push_color(ImGuiCol_FrameBg, 0x000000) // Transparent Frame
         if (im_begin_frame(1000, size.width, 64, 0)) {
             im_end_frame()
@@ -87,27 +89,27 @@ function ui_main() {
         }
 
         // Main Contents
-        im_set_window_pos(0, 64)
+        cursor_contents()
         if(im_begin_frame(1, size.width, size.height-128, 0)) {
             im_end_frame()
         }
-        im_separator()
         im_pop_color(1) // Pop transparent frame
         
         // Bottom panel
-        im_set_window_pos(0, size.height-63)
-        if(im_begin_frame(2, size.width, 64, 0)) {
-            im_end_frame()
-        }
+        if (!smallMode) {
+            im_separator()
+            bottom_bar(2, size.height, size.width)
 
-        // Nav panel
-        im_set_window_pos(0, 0)
-        if(im_begin_frame(3, 64, size.height, 0)) {
-            im_end_frame()
+            // Nav panel
+            nav_bar(3, size.height)
+        } else {
+
+            // Nav panel
+            bottom_bar(3, size.height, size.width)
+
         }
         im_end_window()
     } else {
-        print("Fail")
     }
 
     im_pop_color(19)
