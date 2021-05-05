@@ -159,6 +159,8 @@ function main() {
     winDesc.width = ctx.width
     winDesc.height = ctx.height
     winDesc.title = ctx.title
+    winDesc.minWidth = 640
+    winDesc.minHeight = 480
     winDesc.api = ctx.api
     ctx.mainWindow = MTY_WindowCreate(ctx.app, winDesc)
     MTY_WindowMakeCurrent(ctx.app, ctx.mainWindow, true)
