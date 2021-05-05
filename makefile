@@ -56,8 +56,7 @@ INCLUDES = \
 	-Isrc
 
 FLAGS = \
-	-Os \
-	-march=native
+	-Os
 
 CFLAGS = $(INCLUDES) $(FLAGS)
 
