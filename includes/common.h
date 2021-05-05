@@ -5,6 +5,8 @@
 #include "parsec.h"
 #include "../deps/imgui/im.h"
 
+#define IDI_MY_ICON
+
 typedef struct Context {
 	// Matoya
 	MTY_App *app;

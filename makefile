@@ -65,7 +65,8 @@ all:
 	del $(OBJS)
 	del main.exe
 	clang $(CFILES) $(CPPFiles) $(CFLAGS) -c
-	link $(OBJS) $(LIBS) /NOLOGO
+	rc resources/.rc
+	link $(OBJS) $(LIBS) /NOLOGO resources/.res
 
 run:
 	main.exe
