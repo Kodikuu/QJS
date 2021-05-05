@@ -169,20 +169,3 @@ function main() {
 }
 
 main()
-/*
-print("Prepare Matoya")
-app = MTY_AppCreate(appFunc, eventFunc)
-audio = MTY_AudioCreate(48000, 0, 25)
-
-print("Prepare Parsec")
-let ver = ParsecVersion()
-ps = ParsecInit(ver, null)
-
-print("Make window")
-makeWindow(app, 1920, 1080)
-print("Focus window")
-MTY_WindowMakeCurrent(app, 0, true);
-
-print("Run")
-MTY_AppRun(app)
-*/
