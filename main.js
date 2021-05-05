@@ -24,21 +24,49 @@ function cursor_contents() {
     im_set_window_pos(0, 64)
 }
 
-function cursor_bottom(height) {
-    im_set_window_pos(0, height-63)
+function cursor_bottom(height, offset) {
+    im_set_window_pos(0, height-offset)
 }
 
-function nav_bar(id, height) {
-    cursor_top(height)
-    if(im_begin_frame(id, 64, height, 0)) {
+function user_panel(width) {
+    cursor_top()
+    im_push_color(ImGuiCol_FrameBg, 0x000000) // Transparent Frame
+    if (im_begin_frame(1000, width, 64, 0)) {
         im_end_frame()
+        im_separator()
+    }
+    im_pop_color(1)
+}
+
+function contents_panel(width, height) {
+    im_push_color(ImGuiCol_FrameBg, 0x000000) // Transparent Frame
+    cursor_contents()
+    if(im_begin_frame(1, width, height-128, 0)) {
+        im_end_frame()
+    }
+    im_pop_color(1)
+}
+
+function nav_bar(height, width, smallMode) {
+    if (smallMode) {
+        cursor_bottom(height, 64)
+        if(im_begin_frame(3, width, 64, 0)) {
+            im_end_frame()
+        }
+    } else {
+        cursor_top(height)
+        if(im_begin_frame(3, 64, height, 0)) {
+            im_end_frame()
+        }
     }
 }
 
-function bottom_bar(id, height, width) {
-    cursor_bottom(height)
-    if(im_begin_frame(id, width, 64, 0)) {
-        im_end_frame()
+function bottom_bar(height, width, smallMode) {
+    if (!smallMode) {
+        cursor_bottom(height, 63)
+        if(im_begin_frame(2, width, 64, 0)) {
+            im_end_frame()
+        }
     }
 }
 
@@ -78,38 +106,18 @@ function ui_main() {
     im_set_window_size(size.width+8, size.height)
     im_set_window_pos(-4, 0)
     // Background
-    if (im_begin_window("Main", ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (im_begin_window("Main", ImGuiWindowFlags_NoDecoration)) {
         
         // Top Panel
-        cursor_top()
-        im_push_color(ImGuiCol_FrameBg, 0x000000) // Transparent Frame
-        if (im_begin_frame(1000, size.width, 64, 0)) {
-            im_end_frame()
-            im_separator()
-        }
+        user_panel(size.width)
 
         // Main Contents
-        cursor_contents()
-        if(im_begin_frame(1, size.width, size.height-128, 0)) {
-            im_end_frame()
-        }
-        im_pop_color(1) // Pop transparent frame
+        contents_panel(size.width, size.height)
         
-        // Bottom panel
-        if (!smallMode) {
-            im_separator()
-            bottom_bar(2, size.height, size.width)
-
-            // Nav panel
-            nav_bar(3, size.height)
-        } else {
-
-            // Nav panel
-            bottom_bar(3, size.height, size.width)
-
-        }
+        bottom_bar(size.height, size.width, smallMode)
+        nav_bar(size.height, size.width, smallMode)
+    
         im_end_window()
-    } else {
     }
 
     im_pop_color(19)
