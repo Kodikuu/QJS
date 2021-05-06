@@ -2,7 +2,7 @@
 
 #include "matoya.h"
 #include "quickjs.h"
-#include "parsec.h"
+#include "parsec-dso.h"
 #include "../deps/imgui/im.h"
 
 #define IDI_MY_ICON
@@ -12,6 +12,9 @@ typedef struct Context {
 	MTY_App *app;
 	MTY_Audio *audio;
 	bool running;
+
+	// Parsec
+	const char *dllPath;
 
 	// QuickJS
 	JSRuntime *jsrt;

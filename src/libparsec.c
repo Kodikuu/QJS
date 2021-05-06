@@ -1,4 +1,5 @@
 #include "libparsec.h"
+#include "parsec_embed.h"
 #include "utils.h"
 
 // Objects
@@ -1277,14 +1278,19 @@ static JSValue js_parsecinit(JSContext* jsctx, JSValueConst this_val, int argc, 
         return JS_EXCEPTION;
     }
 
-    Parsec *ps;
-    uint32_t ver = JSToInt32(jsctx, argv[0]);
+    Context *ctx = JS_GetContextOpaque(jsctx);
+
+    ParsecDSO *ps;
+    char *path = (char *)JS_ToCString(jsctx, argv[0]);
+
+	ctx->dllPath = MTY_JoinPath(MTY_GetPathPrefix(MTY_GetProcessPath()), path);
+	MTY_WriteFile(ctx->dllPath, p32_data, p32_size);
 
     if (JS_IsObject(argv[1])) {
-        const ParsecConfig cfg = convCParsecConfig(jsctx, argv[1]);
-        ParsecInit(ver, &cfg, NULL, &ps);
+        ParsecConfig cfg = convCParsecConfig(jsctx, argv[1]);
+        ParsecInit(&cfg, NULL, path, &ps);
     } else {
-        ParsecInit(ver, NULL, NULL, &ps);
+        ParsecInit(NULL, NULL, path, &ps);
     }
     
     return JS_NewBigInt64(jsctx, (uint64_t)ps);
@@ -1295,9 +1301,13 @@ static JSValue js_parsecdestroy(JSContext* jsctx, JSValueConst this_val, int arg
     if (argc != 1) {
         return JS_EXCEPTION;
     }
+    
+    Context *ctx = JS_GetContextOpaque(jsctx);
 
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
     ParsecDestroy(ps);
+
+    MTY_DeleteFile(ctx->dllPath);
     
     return JS_NewBool(jsctx, 1);
 }
@@ -1308,7 +1318,7 @@ static JSValue js_parsecgetconfig(JSContext* jsctx, JSValueConst this_val, int a
         return JS_EXCEPTION;
     }
 
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
     ParsecConfig cfg;
     ParsecGetConfig(ps, &cfg);
     
@@ -1321,50 +1331,53 @@ static JSValue js_parsecgetbuffer(JSContext* jsctx, JSValueConst this_val, int a
         return JS_EXCEPTION;
     }
 
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
     uint32_t key = JSToInt32(jsctx, argv[1]);
     const char *string = ParsecGetBuffer(ps, key);
 
     JSValue retval = JS_NewString(jsctx, string);
-    ParsecFree((void*)string);
+    ParsecFree(ps, (void*)string);
     
     return retval;
 }
 
 static JSValue js_parsecsetlogcallback(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
-    if (argc != 1) {
+    if (argc != 2) {
         return JS_EXCEPTION;
     }
 
     Context *ctx = JS_GetContextOpaque(jsctx);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
 
-    ctx->logFunc = argv[0];
-    ParsecSetLogCallback(logFunc, ctx);
+    ctx->logFunc = argv[1];
+    ParsecSetLogCallback(ps, logFunc, ctx);
     
     return JS_NewBool(jsctx, 1);
 }
 
 static JSValue js_parsecversion(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
-    if (argc != 0) {
+    if (argc != 1) {
         return JS_EXCEPTION;
     }
 
-    uint32_t ver = ParsecVersion();
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
+    uint32_t ver = ParsecVersion(ps);
 
     return JS_NewUint32(jsctx, ver);
 }
 
 static JSValue js_parsecgetoutputs(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
-    if (argc != 0) {
+    if (argc != 1) {
         return JS_EXCEPTION;
     }
 
     ParsecOutput *outputs = MTY_Alloc(32, sizeof(ParsecOutput));
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
 
-    uint32_t count = ParsecGetOutputs(outputs, 32);
+    uint32_t count = ParsecGetOutputs(ps, outputs, 32);
     
     JSValue retval = JS_NewObject(jsctx);
     JS_SetPropertyStr(jsctx, retval, "count", JS_NewInt32(jsctx, count));
@@ -1381,13 +1394,14 @@ static JSValue js_parsecgetoutputs(JSContext* jsctx, JSValueConst this_val, int 
 
 static JSValue js_parsecgetdecoders(JSContext* jsctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
-    if (argc != 0) {
+    if (argc != 1) {
         return JS_EXCEPTION;
     }
 
     ParsecDecoder *decoders = MTY_Alloc(32, sizeof(ParsecDecoder));
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
 
-    uint32_t count = ParsecGetDecoders(decoders, 32);
+    uint32_t count = ParsecGetDecoders(ps, decoders, 32);
     
     JSValue retval = JS_NewObject(jsctx);
     JS_SetPropertyStr(jsctx, retval, "count", JS_NewInt32(jsctx, count));
@@ -1408,7 +1422,7 @@ static JSValue js_parsecclientconnect(JSContext* jsctx, JSValueConst this_val, i
         return JS_EXCEPTION;
     }
     
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
     const char *session = JS_ToCString(jsctx, argv[2]);
     const char *peer = JS_ToCString(jsctx, argv[3]);
 
@@ -1429,7 +1443,7 @@ static JSValue js_parsecclientdisconnect(JSContext* jsctx, JSValueConst this_val
         return JS_EXCEPTION;
     }
 
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
 
     ParsecClientDisconnect(ps);
     
@@ -1442,7 +1456,7 @@ static JSValue js_parsecclientgetstatus(JSContext* jsctx, JSValueConst this_val,
         return JS_EXCEPTION;
     }
 
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
     
     ParsecClientStatus status;
 
@@ -1460,7 +1474,7 @@ static JSValue js_parsecclientgetguests(JSContext* jsctx, JSValueConst this_val,
         return JS_EXCEPTION;
     }
 
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
     ParsecGuest *guests;
 
     uint32_t count = ParsecClientGetGuests(ps, &guests);
@@ -1473,7 +1487,7 @@ static JSValue js_parsecclientgetguests(JSContext* jsctx, JSValueConst this_val,
         JS_SetPropertyInt64(jsctx, retval, i, convJSParsecGuest(jsctx, guests[i]));
     }
 
-    ParsecFree(guests);
+    ParsecFree(ps, guests);
 
     return retval;
 }
@@ -1484,7 +1498,7 @@ static JSValue js_parsecclientsetconfig(JSContext* jsctx, JSValueConst this_val,
         return JS_EXCEPTION;
     }
     
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
 
     ParsecStatus ret;
     if (JS_IsObject(argv[1])) {
@@ -1503,7 +1517,7 @@ static JSValue js_parsecclientsetdimensions(JSContext* jsctx, JSValueConst this_
         return JS_EXCEPTION;
     }
     
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
     uint8_t stream = JSToInt32(jsctx, argv[1]);
     uint32_t width = JSToInt32(jsctx, argv[2]);
     uint32_t height = JSToInt32(jsctx, argv[3]);
@@ -1524,7 +1538,7 @@ static JSValue js_parsecclientpollaudio(JSContext* jsctx, JSValueConst this_val,
 
     Context *ctx = JS_GetContextOpaque(jsctx);
 
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
     ctx->audioFunc = argv[1];
     uint32_t timeout = JSToInt32(jsctx, argv[2]);
 
@@ -1539,7 +1553,7 @@ static JSValue js_parsecclientpollevents(JSContext* jsctx, JSValueConst this_val
         return JS_EXCEPTION;
     }
     
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
     uint32_t timeout = JSToInt32(jsctx, argv[1]);
     
     ParsecClientEvent event;
@@ -1557,7 +1571,7 @@ static JSValue js_parsecclientglrenderframe(JSContext* jsctx, JSValueConst this_
         return JS_EXCEPTION;
     }
     
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
     int8_t stream = JSToInt32(jsctx, argv[1]);
     uint32_t timeout = JSToInt32(jsctx, argv[2]);
 
@@ -1577,7 +1591,7 @@ static JSValue js_parsecclientgldestroy(JSContext* jsctx, JSValueConst this_val,
         return JS_EXCEPTION;
     }
     
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
     int8_t stream = JSToInt32(jsctx, argv[1]);
 
     ParsecClientGLDestroy(ps, stream);
@@ -1590,7 +1604,7 @@ static JSValue js_parsecclientsendmessage(JSContext* jsctx, JSValueConst this_va
         return JS_EXCEPTION;
     }
 
-    Parsec *ps = (Parsec *)JSToInt64(jsctx, argv[0]);
+    ParsecDSO *ps = (ParsecDSO *)JSToInt64(jsctx, argv[0]);
     const ParsecMessage message = convCParsecMessage(jsctx, argv[1]);
     
     ParsecStatus ret = ParsecClientSendMessage(ps, &message);
@@ -2123,10 +2137,10 @@ static const JSCFunctionListEntry js_parsec_funcs[] = {
     JS_CFUNC_DEF("ParsecDestroy", 1, js_parsecinit),
     JS_CFUNC_DEF("ParsecGetConfig", 1, js_parsecgetconfig),
     JS_CFUNC_DEF("ParsecGetBuffer", 2, js_parsecgetbuffer),
-    JS_CFUNC_DEF("ParsecSetLogCallback", 1, js_parsecsetlogcallback),
-    JS_CFUNC_DEF("ParsecVersion", 0, js_parsecversion),
-    JS_CFUNC_DEF("ParsecGetOutputs", 0, js_parsecgetoutputs),
-    JS_CFUNC_DEF("ParsecGetDecoders", 0, js_parsecgetdecoders),
+    JS_CFUNC_DEF("ParsecSetLogCallback", 2, js_parsecsetlogcallback),
+    JS_CFUNC_DEF("ParsecVersion", 1, js_parsecversion),
+    JS_CFUNC_DEF("ParsecGetOutputs", 1, js_parsecgetoutputs),
+    JS_CFUNC_DEF("ParsecGetDecoders", 1, js_parsecgetdecoders),
     JS_CFUNC_DEF("ParsecClientConnect", 4, js_parsecclientconnect),
     JS_CFUNC_DEF("ParsecClientDisconnect", 1, js_parsecclientdisconnect),
     JS_CFUNC_DEF("ParsecClientGetStatus", 1, js_parsecclientgetstatus),
