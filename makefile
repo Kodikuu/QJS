@@ -43,13 +43,13 @@ CPPFiles = \
 
 
 OBJS = \
-	main.o \
-	utils.o \
-	libmatoya.o \
-	libparsec.o \
-	libmtymap.o \
-	libimgui.o \
-	im.o
+	main.bc \
+	utils.bc \
+	libmatoya.bc \
+	libparsec.bc \
+	libmtymap.bc \
+	libimgui.bc \
+	im.bc
 
 INCLUDES = \
 	-Iincludes \
@@ -64,15 +64,14 @@ all:
 	@binary_to_compressed_c -nocompress main.js mainjs > includes/defaultjs.h
 	@binary_to_compressed_c -nocompress deps/parsec32.dll p32 > includes/parsec_embed.h
 
-	@clang $(CFILES) $(CPPFiles) $(CFLAGS) -c
+	@clang $(CFILES) $(CPPFiles) $(CFLAGS) -c -emit-llvm
 	@rc /nologo resources/.rc
 
 	@del debug.exe
-	@link $(OBJS) $(LIBS) /NOLOGO resources/.res  /SUBSYSTEM:Console /OUT:debug.exe
+	@lld-link $(OBJS) $(LIBS) /NOLOGO resources/.res  /SUBSYSTEM:Console /OUT:debug.exe /debug
 
 	@del release.exe
-	@link $(OBJS) $(LIBS) /NOLOGO resources/.res  /SUBSYSTEM:WINDOWS /OUT:release.exe
-	@strip release.exe
+	@lld-link $(OBJS) $(LIBS) /NOLOGO resources/.res  /SUBSYSTEM:WINDOWS /OUT:release.exe
 
 	@del $(OBJS)
 
