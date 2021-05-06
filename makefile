@@ -61,11 +61,20 @@ FLAGS = \
 CFLAGS = $(INCLUDES) $(FLAGS)
 
 all:
-	del $(OBJS)
-	del main.exe
-	clang $(CFILES) $(CPPFiles) $(CFLAGS) -c
-	rc resources/.rc
-	link $(OBJS) $(LIBS) /NOLOGO resources/.res
+	@binary_to_compressed_c -nocompress main.js mainjs > includes/defaultjs.h
+	@binary_to_compressed_c -nocompress deps/parsec32.dll p32 > includes/parsec_embed.h
+
+	@clang $(CFILES) $(CPPFiles) $(CFLAGS) -c
+	@rc /nologo resources/.rc
+
+	@del debug.exe
+	@link $(OBJS) $(LIBS) /NOLOGO resources/.res  /SUBSYSTEM:Console /OUT:debug.exe
+
+	@del release.exe
+	@link $(OBJS) $(LIBS) /NOLOGO resources/.res  /SUBSYSTEM:WINDOWS /OUT:release.exe
+	@strip release.exe
+
+	@del $(OBJS)
 
 run:
-	main.exe
+	debug.exe
