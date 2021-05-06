@@ -6,6 +6,8 @@ ctx.title = "Parsec"
 ctx.api = MTY_GFX_D3D11
 ctx.page = 1
 
+ctx.ps = 0
+
 // ABGR
 let COLOR_TEXT = 0xFEEEEEEE
 let COLOR_LABEL = 0xFFAAAAAA
@@ -225,6 +227,7 @@ function main() {
     ctx.app = MTY_AppCreate(appFunc, eventFunc)
 
     im_create()
+    ctx.ps = ParsecInit("parsec.dll", null)
 
     let winDesc = MTY_WindowDesc
     winDesc.width = ctx.width
@@ -237,8 +240,9 @@ function main() {
     MTY_WindowMakeCurrent(ctx.app, ctx.mainWindow, true)
     MTY_AppRun(ctx.app)
 
-    MTY_AppDestroy(ctx.app)
     im_destroy()
+    MTY_AppDestroy(ctx.app)
+    ParsecDestroy(ctx.ps)
+    ctx.ps = null
 }
-
 main()
