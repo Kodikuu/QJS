@@ -2134,7 +2134,7 @@ static const JSCFunctionListEntry js_parsec_funcs[] = {
 
 // Functions
     JS_CFUNC_DEF("ParsecInit", 2, js_parsecinit),
-    JS_CFUNC_DEF("ParsecDestroy", 1, js_parsecinit),
+    JS_CFUNC_DEF("ParsecDestroy", 1, js_parsecdestroy),
     JS_CFUNC_DEF("ParsecGetConfig", 1, js_parsecgetconfig),
     JS_CFUNC_DEF("ParsecGetBuffer", 2, js_parsecgetbuffer),
     JS_CFUNC_DEF("ParsecSetLogCallback", 2, js_parsecsetlogcallback),
