@@ -18,6 +18,12 @@
 	#define MTY_EXPORT
 #endif
 
+#if defined(__GNUC__)
+	#define MTY_FMT(a, b) __attribute__((format(printf, a, b)))
+#else
+	#define MTY_FMT(a, b)
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,16 +57,17 @@ typedef enum {
 
 /// @brief Raw image color formats.
 typedef enum {
-	MTY_COLOR_FORMAT_UNKNOWN = 0, ///< Unknown color format.
-	MTY_COLOR_FORMAT_RGBA    = 1, ///< 8-bits per channel RGBA.
-	MTY_COLOR_FORMAT_NV12    = 2, ///< 4:2:0 full W/H Y plane followed by an interleaved half
-	                              ///<   W/H UV plane.
-	MTY_COLOR_FORMAT_I420    = 3, ///< 4:2:0 full W/H Y plane followed by a half W/H U plane
-	                              ///<   followed by a half W/H V plane.
-	MTY_COLOR_FORMAT_I444    = 4, ///< 4:4:4 full W/H consecutive Y, U, V planes.
-	MTY_COLOR_FORMAT_NV16    = 5, ///< 4:2:2 full W/H Y plane followed by an interleaved half W
-	                              ///<   full H UV plane.
-	MTY_COLOR_FORMAT_RGB565  = 6, ///< 5-bits red, 6-bits green, 5-bits blue RGBA.
+	MTY_COLOR_FORMAT_UNKNOWN  = 0, ///< Unknown color format.
+	MTY_COLOR_FORMAT_BGRA     = 1, ///< 8-bits per channel BGRA.
+	MTY_COLOR_FORMAT_NV12     = 2, ///< 4:2:0 full W/H Y plane followed by an interleaved half
+	                               ///<   W/H UV plane.
+	MTY_COLOR_FORMAT_I420     = 3, ///< 4:2:0 full W/H Y plane followed by a half W/H U plane
+	                               ///<   followed by a half W/H V plane.
+	MTY_COLOR_FORMAT_I444     = 4, ///< 4:4:4 full W/H consecutive Y, U, V planes.
+	MTY_COLOR_FORMAT_NV16     = 5, ///< 4:2:2 full W/H Y plane followed by an interleaved half W
+	                               ///<   full H UV plane.
+	MTY_COLOR_FORMAT_BGR565   = 6, ///< 5-bits blue, 6-bits green, 5-bits red.
+	MTY_COLOR_FORMAT_BGRA5551 = 7, ///< 5-bits per BGR channels, 1-bit alpha.
 	MTY_COLOR_FORMAT_MAKE_32 = INT32_MAX,
 } MTY_ColorFormat;
 
@@ -68,8 +75,8 @@ typedef enum {
 typedef enum {
 	MTY_FILTER_NEAREST        = 0, ///< Nearest neighbor filter by the GPU, can cause shimmering.
 	MTY_FILTER_LINEAR         = 1, ///< Bilinear filter by the GPU, can cause noticeable blurring.
-	MTY_FILTER_GAUSSIAN_SHARP = 2, ///< A softer nearest neighbor filter applied via shader.
-	MTY_FILTER_GAUSSIAN_SOFT  = 3, ///< A sharper bilinear filter applied via shader.
+	MTY_FILTER_GAUSSIAN_SOFT  = 2, ///< A softer nearest neighbor filter applied via shader.
+	MTY_FILTER_GAUSSIAN_SHARP = 3, ///< A sharper bilinear filter applied via shader.
 	MTY_FILTER_MAKE_32        = INT32_MAX,
 } MTY_Filter;
 
@@ -227,6 +234,10 @@ MTY_RendererHasUITexture(MTY_Renderer *ctx, uint32_t id);
 /// @returns The number of graphics APIs set in `apis`.
 MTY_EXPORT uint32_t
 MTY_GetAvailableGFX(MTY_GFX *apis);
+
+/// @brief Get the default graphics API for the current OS.
+MTY_EXPORT MTY_GFX
+MTY_GetDefaultGFX(void);
 
 /// @brief Get the current rendering context state.
 /// @details This function can be used to snapshot the current context state before
@@ -1067,6 +1078,12 @@ MTY_WindowGetScreenSize(MTY_App *app, MTY_Window window, uint32_t *width,
 MTY_EXPORT float
 MTY_WindowGetScreenScale(MTY_App *app, MTY_Window window);
 
+/// @brief Get the refresh rate of the display where the window currently resides.
+/// @param app The MTY_App.
+/// @param window An MTY_Window.
+MTY_EXPORT uint32_t
+MTY_WindowGetRefreshRate(MTY_App *app, MTY_Window window);
+
 /// @brief Set the window's title.
 /// @param app The MTY_App.
 /// @param window An MTY_Window.
@@ -1470,7 +1487,7 @@ MTY_HasDialogs(void);
 /// @param ... Variable arguments as specified by `fmt`.
 //- #support Windows macOS
 MTY_EXPORT void
-MTY_ShowMessageBox(const char *title, const char *fmt, ...);
+MTY_ShowMessageBox(const char *title, const char *fmt, ...) MTY_FMT(2, 3);
 
 
 //- #module File
@@ -1545,7 +1562,7 @@ MTY_WriteFile(const char *path, const void *buf, size_t size);
 /// @param ... Variable arguments as specified by `fmt`.
 /// @returns Returns true on success, false on failure. Call MTY_GetLog for details.
 MTY_EXPORT bool
-MTY_WriteTextFile(const char *path, const char *fmt, ...);
+MTY_WriteTextFile(const char *path, const char *fmt, ...) MTY_FMT(2, 3);
 
 /// @brief Append formatted text to a file.
 /// @details This function appends to the file in text mode.\n\n
@@ -1556,7 +1573,7 @@ MTY_WriteTextFile(const char *path, const char *fmt, ...);
 /// @param ... Variable arguments as specified by `fmt`.
 /// @returns Returns true on success, false on failure. Call MTY_GetLog for details.
 MTY_EXPORT bool
-MTY_AppendTextToFile(const char *path, const char *fmt, ...);
+MTY_AppendTextToFile(const char *path, const char *fmt, ...) MTY_FMT(2, 3);
 
 /// @brief Delete a file.
 /// @param path Path to the file.
@@ -1611,6 +1628,12 @@ MTY_GetDir(MTY_Dir dir);
 /// @returns This buffer is allocated in thread local storage and must not be freed.
 MTY_EXPORT const char *
 MTY_GetFileName(const char *path, bool extension);
+
+/// @brief Parse a path and extract the file extension.
+/// @param path Path to a file.
+/// @returns This buffer is allocated in thread local storage and must not be freed.
+MTY_EXPORT const char *
+MTY_GetFileExtension(const char *path);
 
 /// @brief Get all but the final component of a path.
 /// @param path Path to a file or directory.
@@ -2105,7 +2128,7 @@ MTY_DisableLog(bool disabled);
 /// @param fmt Format string.
 /// @param ... Variable arguments as specified by `fmt`.
 MTY_EXPORT void
-MTY_LogParams(const char *func, const char *fmt, ...);
+MTY_LogParams(const char *func, const char *fmt, ...) MTY_FMT(2, 3);
 
 /// @brief Log a formatted string then abort.
 /// @details This function is intended to be called internally via the
@@ -2115,7 +2138,7 @@ MTY_LogParams(const char *func, const char *fmt, ...);
 /// @param fmt Format string.
 /// @param ... Variable arguments as specified by `fmt`.
 MTY_EXPORT void
-MTY_LogFatalParams(const char *func, const char *fmt, ...);
+MTY_LogFatalParams(const char *func, const char *fmt, ...) MTY_FMT(2, 3);
 
 
 //- #module Memory
@@ -2228,7 +2251,18 @@ MTY_VsprintfD(const char *fmt, va_list args);
 /// @returns This function can not return NULL. It will call `abort()` on failure.\n\n
 ///   The returned buffer must be destroyed with MTY_Free.
 MTY_EXPORT char *
-MTY_SprintfD(const char *fmt, ...);
+MTY_SprintfD(const char *fmt, ...) MTY_FMT(1, 2);
+
+/// @brief Dynamically format a string and put the result in thread local storage.
+/// @details For more information, see `snprintf` from the C standard library.\n\n
+///   Warning: Be careful with your format string, if it is incorrect this
+///   function will have undefined behavior.
+/// @param fmt Format string.
+/// @param ... Variable arguments as specified by `fmt`.
+/// @returns This function can not return NULL. It will call `abort()` on failure.\n\n
+///   This buffer is allocated in thread local storage and must not be freed.
+MTY_EXPORT const char *
+MTY_SprintfDL(const char *fmt, ...) MTY_FMT(1, 2);
 
 /// @brief Case insensitive string comparison.
 /// @details For more information, see `strcasecmp` from the C standard library.
@@ -2237,6 +2271,15 @@ MTY_SprintfD(const char *fmt, ...);
 /// @returns If the strings match, returns 0, otherwise a non-zero value.
 MTY_EXPORT int32_t
 MTY_Strcasecmp(const char *s0, const char *s1);
+
+/// @brief Case insensitive substring search.
+/// @details For more information, see `strcasestr` from the C standard library.
+/// @param s0 String to be scanned.
+/// @param s1 String containing the sequence of characters to match.
+/// @returns A pointer to the first occurrence in `s1` of the entire sequence of
+///   characters specified in `s0`, or NULL if the sequence is not present in `s0`.
+MTY_EXPORT char *
+MTY_Strcasestr(const char *s0, const char *s1);
 
 /// @brief Reentrant string tokenization.
 /// @details For more information, see `strtok_r` from the C standard library.
@@ -3125,6 +3168,11 @@ MTY_SOGetSymbol(MTY_SO *so, const char *name);
 MTY_EXPORT void
 MTY_SOUnload(MTY_SO **so);
 
+/// @brief Get the platform's shared object file extension.
+/// @returns This buffer is allocated in thread local storage and must not be freed.
+MTY_EXPORT const char *
+MTY_GetSOExtension(void);
+
 /// @brief Get the computer's hostname.
 /// @returns This buffer is allocated in thread local storage and must not be freed.
 MTY_EXPORT const char *
@@ -3150,7 +3198,10 @@ MTY_GetPlatformNoWeb(void);
 
 /// @brief Turn a platform integer into a readable string.
 /// @param platform Platform integer returned by MTY_GetPlatform or
-///   MTY_GetPlatformNoWeb.
+///   MTY_GetPlatformNoWeb. Bytes in the platform integer may be masked out to
+///   omit components of the string, i.e. a mask of 0xFFFF will create a string
+///   only with the version and not the OS, and a mask of 0xFF000000 will
+///   create a string only with the OS.
 /// @returns Example format would be `Windows 10.0`.\n\n
 ///   This buffer is allocated in thread local storage and must not be freed.
 MTY_EXPORT const char *
@@ -3167,6 +3218,11 @@ MTY_HandleProtocol(const char *uri, void *token);
 /// @returns This buffer is allocated in thread local storage and must not be freed.
 MTY_EXPORT const char *
 MTY_GetProcessPath(void);
+
+/// @brief Get the full base directory path to the current process executable.
+/// @returns This buffer is allocated in thread local storage and must not be freed.
+MTY_EXPORT const char *
+MTY_GetProcessDir(void);
 
 /// @brief Restart the current process.
 /// @details For more information, see `execv` from the C standard library.
