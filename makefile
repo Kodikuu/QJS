@@ -41,7 +41,6 @@ CFILES =  \
 CPPFiles = \
 	deps/imgui/im.cpp
 
-
 OBJS = \
 	main.bc \
 	utils.bc \
@@ -61,6 +60,8 @@ FLAGS = \
 CFLAGS = $(INCLUDES) $(FLAGS)
 
 all:
+	@del includes\defaultjs.h
+	@del includes\parsec_embed.h
 	@binary_to_compressed_c -nocompress main.js mainjs > includes/defaultjs.h
 	@binary_to_compressed_c -nocompress deps/parsec32.dll p32 > includes/parsec_embed.h
 
