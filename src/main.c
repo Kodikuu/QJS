@@ -25,7 +25,7 @@ static void prepareQuickJS(Context *ctx) {
 	JS_AddIntrinsicImgui(ctx->jsctx);
 }
 
-int main() {
+int main(int32_t argc, char *argv[]) {
 	Context ctx = {0};
 	ctx.running = true;
 
@@ -45,5 +45,25 @@ int main() {
 }
 
 int32_t WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int32_t nCmdShow) {
-	return main();
+	int32_t pNumArgs = 0;
+	LPWSTR *wargv = CommandLineToArgvW(GetCommandLineW(), &pNumArgs);
+
+	char **argv = MTY_Alloc(pNumArgs, sizeof(char *));
+	for (uint8_t i; i<pNumArgs; i++) {
+		char *dst = MTY_Alloc(wcslen(wargv[i]), sizeof(char));
+		if (MTY_WideToMulti(wargv[i], dst, wcslen(wargv[i]))) {
+			argv[i] = dst;
+		} else {
+			argv[i] = "";
+		}
+	}
+
+	int32_t ret = main(pNumArgs, argv);
+
+	for (uint8_t i; i<pNumArgs; i++) {
+		MTY_Free((void *)argv[i]);
+	}
+	MTY_Free((void *)argv);
+
+	return ret;
 }
