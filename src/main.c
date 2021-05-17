@@ -26,6 +26,7 @@ static void prepareQuickJS(Context *ctx) {
 }
 
 int main(int32_t argc, char *argv[]) {
+	SetProcessShutdownParameters(100, 0);
 	Context ctx = {0};
 	ctx.running = true;
 
